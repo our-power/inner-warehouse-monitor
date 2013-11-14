@@ -1297,6 +1297,9 @@ func (q *Reader) syncHandler(handler Handler) {
 			break
 		}
 
+        /*
+        检测该消息是否超过处理的重试次数，若已超过，则当作已处理，即放弃处理。
+        */
 		finishedMessage := q.checkMessageAttempts(message, handler)
 		if finishedMessage != nil {
 			message.responseChan <- finishedMessage
@@ -1347,6 +1350,9 @@ func (q *Reader) asyncHandler(handler AsyncHandler) {
 			break
 		}
 
+        /*
+        检测该消息是否超过处理的重试次数，若已超过，则当作已处理，即放弃处理。
+        */
 		finishedMessage := q.checkMessageAttempts(message, handler)
 		if finishedMessage != nil {
 			message.responseChan <- finishedMessage
@@ -1357,6 +1363,9 @@ func (q *Reader) asyncHandler(handler AsyncHandler) {
 	}
 }
 
+/*
+    检测该消息是否超过处理的重试次数，若已超过，则当作已处理，即放弃处理。
+*/
 func (q *Reader) checkMessageAttempts(message *Message, handler interface{}) *FinishedMessage {
 	// message passed the max number of attempts
 	if q.MaxAttemptCount > 0 && message.Attempts > q.MaxAttemptCount {
