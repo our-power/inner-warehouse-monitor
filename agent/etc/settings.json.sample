@@ -1,0 +1,16 @@
+{
+	"InModules":[
+		{"name":"cpu_usage", "bid":"1001", "interval":"300", "windows":"1", "linux":"1" },
+		{"name":"flow", "bid":"1002", "interval":"300", "windows":"1", "linux":"1" },
+		{"name":"mem_usage", "bid":"1003", "interval":"300", "windows":"1", "linux":"1" },
+		{"name":"disk_usable", "bid":"1004", "interval":"300", "windows":"1", "linux":"1" }
+	],
+	"OutModules":[
+		{"name":"sh_ecc_no", "url":"http://192.168.2.26:8080/data/server_view/api/data_collector.php", "host":"sh.ecc.com"}
+	],
+	"UpdateServer":[
+		{"name":"local", "url":"http://localhost:9090/update", "host":""}
+	],
+	"Hb":30,
+	"Update":3600
+}

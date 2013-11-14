@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title> Update Agent </title>
+</head>
+<body>
+输入IP列表
+<form action="/store" method="post">
+    <input type='hidden' name='files' value='{{.Files}}' />
+    <input type='hidden' name='version' value='{{.Version}}' />
+    <table>
+        <tr><th><label for="ips">IP（一行一个IP）</label></th></tr>
+        <tr><td><textarea id="ips" cols="40" rows="10" name="ips" ></textarea></td></tr>
+    </table>
+    <input type="submit" value="更新!" />
+</form>
+</body>
+</html>
