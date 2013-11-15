@@ -16,6 +16,9 @@ import (
 	"cpu_usage"
 	"mem_usage"
 	"net_flow"
+	"heartbeat"
+	"accessibility"
+	"register"
 )
 
 var (
@@ -157,6 +160,118 @@ func runNetFlowClient(nfh *net_flow.NetFlowHandler)(nfTodb *nsq.Reader, err erro
 	return
 }
 
+func runHeartBeatClient(hbh *heartbeat.HeartBeatHandler)(hbTodb *nsq.Reader, err error) {
+	hbTodb, err = nsq.NewReader("heartbeat", "todb")
+	if err != nil {
+		log.Fatalf(err.Error())
+	}
+	hbTodb.SetMaxInFlight(*maxInFlight)
+	hbTodb.SetMaxBackoffDuration(*maxBackoffDuration)
+	hbTodb.VerboseLogging = *verbose
+	hbTodb.AddHandler(hbh)
+
+	fmt.Println(nsqdTCPAddrs)
+	for _, addrString := range nsqdTCPAddrs {
+		err := hbTodb.ConnectToNSQ(addrString)
+		if err != nil {
+			log.Fatalf(err.Error())
+		}
+	}
+
+	for _, addrString := range lookupdHTTPAddrs {
+		log.Printf("lookupd addr %s", addrString)
+		err :=hbTodb.ConnectToLookupd(addrString)
+		if err != nil {
+			log.Fatalf(err.Error())
+		}
+	}
+	return
+}
+
+func runAccessibilityToDBClient(ath *accessibility.AccessibilityToDBHandler)(aTodb *nsq.Reader, err error) {
+	aTodb, err = nsq.NewReader("accessibility", "todb")
+	if err != nil {
+		log.Fatalf(err.Error())
+	}
+	aTodb.SetMaxInFlight(*maxInFlight)
+	aTodb.SetMaxBackoffDuration(*maxBackoffDuration)
+	aTodb.VerboseLogging = *verbose
+	aTodb.AddHandler(ath)
+
+	fmt.Println(nsqdTCPAddrs)
+	for _, addrString := range nsqdTCPAddrs {
+		err := aTodb.ConnectToNSQ(addrString)
+		if err != nil {
+			log.Fatalf(err.Error())
+		}
+	}
+
+	for _, addrString := range lookupdHTTPAddrs {
+		log.Printf("lookupd addr %s", addrString)
+		err :=aTodb.ConnectToLookupd(addrString)
+		if err != nil {
+			log.Fatalf(err.Error())
+		}
+	}
+	return
+}
+
+func runAccessibilityCheckClient(ach *accessibility.AccessibilityCheckHandler)(aCheck *nsq.Reader, err error) {
+	aCheck, err = nsq.NewReader("accessibility", "check_exception")
+	if err != nil {
+		log.Fatalf(err.Error())
+	}
+	aCheck.SetMaxInFlight(*maxInFlight)
+	aCheck.SetMaxBackoffDuration(*maxBackoffDuration)
+	aCheck.VerboseLogging = *verbose
+	aCheck.AddHandler(ach)
+
+	fmt.Println(nsqdTCPAddrs)
+	for _, addrString := range nsqdTCPAddrs {
+		err := aCheck.ConnectToNSQ(addrString)
+		if err != nil {
+			log.Fatalf(err.Error())
+		}
+	}
+
+	for _, addrString := range lookupdHTTPAddrs {
+		log.Printf("lookupd addr %s", addrString)
+		err :=aCheck.ConnectToLookupd(addrString)
+		if err != nil {
+			log.Fatalf(err.Error())
+		}
+	}
+	return
+}
+
+func runRegisterToDBClient(rh *register.RegisterToDBHandler)(registerTodb *nsq.Reader, err error) {
+	registerTodb, err = nsq.NewReader("register", "todb")
+	if err != nil {
+		log.Fatalf(err.Error())
+	}
+	registerTodb.SetMaxInFlight(*maxInFlight)
+	registerTodb.SetMaxBackoffDuration(*maxBackoffDuration)
+	registerTodb.VerboseLogging = *verbose
+	registerTodb.AddHandler(rh)
+
+	fmt.Println(nsqdTCPAddrs)
+	for _, addrString := range nsqdTCPAddrs {
+		err := registerTodb.ConnectToNSQ(addrString)
+		if err != nil {
+			log.Fatalf(err.Error())
+		}
+	}
+
+	for _, addrString := range lookupdHTTPAddrs {
+		log.Printf("lookupd addr %s", addrString)
+		err :=registerTodb.ConnectToLookupd(addrString)
+		if err != nil {
+			log.Fatalf(err.Error())
+		}
+	}
+	return
+}
+
 func main() {
 	flag.Parse()
 
@@ -190,6 +305,8 @@ func main() {
 		fmt.Println(err)
 		return
 	}
+
+	// 初始化各种指标的处理类
 	cpuUsageHandler, err := cpu_usage.NewCPUUsageHandler(dbLink)
 	if err != nil {
 		fmt.Println(err)
@@ -205,6 +322,27 @@ func main() {
 		fmt.Println(err)
 	}
 
+	heartBeatHandler, err := heartbeat.NewHeartBeatHandler(dbLink)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	accessibilityToDBHandler, err := accessibility.NewAccessibilityToDBHandler(dbLink)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	accessibilityCheckHandler, err := accessibility.NewAccessibilityCheckHandler(dbLink)
+	if err != nil{
+		fmt.Println(err)
+	}
+
+	registerToDBHandler, err := register.NewRegisterToDBHandler(dbLink)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	// 注册各种指标的处理类，各自连接到NSQ的某个channel
 	cuTodb, err := runCpuUsageClient(cpuUsageHandler)
 	if err != nil {
 		fmt.Println(err)
@@ -220,6 +358,26 @@ func main() {
 		fmt.Println(err)
 	}
 
+	hbTodb, err := runHeartBeatClient(heartBeatHandler)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	aTodb, err := runAccessibilityToDBClient(accessibilityToDBHandler)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	aCheck, err := runAccessibilityCheckClient(accessibilityCheckHandler)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	rTodb, err := runRegisterToDBClient(registerToDBHandler)
+	if err != nil {
+		fmt.Println(err)
+	}
+
 	for {
 		select {
 		case <-muTodb.ExitChan:
@@ -228,10 +386,22 @@ func main() {
 			return
 		case <-nfTodb.ExitChan:
 			return
+		case <-hbTodb.ExitChan:
+			return
+		case <-aTodb.ExitChan:
+			return
+		case <-aCheck.ExitChan:
+			return
+		case <-rTodb.ExitChan:
+			return
 		case <-termChan:
 			cuTodb.Stop()
 			muTodb.Stop()
 			nfTodb.Stop()
+			hbTodb.Stop()
+			aTodb.Stop()
+			aCheck.Stop()
+			rTodb.Stop()
 		}
 	}
 }
