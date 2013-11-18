@@ -73,6 +73,42 @@ func getDBLink(dbDriver string, dbSourceName string) (link *sql.DB, err error) {
 		if err != nil {
 			fmt.Println(err)
 		}
+
+		sql = `
+		CREATE TABLE heartbeat (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, date TEXT, time_index INTEGER, ip TEXT, host_name TEXT, hardware_addr TEXT, alive INTEGER NOT NULL);
+        DELETE FROM heartbeat;
+		`
+		_, err = link.Exec(sql)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		sql = `
+		CREATE TABLE register (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, date TEXT, time_index INTEGER, ip TEXT, host_name TEXT, hardware_addr TEXT, agent_version TEXT, machine_role TEXT);
+        DELETE FROM register;
+		`
+		_, err = link.Exec(sql)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		sql = `
+		CREATE TABLE ping_accessibility (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, date TEXT, time_index INTEGER, ip TEXT, host_name TEXT, hardware_addr TEXT, target_ip TEXT, response_time TEXT);
+        DELETE FROM ping_accessibility;
+		`
+		_, err = link.Exec(sql)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		sql = `
+		CREATE TABLE telnet_accessibility (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, date TEXT, time_index INTEGER, ip TEXT, host_name TEXT, hardware_addr TEXT, target_url TEXT, status TEXT);
+        DELETE FROM telnet_accessibility;
+		`
+		_, err = link.Exec(sql)
+		if err != nil {
+			fmt.Println(err)
+		}
 	}
 	return
 }
