@@ -1,0 +1,4 @@
+\Network interface(*)\bytes sent/sec
+\Network interface(*)\bytes received/sec
+\Network interface(*)\packets sent/sec
+\Network interface(*)\packets received/sec
