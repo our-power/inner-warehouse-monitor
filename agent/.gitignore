@@ -2,3 +2,5 @@
 *.ipr
 *.iws
 out/*
+settings.json
+README
