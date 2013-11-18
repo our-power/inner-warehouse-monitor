@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 	"strconv"
+	"time"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/bitly/go-nsq"
 )
@@ -26,10 +27,16 @@ func (h *AccessibilityToDBHandler) HandleMessage(m *nsq.Message) (err error) {
 	bodyParts := strings.Split(string(m.Body), "\r\n")
 	time_index, err := strconv.Atoi(bodyParts[1])
 	if bodyParts[5] == "1" {
-		sql := `
-		INSERT INTO ping_accessibility (date, time_index, ip, host_name, hardware_addr, target_ip, response_time) VALUES (?, ?, ?, ?, ?, ?, ?);
-		`
-		validData := bodyParts[6:]
+		tx, err := h.db.Begin()
+		if err != nil {
+			fmt.Println(err)
+		}
+		stmt, err := tx.Prepare("INSERT INTO ping_accessibility (date, time_index, ip, host_name, hardware_addr, target_ip, response_time) VALUES (?, ?, ?, ?, ?, ?, ?)")
+		if err != nil {
+			fmt.Println(err)
+		}
+		defer stmt.Close()
+		validData := bodyParts[6:len(bodyParts)-1]
 		for _, item := range validData {
 			targetAndPingResult := strings.Split(item, ",")
 			pingResult := strings.Split(targetAndPingResult[1], "=")
@@ -37,24 +44,34 @@ func (h *AccessibilityToDBHandler) HandleMessage(m *nsq.Message) (err error) {
 			if pingResult[0] == "ResponseTime" {
 				responseTime, err = strconv.Atoi(pingResult[1])
 			}
-			_, err = h.db.Exec(sql, bodyParts[0], time_index, bodyParts[2], bodyParts[3], bodyParts[4], targetAndPingResult[0], responseTime)
+			_, err = stmt.Exec(bodyParts[0], time_index, bodyParts[2], bodyParts[3], bodyParts[4], targetAndPingResult[0], responseTime)
 		}
 
+		tx.Commit()
 	}
 	if bodyParts[5] == "2" {
-		sql := `
-		INSERT INTO telnet_accessibility (date, time_index, ip, host_name, hardware_addr, target_url, status) VALUES (?, ?, ?, ?, ?, ?, ?);
-		`
-		validData := bodyParts[6:]
+
+		tx, err := h.db.Begin()
+		if err != nil {
+			fmt.Println(err)
+		}
+		stmt, err := tx.Prepare("INSERT INTO telnet_accessibility (date, time_index, ip, host_name, hardware_addr, target_url, status) VALUES (?, ?, ?, ?, ?, ?, ?)")
+		if err != nil {
+			fmt.Println(err)
+		}
+		defer stmt.Close()
+		validData := bodyParts[6:len(bodyParts)-1]
 		for _, item := range validData {
 			targetAndTelnetResult := strings.Split(item, ",")
 			status := targetAndTelnetResult[1]
 			if status == "" {
 				status = "NotOK"
 			}
-			_, err = h.db.Exec(sql, bodyParts[0], time_index, bodyParts[2], bodyParts[3], bodyParts[4], targetAndTelnetResult[0], status)
+			_, err = stmt.Exec(bodyParts[0], time_index, bodyParts[2], bodyParts[3], bodyParts[4], targetAndTelnetResult[0], status)
 		}
+		tx.Commit()
 	}
+
 	return err
 }
 
@@ -81,12 +98,17 @@ func (h *AccessibilityCheckHandler) HandleMessage(m *nsq.Message) (err error) {
 
 	bodyParts := strings.Split(string(m.Body), "\r\n")
 	time_index, err := strconv.Atoi(bodyParts[1])
-	secondsToNow := time_index * 30
-	hour := secondsToNow / 3600
-	minutes := secondsToNow % 3600 / 60
-	seconds := secondsToNow % 60
+
+	yearTime, _ := time.Parse("20060102", bodyParts[0])
+	year := yearTime.Format("2006-01-02")
+
+	secondsToNow := time_index*30
+	hour := secondsToNow/3600
+	minutes := secondsToNow%3600/60
+	seconds := secondsToNow%60
+
 	if bodyParts[5] == "1" {
-		validData := bodyParts[6:]
+		validData := bodyParts[6:len(bodyParts)-1]
 		for _, item := range validData {
 			targetAndPingResult := strings.Split(item, ",")
 			pingResult := strings.Split(targetAndPingResult[1], "=")
@@ -95,22 +117,21 @@ func (h *AccessibilityCheckHandler) HandleMessage(m *nsq.Message) (err error) {
 				responseTime, err = strconv.Atoi(pingResult[1])
 			}
 			if responseTime == -1 {
-				fmt.Printf("%s %d:%d:%d %s无法ping通%s\n", bodyParts[0], hour, minutes, seconds, bodyParts[2], targetAndPingResult[0])
+				fmt.Printf("%s %#d:%#d:%#d %s无法ping通%s\n", year, hour, minutes, seconds, bodyParts[2], targetAndPingResult[0])
 			}
 		}
 
 	}
 	if bodyParts[5] == "2" {
-		validData := bodyParts[6:]
+		validData := bodyParts[6:len(bodyParts)-1]
 		for _, item := range validData {
 			targetAndTelnetResult := strings.Split(item, ",")
 			status := targetAndTelnetResult[1]
 			if status == "" {
-				fmt.Printf("%s %d:%d:%d %s无法成功连接到%s\n", bodyParts[0], hour, minutes, seconds, bodyParts[2], targetAndTelnetResult[0])
+				fmt.Printf("%s %#d:%#d:%#d %s无法成功连接到%s\n", year, hour, minutes, seconds, bodyParts[2], targetAndTelnetResult[0])
 			}
 		}
 	}
-
 	return err
 }
 

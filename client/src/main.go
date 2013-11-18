@@ -113,7 +113,7 @@ func getDBLink(dbDriver string, dbSourceName string) (link *sql.DB, err error) {
 	return
 }
 
-func runCpuUsageClient(cuh *cpu_usage.CPUUsageHandler)(cuTodb *nsq.Reader, err error) {
+func runCpuUsageClient(cuh *cpu_usage.CPUUsageHandler) (cuTodb *nsq.Reader, err error) {
 	cuTodb, err = nsq.NewReader("cpu_usage", "todb")
 	if err != nil {
 		log.Fatalf(err.Error())
@@ -140,7 +140,7 @@ func runCpuUsageClient(cuh *cpu_usage.CPUUsageHandler)(cuTodb *nsq.Reader, err e
 	return
 }
 
-func runMemUsageClient(muh *mem_usage.MemUsageHandler)(muTodb *nsq.Reader, err error) {
+func runMemUsageClient(muh *mem_usage.MemUsageHandler) (muTodb *nsq.Reader, err error) {
 	muTodb, err = nsq.NewReader("mem_usage", "todb")
 	if err != nil {
 		log.Fatalf(err.Error())
@@ -160,7 +160,7 @@ func runMemUsageClient(muh *mem_usage.MemUsageHandler)(muTodb *nsq.Reader, err e
 
 	for _, addrString := range lookupdHTTPAddrs {
 		log.Printf("lookupd addr %s", addrString)
-		err :=muTodb.ConnectToLookupd(addrString)
+		err := muTodb.ConnectToLookupd(addrString)
 		if err != nil {
 			log.Fatalf(err.Error())
 		}
@@ -168,7 +168,7 @@ func runMemUsageClient(muh *mem_usage.MemUsageHandler)(muTodb *nsq.Reader, err e
 	return
 }
 
-func runNetFlowClient(nfh *net_flow.NetFlowHandler)(nfTodb *nsq.Reader, err error) {
+func runNetFlowClient(nfh *net_flow.NetFlowHandler) (nfTodb *nsq.Reader, err error) {
 	nfTodb, err = nsq.NewReader("net_flow", "todb")
 	if err != nil {
 		log.Fatalf(err.Error())
@@ -188,7 +188,7 @@ func runNetFlowClient(nfh *net_flow.NetFlowHandler)(nfTodb *nsq.Reader, err erro
 
 	for _, addrString := range lookupdHTTPAddrs {
 		log.Printf("lookupd addr %s", addrString)
-		err :=nfTodb.ConnectToLookupd(addrString)
+		err := nfTodb.ConnectToLookupd(addrString)
 		if err != nil {
 			log.Fatalf(err.Error())
 		}
@@ -196,7 +196,7 @@ func runNetFlowClient(nfh *net_flow.NetFlowHandler)(nfTodb *nsq.Reader, err erro
 	return
 }
 
-func runHeartBeatClient(hbh *heartbeat.HeartBeatHandler)(hbTodb *nsq.Reader, err error) {
+func runHeartBeatClient(hbh *heartbeat.HeartBeatHandler) (hbTodb *nsq.Reader, err error) {
 	hbTodb, err = nsq.NewReader("heartbeat", "todb")
 	if err != nil {
 		log.Fatalf(err.Error())
@@ -216,7 +216,7 @@ func runHeartBeatClient(hbh *heartbeat.HeartBeatHandler)(hbTodb *nsq.Reader, err
 
 	for _, addrString := range lookupdHTTPAddrs {
 		log.Printf("lookupd addr %s", addrString)
-		err :=hbTodb.ConnectToLookupd(addrString)
+		err := hbTodb.ConnectToLookupd(addrString)
 		if err != nil {
 			log.Fatalf(err.Error())
 		}
@@ -224,7 +224,7 @@ func runHeartBeatClient(hbh *heartbeat.HeartBeatHandler)(hbTodb *nsq.Reader, err
 	return
 }
 
-func runAccessibilityToDBClient(ath *accessibility.AccessibilityToDBHandler)(aTodb *nsq.Reader, err error) {
+func runAccessibilityToDBClient(ath *accessibility.AccessibilityToDBHandler) (aTodb *nsq.Reader, err error) {
 	aTodb, err = nsq.NewReader("accessibility", "todb")
 	if err != nil {
 		log.Fatalf(err.Error())
@@ -244,7 +244,7 @@ func runAccessibilityToDBClient(ath *accessibility.AccessibilityToDBHandler)(aTo
 
 	for _, addrString := range lookupdHTTPAddrs {
 		log.Printf("lookupd addr %s", addrString)
-		err :=aTodb.ConnectToLookupd(addrString)
+		err := aTodb.ConnectToLookupd(addrString)
 		if err != nil {
 			log.Fatalf(err.Error())
 		}
@@ -252,7 +252,7 @@ func runAccessibilityToDBClient(ath *accessibility.AccessibilityToDBHandler)(aTo
 	return
 }
 
-func runAccessibilityCheckClient(ach *accessibility.AccessibilityCheckHandler)(aCheck *nsq.Reader, err error) {
+func runAccessibilityCheckClient(ach *accessibility.AccessibilityCheckHandler) (aCheck *nsq.Reader, err error) {
 	aCheck, err = nsq.NewReader("accessibility", "check_exception")
 	if err != nil {
 		log.Fatalf(err.Error())
@@ -272,7 +272,7 @@ func runAccessibilityCheckClient(ach *accessibility.AccessibilityCheckHandler)(a
 
 	for _, addrString := range lookupdHTTPAddrs {
 		log.Printf("lookupd addr %s", addrString)
-		err :=aCheck.ConnectToLookupd(addrString)
+		err := aCheck.ConnectToLookupd(addrString)
 		if err != nil {
 			log.Fatalf(err.Error())
 		}
@@ -280,7 +280,7 @@ func runAccessibilityCheckClient(ach *accessibility.AccessibilityCheckHandler)(a
 	return
 }
 
-func runRegisterToDBClient(rh *register.RegisterToDBHandler)(registerTodb *nsq.Reader, err error) {
+func runRegisterToDBClient(rh *register.RegisterToDBHandler) (registerTodb *nsq.Reader, err error) {
 	registerTodb, err = nsq.NewReader("register", "todb")
 	if err != nil {
 		log.Fatalf(err.Error())
@@ -300,7 +300,7 @@ func runRegisterToDBClient(rh *register.RegisterToDBHandler)(registerTodb *nsq.R
 
 	for _, addrString := range lookupdHTTPAddrs {
 		log.Printf("lookupd addr %s", addrString)
-		err :=registerTodb.ConnectToLookupd(addrString)
+		err := registerTodb.ConnectToLookupd(addrString)
 		if err != nil {
 			log.Fatalf(err.Error())
 		}
@@ -362,14 +362,14 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
-
 	accessibilityToDBHandler, err := accessibility.NewAccessibilityToDBHandler(dbLink)
 	if err != nil {
 		fmt.Println(err)
 	}
 
+
 	accessibilityCheckHandler, err := accessibility.NewAccessibilityCheckHandler(dbLink)
-	if err != nil{
+	if err != nil {
 		fmt.Println(err)
 	}
 
@@ -398,6 +398,7 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
+
 
 	aTodb, err := runAccessibilityToDBClient(accessibilityToDBHandler)
 	if err != nil {
@@ -430,6 +431,7 @@ func main() {
 			return
 		case <-rTodb.ExitChan:
 			return
+
 		case <-termChan:
 			cuTodb.Stop()
 			muTodb.Stop()
