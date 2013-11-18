@@ -19,6 +19,7 @@ type Settings struct {
 	UpdateServer []map[string] string
 	Hb int
 	Update int
+	Role string
 }
 
 /* Load settings */
@@ -50,11 +51,10 @@ func checkSettings(settings Settings) (err error) {
 	}
 	for _, mod := range settings.InModules {
 		_, ok1 := mod["name"]
-		_, ok2 := mod["bid"]
+		_, ok2 := mod["topic"]
 		_, ok3 := mod["interval"]
-		_, ok4 := mod["windows"]
-		_, ok5 := mod["linux"]
-		if !ok1 || !ok2 || !ok3 || !(ok4||ok5) {
+		_, ok4 := mod["type"]
+		if !ok1 || !ok2 || !ok3 || !ok4 {
 			err = errors.New("Some Input modules are not properly configured.")
 			return
 		}
@@ -90,8 +90,8 @@ func checkSettings(settings Settings) (err error) {
 	Get specific IP address (exclude ip starts with "127.0.0" and "0.0.0.0") and the hostname.
 	Return: IP and hostname
 */
-func GetLocalInfo() (ip string, hostName string, err error) {
-	addrs,err := net.InterfaceAddrs()
+func GetLocalInfo() (ip string, hostName string, macAddress string, err error) {
+	addrs, err := net.InterfaceAddrs()
     for _, ad := range addrs {
     	if tmp := strings.Split(ad.String(),"/")[0]; !strings.HasPrefix(tmp, "127.0.0") && !strings.HasPrefix(tmp, "0.0.0") {
     		ip = tmp
@@ -99,15 +99,21 @@ func GetLocalInfo() (ip string, hostName string, err error) {
     	}
     }
 	hostName, _ = os.Hostname()
+	ifs, err := net.Interfaces()
+	if err != nil || len(ifs) <= 0 {
+		macAddress = "no_nic"
+	} else {
+		macAddress = ifs[0].HardwareAddr.String()
+	}
 	return
 }
 
 /*
-	Do GET reuqest. Returns a slice of byte.
+	Do request. Returns a slice of byte.
 	If the hostHeader string for a module is "" then we use no hostHeader for it.
 */
-func ReadRemote(urlString string, hostHeader string, client *http.Client) (b []byte, err error) {
-	req, _ := http.NewRequest("GET", urlString, nil)
+func ReadRemote(method string, urlString string, content string, hostHeader string, client *http.Client) (b []byte, err error) {
+	req, _ := http.NewRequest(method, urlString, strings.NewReader(content))
 	if hostHeader != "" {
 		req.Header.Set("Host", hostHeader)
 	} 
