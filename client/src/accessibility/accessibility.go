@@ -36,7 +36,7 @@ func (h *AccessibilityToDBHandler) HandleMessage(m *nsq.Message) (err error) {
 			fmt.Println(err)
 		}
 		defer stmt.Close()
-		validData := bodyParts[6:len(bodyParts)-1]
+		validData := bodyParts[6:len(bodyParts) - 1]
 		for _, item := range validData {
 			targetAndPingResult := strings.Split(item, ",")
 			pingResult := strings.Split(targetAndPingResult[1], "=")
@@ -60,7 +60,7 @@ func (h *AccessibilityToDBHandler) HandleMessage(m *nsq.Message) (err error) {
 			fmt.Println(err)
 		}
 		defer stmt.Close()
-		validData := bodyParts[6:len(bodyParts)-1]
+		validData := bodyParts[6:len(bodyParts) - 1]
 		for _, item := range validData {
 			targetAndTelnetResult := strings.Split(item, ",")
 			status := targetAndTelnetResult[1]
@@ -99,16 +99,16 @@ func (h *AccessibilityCheckHandler) HandleMessage(m *nsq.Message) (err error) {
 	bodyParts := strings.Split(string(m.Body), "\r\n")
 	time_index, err := strconv.Atoi(bodyParts[1])
 
-	yearTime, _ := time.Parse("20060102", bodyParts[0])
-	year := yearTime.Format("2006-01-02")
-
 	secondsToNow := time_index*30
 	hour := secondsToNow/3600
 	minutes := secondsToNow%3600/60
 	seconds := secondsToNow%60
 
+	yearTime, _ := time.Parse("20060102", bodyParts[0])
+	date := time.Date(yearTime.Year(), yearTime.Month(), yearTime.Day(), hour, minutes, seconds, 0, time.Local).Format("2006-01-02 15:04:05")
+
 	if bodyParts[5] == "1" {
-		validData := bodyParts[6:len(bodyParts)-1]
+		validData := bodyParts[6:len(bodyParts) - 1]
 		for _, item := range validData {
 			targetAndPingResult := strings.Split(item, ",")
 			pingResult := strings.Split(targetAndPingResult[1], "=")
@@ -117,18 +117,18 @@ func (h *AccessibilityCheckHandler) HandleMessage(m *nsq.Message) (err error) {
 				responseTime, err = strconv.Atoi(pingResult[1])
 			}
 			if responseTime == -1 {
-				fmt.Printf("%s %#d:%#d:%#d %s无法ping通%s\n", year, hour, minutes, seconds, bodyParts[2], targetAndPingResult[0])
+				fmt.Printf("%s  %s 无法ping通 %s\n", date, bodyParts[2], targetAndPingResult[0])
 			}
 		}
 
 	}
 	if bodyParts[5] == "2" {
-		validData := bodyParts[6:len(bodyParts)-1]
+		validData := bodyParts[6:len(bodyParts) - 1]
 		for _, item := range validData {
 			targetAndTelnetResult := strings.Split(item, ",")
 			status := targetAndTelnetResult[1]
 			if status == "" {
-				fmt.Printf("%s %#d:%#d:%#d %s无法成功连接到%s\n", year, hour, minutes, seconds, bodyParts[2], targetAndTelnetResult[0])
+				fmt.Printf("%s  %s 无法成功连接到 %s\n", date, bodyParts[2], targetAndTelnetResult[0])
 			}
 		}
 	}
