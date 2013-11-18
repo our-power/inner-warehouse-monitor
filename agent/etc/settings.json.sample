@@ -1,16 +1,17 @@
 {
 	"InModules":[
-		{"name":"cpu_usage", "bid":"1001", "interval":"300", "windows":"1", "linux":"1" },
-		{"name":"flow", "bid":"1002", "interval":"300", "windows":"1", "linux":"1" },
-		{"name":"mem_usage", "bid":"1003", "interval":"300", "windows":"1", "linux":"1" },
-		{"name":"disk_usable", "bid":"1004", "interval":"300", "windows":"1", "linux":"1" }
+		{"name":"cpu_usage", "topic":"cpu_usage", "interval":"30", "type":"perf"},
+		{"name":"flow", "topic":"net_flow", "interval":"30", "type":"perf"},
+		{"name":"mem_usage", "topic":"mem_usage", "interval":"30", "type":"perf"},
+		{"name":"ping_ip", "topic":"accessibility", "interval":"30", "type":"exec"}
 	],
 	"OutModules":[
-		{"name":"sh_ecc_no", "url":"http://192.168.2.26:8080/data/server_view/api/data_collector.php", "host":"sh.ecc.com"}
+		{"name":"inner-warehouse", "url":"http://10.24.178.60:4151/put", "host":""}
 	],
 	"UpdateServer":[
-		{"name":"local", "url":"http://localhost:9090/update", "host":""}
+		{"name":"local", "url":"http://192.168.2.237:9090/update", "host":""}
 	],
 	"Hb":30,
-	"Update":3600
+	"Update":600,
+	"role":"test"
 }

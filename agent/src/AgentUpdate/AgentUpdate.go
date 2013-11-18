@@ -27,10 +27,10 @@ var netClient *http.Client
 */
 func checkList() []string {
 	var list []string
-	ip, _, _ := utils.GetLocalInfo() 
+	ip, _, _, _ := utils.GetLocalInfo()
 	urlString := settings.UpdateServer[0]["url"] + "?action=get_list&ip=" + ip
 	hostString := settings.UpdateServer[0]["host"]
-	resp, err := utils.ReadRemote(urlString, hostString, netClient)
+	resp, err := utils.ReadRemote("GET", urlString, "", hostString, netClient)
 	if err != nil {
 		logger.Println(err.Error())
 	    return list
@@ -58,7 +58,7 @@ func downloadAndReplaceFile(filename string, version string) bool {
 	}
 	urlString := settings.UpdateServer[0]["url"] + "?action=get_file&v=" + version + "&name=" + url.QueryEscape(filename)
 	hostHeader := settings.UpdateServer[0]["host"]
-    resp, err := utils.ReadRemote(urlString, hostHeader, netClient)
+    resp, err := utils.ReadRemote("GET", urlString, "", hostHeader, netClient)
 	if err != nil {
 	    logger.Println(err.Error())
 	    return false
@@ -78,10 +78,10 @@ func downloadAndReplaceFile(filename string, version string) bool {
 }
 
 func setDoneFlag() {
-	ip, _, _ := utils.GetLocalInfo()
+	ip, _, _, _ := utils.GetLocalInfo()
 	urlString := settings.UpdateServer[0]["url"] + "?action=set_done&ip=" + ip
 	hostHeader := settings.UpdateServer[0]["host"]
-	_, err := utils.ReadRemote(urlString, hostHeader, netClient)
+	_, err := utils.ReadRemote("GET", urlString, "", hostHeader, netClient)
 	if err != nil {
 		logger.Println(err.Error())
 	}
