@@ -24,11 +24,11 @@ var netClient *http.Client
 
 /* Send heartbeat signal to server */
 func heartbeat() {
-	outModules(prepareOutput("heartbeat", "alive", 0))
+	outModules(prepareOutput("heartbeat", "alive", settings.Hb))
 	c := time.Tick(time.Duration(settings.Hb) * time.Second)
 	for _ = range c {
 		if stop { break }
-		outModules(prepareOutput("heartbeat", "alive", 0))
+		outModules(prepareOutput("heartbeat", "alive", settings.Hb))
 	}
 }
 
@@ -110,6 +110,8 @@ func prepareOutput(topic string, output string, interval int) (request string, c
 	if len(lines) > 3 {
 		line = lines[3]
 		line = strings.Replace(line, "\"", "", -1)
+	} else {
+		line = output
 	}
 	line = strings.Trim(line, "\r")
 	content = fmt.Sprintf("%s\r\n%d\r\n%s\r\n%s\r\n%s\r\n%s", dateNow, timeIdx, ip, hostName, macAddress, line)
