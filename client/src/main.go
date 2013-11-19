@@ -84,7 +84,7 @@ func getDBLink(dbDriver string, dbSourceName string) (link *sql.DB, err error) {
 		}
 
 		sql = `
-		CREATE TABLE register (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, date TEXT, time_index INTEGER, ip TEXT, host_name TEXT, hardware_addr TEXT, agent_version TEXT, machine_role TEXT);
+		CREATE TABLE register (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, date TEXT, time_index INTEGER, ip TEXT, host_name TEXT, hardware_addr TEXT UNIQUE, agent_version TEXT, machine_role TEXT);
         DELETE FROM register;
 		`
 		_, err = link.Exec(sql)
