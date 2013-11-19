@@ -34,7 +34,7 @@ func heartbeat() {
 
 func register() {
 	appVersion := runtime.GOOS + APPVERSION
-	outModules(prepareOutput("register", appVersion + settings.Role, 0))
+	outModules(prepareOutput("register", appVersion + "," + settings.Role, 0))
 }
 
 func runInModule(name string, topic string, interval string) {
@@ -107,7 +107,7 @@ func prepareOutput(topic string, output string, interval int) (request string, c
 	}
 	line := ""
 	lines := strings.Split(output, "\n")
-	if len(lines) > 3 {
+	if len(lines) > 3 && topic != "accessibility" {
 		line = lines[3]
 		line = strings.Replace(line, "\"", "", -1)
 	} else {
