@@ -13,7 +13,6 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-
 func init() {
 	dbSourceList := strings.Split(beego.AppConfig.String("dbsourcename"), ";")
 	for _, dbSource := range dbSourceList {
