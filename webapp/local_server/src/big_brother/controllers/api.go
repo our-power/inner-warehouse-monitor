@@ -3,7 +3,7 @@ package controllers
 import (
 	"time"
 	"github.com/astaxie/beego"
-
+	"github.com/astaxie/beego/orm"
 	"big_brother/models"
 )
 
@@ -20,18 +20,28 @@ func (this *ApiController) GetServerIndicator() {
 	date, _ := time.Parse("2006-01-02", this.GetString("date"))
 	date_str := date.Format("20060102")
 
+	var maps []orm.Params
 	if indicator == "cpu_usage" {
-		var cpuUsageData []*models.Cpu_usage
-		o.QueryTable(indicator).Filter("hardware_addr", hardware_addr).Filter("date", date_str).All(&cpuUsageData)
-		this.Data["json"] = &cpuUsageData
+		_, err := o.QueryTable(indicator).Filter("hardware_addr", hardware_addr).Filter("date", date_str).Values(&maps, "id", "ip", "host_name", "usage")
+		if err == nil {
+			this.Data["json"] = &maps
+		} else {
+			this.Data["json"] = nil
+		}
 	}else if indicator == "mem_usage" {
-		var memUsageData []*models.Mem_usage
-		o.QueryTable(indicator).Filter("hardware_addr", hardware_addr).Filter("date", date_str).All(&memUsageData)
-		this.Data["json"] = &memUsageData
+		_, err := o.QueryTable(indicator).Filter("hardware_addr", hardware_addr).Filter("date", date_str).Values(&maps, "id", "ip", "host_name", "usage")
+		if err == nil {
+			this.Data["json"] = &maps
+		} else {
+			this.Data["json"] = nil
+		}
 	}else if indicator == "net_flow" {
-		var netflowUsageData []*models.Net_flow
-		o.QueryTable(indicator).Filter("hardware_addr", hardware_addr).Filter("date", date_str).All(&netflowUsageData)
-		this.Data["json"] = &netflowUsageData
+		_, err := o.QueryTable(indicator).Filter("hardware_addr", hardware_addr).Filter("date", date_str).Values(&maps, "id", "ip", "host_name", "out_bytes", "in_bytes", "out_packets", "in_packets")
+		if err == nil {
+			this.Data["json"] = &maps
+		}else{
+			this.Data["json"] = nil
+		}
 	}else{
 		this.Data["json"] = nil
 	}
@@ -43,5 +53,12 @@ func (this *ApiController) GetServerIndicator() {
 GET /api/serverinuse
 */
 func (this *ApiController) GetServerListInUse() {
-
+	var serverList []*models.Register
+	_, err := o.QueryTable("register").All(&serverList)
+	if err == nil {
+		this.Data["json"] = &serverList
+	}else{
+		this.Data["json"] = nil
+	}
+	this.ServeJson()
 }

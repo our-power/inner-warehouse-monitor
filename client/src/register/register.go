@@ -22,18 +22,28 @@ func (h *RegisterToDBHandler) HandleMessage(m *nsq.Message) (err error) {
 	bodyParts := strings.Split(string(m.Body), "\r\n")
 	time_index, err := strconv.Atoi(bodyParts[1])
 
+	/*
+	0:机器正常关闭
+	1:机器正在运行
+	-1:机器没有正常发送心跳数据
+	-2:删除机器（该机器不再投入使用）
+	*/
+	var status int
 	if bodyParts[5] == "shutdown" {
+		status = 0
 		sql := `
-			DELETE FROM register WHERE hardware_addr=?;
+		REPLACE INTO register (date, time_index, ip, host_name, hardware_addr, status) VALUES (?, ?, ?, ?, ?, ?);
 		`
-		_, err = h.db.Exec(sql, bodyParts[4])
+		_, err = h.db.Exec(sql, bodyParts[0], time_index, bodyParts[2], bodyParts[3], bodyParts[4], status)
 	} else {
+		status = 1
 		version_role := strings.Split(bodyParts[5], ",")
 		sql := `
-		REPLACE INTO register (date, time_index, ip, host_name, hardware_addr, agent_version, machine_role) VALUES (?, ?, ?, ?, ?, ?, ?);
+		REPLACE INTO register (date, time_index, ip, host_name, hardware_addr, agent_version, machine_role, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
 		`
-		_, err = h.db.Exec(sql, bodyParts[0], time_index, bodyParts[2], bodyParts[3], bodyParts[4], version_role[0], version_role[1])
+		_, err = h.db.Exec(sql, bodyParts[0], time_index, bodyParts[2], bodyParts[3], bodyParts[4], version_role[0], version_role[1], status)
 	}
+
 	return err
 }
 

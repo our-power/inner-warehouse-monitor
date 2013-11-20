@@ -67,6 +67,7 @@ type Register struct {
 	Hardware_addr string
 	Agent_version string
 	Machine_role string
+	Status int
 }
 
 type Ping_accessibility struct {

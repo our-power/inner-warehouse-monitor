@@ -30,6 +30,6 @@ func main() {
 
 	beego.Router("/", &controllers.HomeController{})
 	beego.Router("/api/serverindicator", &controllers.ApiController{}, "GET:GetServerIndicator")
-	//beego.Router("/api/serverinuse", &controllers.ApiController{}, "GET:GetServerListInUse")
+	beego.Router("/api/serverinuse", &controllers.ApiController{}, "GET:GetServerListInUse")
 	beego.Run()
 }
