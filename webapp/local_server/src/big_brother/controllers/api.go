@@ -58,7 +58,7 @@ GET /api/serverinuse
 func (this *ApiController) GetServerList() {
 	var serverList []*models.Register
 	// 在ORM的数据库default中
-	//o.Using("register")
+	o.Using("default")
 	_, err := o.QueryTable("register").All(&serverList)
 	if err == nil {
 		this.Data["json"] = &serverList
