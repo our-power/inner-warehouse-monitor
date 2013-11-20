@@ -86,9 +86,7 @@ func NewAccessibilityToDBHandler(dbLink *sql.DB) (accessibilityToDBHandler *Acce
  *	检测可达性是否异常的类
  */
 
-type AccessibilityCheckHandler struct {
-	db *sql.DB
-}
+type AccessibilityCheckHandler struct {}
 
 func (h *AccessibilityCheckHandler) HandleMessage(m *nsq.Message) (err error) {
 	/*
@@ -135,9 +133,7 @@ func (h *AccessibilityCheckHandler) HandleMessage(m *nsq.Message) (err error) {
 	return err
 }
 
-func NewAccessibilityCheckHandler(dbLink *sql.DB) (accessibilityCheckHandler *AccessibilityCheckHandler, err error) {
-	accessibilityCheckHandler = &AccessibilityCheckHandler {
-		db: dbLink,
-	}
+func NewAccessibilityCheckHandler() (accessibilityCheckHandler *AccessibilityCheckHandler, err error) {
+	accessibilityCheckHandler = &AccessibilityCheckHandler {}
 	return accessibilityCheckHandler, err
 }

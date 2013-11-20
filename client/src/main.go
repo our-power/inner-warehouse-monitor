@@ -8,7 +8,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"strings"
+	//"strings"
 	"time"
 	"util"
 	_ "github.com/mattn/go-sqlite3"
@@ -28,7 +28,7 @@ var (
 	maxInFlight        = flag.Int("max-in-flight", 200, "max number of messages to allow in flight")
 	verbose            = flag.Bool("verbose", false, "enable verbose logging")
 	maxBackoffDuration = flag.Duration("max-backoff-duration", 120*time.Second, "the maximum backoff duration")
-	dbPath             = flag.String("dbPath", "./", "the path to store db file")
+	dbPath             = flag.String("dbPath", "D:\\", "the path to store db file")
 	termChan chan os.Signal
 )
 
@@ -38,11 +38,14 @@ func init() {
 }
 
 func getDBLink(dbDriver string, dbSourceName string) (link *sql.DB, err error) {
+	/*
 	notExist := false
 	if _, e := os.Stat(dbSourceName); os.IsNotExist(e) {
 		notExist = true
 	}
+	*/
 	link, err = sql.Open(dbDriver, dbSourceName)
+	/*
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -110,6 +113,8 @@ func getDBLink(dbDriver string, dbSourceName string) (link *sql.DB, err error) {
 			fmt.Println(err)
 		}
 	}
+	*/
+
 	return
 }
 
@@ -332,48 +337,75 @@ func main() {
 
 
 	//date := time.Now().Format("2006-01-02")
+	/*
 	if !strings.HasSuffix(*dbPath, "/") {
 		*dbPath = *dbPath + "/"
 	}
-
-	dbLink, err := getDBLink("sqlite3", *dbPath + "sqlite.db")
+	*/
+	// 初始化各种指标的处理类
+	cpu_usage_db_link, err := getDBLink("sqlite3", *dbPath + "cpu_usage_sqlite.db")
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-
-	// 初始化各种指标的处理类
-	cpuUsageHandler, err := cpu_usage.NewCPUUsageHandler(dbLink)
+	cpuUsageHandler, err := cpu_usage.NewCPUUsageHandler(cpu_usage_db_link)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	memUsageHandler, err := mem_usage.NewMemUsageHandler(dbLink)
+	mem_usage_db_link, err := getDBLink("sqlite3", *dbPath + "mem_usage_sqlite.db")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	memUsageHandler, err := mem_usage.NewMemUsageHandler(mem_usage_db_link)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	netFlowHandler, err := net_flow.NewNetFlowHandler(dbLink)
+	net_flow_db_link, err := getDBLink("sqlite3", *dbPath + "net_flow_sqlite.db")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	netFlowHandler, err := net_flow.NewNetFlowHandler(net_flow_db_link)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	heartBeatHandler, err := heartbeat.NewHeartBeatHandler(dbLink)
+	heartbeat_db_link, err := getDBLink("sqlite3", *dbPath + "heartbeat_sqlite.db")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	heartBeatHandler, err := heartbeat.NewHeartBeatHandler(heartbeat_db_link)
 	if err != nil {
 		fmt.Println(err)
 	}
-	accessibilityToDBHandler, err := accessibility.NewAccessibilityToDBHandler(dbLink)
+
+	accessibility_db_link, err := getDBLink("sqlite3", *dbPath + "accessibility_sqlite.db")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	accessibilityToDBHandler, err := accessibility.NewAccessibilityToDBHandler(accessibility_db_link)
 	if err != nil {
 		fmt.Println(err)
 	}
 
 
-	accessibilityCheckHandler, err := accessibility.NewAccessibilityCheckHandler(dbLink)
+	// 可达性异常检测处理类，无需读写DB
+	accessibilityCheckHandler, err := accessibility.NewAccessibilityCheckHandler()
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	registerToDBHandler, err := register.NewRegisterToDBHandler(dbLink)
+	register_db_link, err := getDBLink("sqlite3", *dbPath + "register_sqlite.db")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	registerToDBHandler, err := register.NewRegisterToDBHandler(register_db_link)
 	if err != nil {
 		fmt.Println(err)
 	}

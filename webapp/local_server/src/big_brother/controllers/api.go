@@ -22,27 +22,30 @@ func (this *ApiController) GetServerIndicator() {
 
 	var maps []orm.Params
 	if indicator == "cpu_usage" {
-		_, err := o.QueryTable(indicator).Filter("hardware_addr", hardware_addr).Filter("date", date_str).Values(&maps, "id", "ip", "host_name", "usage")
+		o.Using("cpu_usage")
+		_, err := o.QueryTable(indicator).Filter("hardware_addr", hardware_addr).Filter("date", date_str).OrderBy("time_index").Values(&maps, "id", "time_index", "ip", "host_name", "usage")
 		if err == nil {
 			this.Data["json"] = &maps
 		} else {
 			this.Data["json"] = nil
 		}
 	}else if indicator == "mem_usage" {
-		_, err := o.QueryTable(indicator).Filter("hardware_addr", hardware_addr).Filter("date", date_str).Values(&maps, "id", "ip", "host_name", "usage")
+		o.Using("mem_usage")
+		_, err := o.QueryTable(indicator).Filter("hardware_addr", hardware_addr).Filter("date", date_str).OrderBy("time_index").Values(&maps, "id", "time_index", "ip", "host_name", "usage")
 		if err == nil {
 			this.Data["json"] = &maps
 		} else {
 			this.Data["json"] = nil
 		}
 	}else if indicator == "net_flow" {
-		_, err := o.QueryTable(indicator).Filter("hardware_addr", hardware_addr).Filter("date", date_str).Values(&maps, "id", "ip", "host_name", "out_bytes", "in_bytes", "out_packets", "in_packets")
+		o.Using("net_flow")
+		_, err := o.QueryTable(indicator).Filter("hardware_addr", hardware_addr).Filter("date", date_str).OrderBy("time_index").Values(&maps, "id", "time_index", "ip", "host_name", "out_bytes", "in_bytes", "out_packets", "in_packets")
 		if err == nil {
 			this.Data["json"] = &maps
-		}else{
+		}else {
 			this.Data["json"] = nil
 		}
-	}else{
+	}else {
 		this.Data["json"] = nil
 	}
 
@@ -52,12 +55,14 @@ func (this *ApiController) GetServerIndicator() {
 /*
 GET /api/serverinuse
 */
-func (this *ApiController) GetServerListInUse() {
+func (this *ApiController) GetServerList() {
 	var serverList []*models.Register
+	// 在ORM的数据库default中
+	//o.Using("register")
 	_, err := o.QueryTable("register").All(&serverList)
 	if err == nil {
 		this.Data["json"] = &serverList
-	}else{
+	}else {
 		this.Data["json"] = nil
 	}
 	this.ServeJson()

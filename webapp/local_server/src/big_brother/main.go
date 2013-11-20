@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/astaxie/beego"
 
@@ -14,7 +15,16 @@ import (
 
 
 func init() {
-	orm.RegisterDataBase("default", beego.AppConfig.String("dbdriver"), beego.AppConfig.String("dbsourcename"))
+	dbSourceList := strings.Split(beego.AppConfig.String("dbsourcename"), ";")
+	for _, dbSource := range dbSourceList {
+		dbName_DbSource := strings.Split(dbSource, ",")
+		if dbName_DbSource[0] == "register" {
+			// beego的ORM要求必须要有个default的数据库
+			orm.RegisterDataBase("default", beego.AppConfig.String("dbdriver"), dbName_DbSource[1])
+		}else{
+			orm.RegisterDataBase(dbName_DbSource[0], beego.AppConfig.String("dbdriver"), dbName_DbSource[1])
+		}
+	}
 	models.InitModels()
 	controllers.InitControllers()
 }
@@ -30,6 +40,6 @@ func main() {
 
 	beego.Router("/", &controllers.HomeController{})
 	beego.Router("/api/serverindicator", &controllers.ApiController{}, "GET:GetServerIndicator")
-	beego.Router("/api/serverinuse", &controllers.ApiController{}, "GET:GetServerListInUse")
+	beego.Router("/api/serverlist", &controllers.ApiController{}, "GET:GetServerList")
 	beego.Run()
 }
