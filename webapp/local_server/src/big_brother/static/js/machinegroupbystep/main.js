@@ -28,24 +28,21 @@ $(function () {
         var seriesName = "";
         switch (indicator) {
             case "cpu_view":
-                title = queryDate + " CPU使用率(%)";
+                title = queryDate + " , CPU使用率(%)";
                 xAxisTitle = "时间";
                 yAxisTitle = "使用率(%)";
-                seriesName = "CPU使用率";
+                seriesName = "CPU使用率(%)";
                 break;
             case "memory_view":
-                title = queryDate + " 内存使用量";
+                title = queryDate + " , 内存使用量";
                 xAxisTitle = "时间";
                 yAxisTitle = "使用量(MB)";
-                seriesName = "使用量";
+                seriesName = "使用量(MB)";
                 break;
             case "netflow_view":
-                title = queryDate + " 网络流量";
+                title = queryDate + " , 网络流量";
                 break
         }
-        console.log(step);
-        console.log(queryDate);
-        console.log(indicator);
 
         var req = $.ajax({
             "type": "get",
@@ -57,33 +54,32 @@ $(function () {
             if (resp != null) {
                 var machineCount = resp.length;
                 for (var index = 0; index < machineCount; index++) {
-                    console.log(resp[index]);
                     $(href).empty().append($("<div></div>", {
                         "id": indicator + "_" + index
                     }));
-                    var container = $("#" + indicator + "_" + index);
-                    console.log(resp[index].Host_name);
-                    console.log(resp[index].Data);
-                    plotHighCharts(container, resp[index].Host_name + "" + title, xAxisTitle, yAxisTitle, seriesName, resp[index].Data);
+                    var container = indicator + "_" + index
+                    plotHighCharts(container, resp[index].Host_name + " , " + title, xAxisTitle, yAxisTitle, seriesName, resp[index].Data);
                 }
             }
         });
     });
 
     function plotHighCharts(container, chartTitle, xAxisTitle, yAxisTitle, seriesName, seriesData) {
-        var chart = new Highcharts.Chart({
+        new Highcharts.Chart({
             chart: {
                 renderTo: container,
                 zoomType: 'x',
                 spacingRight: 20
             },
+            credits: {
+                enabled: false
+            },
             title: {
                 text: chartTitle
             },
-            subtitle: {},
             xAxis: {
                 type: 'datetime',
-                maxZoom: 5 * 60, // five minutes
+                maxZoom: 5 * 60 * 1000, // five minutes
                 title: {
                     text: xAxisTitle
                 }
@@ -91,7 +87,9 @@ $(function () {
             yAxis: {
                 title: {
                     text: yAxisTitle
-                }
+                },
+                min: -5,
+                startOnTick: false
             },
             tooltip: {
                 shared: true
@@ -121,13 +119,12 @@ $(function () {
                     threshold: null
                 }
             },
-
             series: [
                 {
                     type: 'area',
                     name: seriesName,
                     pointInterval: 30 * 1000,
-                    pointStart: Date.UTC(new Date().getYear(), new Date().getMonth() + 1, new Date().getDate()),
+                    pointStart: Date.UTC(new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate()),
                     data: seriesData
                 }
             ]

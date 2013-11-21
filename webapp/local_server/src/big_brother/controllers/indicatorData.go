@@ -64,7 +64,12 @@ func (this *IndicatorDataController) GetStepIndicatorData() {
 				for _, machine := range maps {
 					var rows []orm.Params
 					num, err := o.QueryTable(dataTable).Filter("hardware_addr", machine["Hardware_addr"]).Filter("date", dateStr).OrderBy("time_index").Limit(-1).Values(&rows, "time_index", "usage")
-					usageData := make([]float64, rows[num-1]["Time_index"].(int64) + 1)
+					dataContainerLength := int(rows[num-1]["Time_index"].(int64)) + 1
+					usageData := make([]float64, dataContainerLength)
+					for index :=0; index < dataContainerLength; index++ {
+						usageData[index] = -1;
+					}
+
 					if err == nil {
 						for _, row := range rows {
 							time_index, _ := row["Time_index"].(int64)
