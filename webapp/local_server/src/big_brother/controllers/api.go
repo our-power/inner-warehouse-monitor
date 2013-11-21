@@ -12,9 +12,9 @@ type ApiController struct {
 }
 
 /*
-GET /api/serverindicator?hardwareaddr=xxxx&indicator=xxx&date=xxxx
+GET /api/machine_indicator?hardwareaddr=xxxx&indicator=xxx&date=xxxx
 */
-func (this *ApiController) GetServerIndicator() {
+func (this *ApiController) GetMachineIndicator() {
 	hardware_addr := this.GetString("hardwareaddr")
 	indicator := this.GetString("indicator")
 	date, _ := time.Parse("2006-01-02", this.GetString("date"))
@@ -55,7 +55,7 @@ func (this *ApiController) GetServerIndicator() {
 /*
 GET /api/machine_list
 */
-func (this *ApiController) GetServerList() {
+func (this *ApiController) GetMachineList() {
 	var serverList []*models.Register
 	// 在ORM的数据库default中
 	o.Using("default")

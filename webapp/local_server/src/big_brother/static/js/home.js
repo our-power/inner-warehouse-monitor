@@ -8,6 +8,9 @@ $(function() {
                 plotShadow : false,
                 height:300
             },
+            credits: {
+                enabled : false
+            },
             title : {
                 text : titletext
             },

@@ -11,9 +11,10 @@ type IndicatorDataController struct {
 
 func (this *IndicatorDataController) GetStepIndicatorData() {
 	step := this.GetString("step")
-	queryDate := this.GetString("date")
-	indicator := this.GetString("indicator")
+	//queryDate := this.GetString("date")
+	//indicator := this.GetString("indicator")
 
+	var role string
 	switch step {
 	case "kaipiao":
 		role = "test"
@@ -33,9 +34,11 @@ func (this *IndicatorDataController) GetStepIndicatorData() {
 		o.Using("default")
 		_, err := o.QueryTable("register").Filter("machine_role", role).Values(&maps, "host_name", "hardware_addr")
 		if err == nil {
+			/*
 			for _, machine := range maps {
 
 			}
+			*/
 		}else{
 			this.Data["json"] = nil
 		}
