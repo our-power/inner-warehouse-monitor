@@ -23,7 +23,7 @@ func (this *ApiController) GetMachineIndicator() {
 	var maps []orm.Params
 	if indicator == "cpu_usage" {
 		o.Using("cpu_usage")
-		_, err := o.QueryTable(indicator).Filter("hardware_addr", hardware_addr).Filter("date", date_str).OrderBy("time_index").Values(&maps, "id", "time_index", "ip", "host_name", "usage")
+		_, err := o.QueryTable(indicator).Filter("hardware_addr", hardware_addr).Filter("date", date_str).Limit(-1).OrderBy("time_index").Values(&maps, "id", "time_index", "ip", "host_name", "usage")
 		if err == nil {
 			this.Data["json"] = &maps
 		} else {
@@ -31,7 +31,7 @@ func (this *ApiController) GetMachineIndicator() {
 		}
 	}else if indicator == "mem_usage" {
 		o.Using("mem_usage")
-		_, err := o.QueryTable(indicator).Filter("hardware_addr", hardware_addr).Filter("date", date_str).OrderBy("time_index").Values(&maps, "id", "time_index", "ip", "host_name", "usage")
+		_, err := o.QueryTable(indicator).Filter("hardware_addr", hardware_addr).Filter("date", date_str).Limit(-1).OrderBy("time_index").Values(&maps, "id", "time_index", "ip", "host_name", "usage")
 		if err == nil {
 			this.Data["json"] = &maps
 		} else {
@@ -39,7 +39,7 @@ func (this *ApiController) GetMachineIndicator() {
 		}
 	}else if indicator == "net_flow" {
 		o.Using("net_flow")
-		_, err := o.QueryTable(indicator).Filter("hardware_addr", hardware_addr).Filter("date", date_str).OrderBy("time_index").Values(&maps, "id", "time_index", "ip", "host_name", "out_bytes", "in_bytes", "out_packets", "in_packets")
+		_, err := o.QueryTable(indicator).Filter("hardware_addr", hardware_addr).Filter("date", date_str).Limit(-1).OrderBy("time_index").Values(&maps, "id", "time_index", "ip", "host_name", "out_bytes", "in_bytes", "out_packets", "in_packets")
 		if err == nil {
 			this.Data["json"] = &maps
 		}else {
@@ -79,7 +79,7 @@ func (this * ApiController) GetStatusOverview() {
 	one = 1
 	zero = 0
 	o.Using("default")
-	_, err := o.QueryTable("register").Filter("machine_role", machineRole).Values(&serverList, "ip", "host_name", "hardware_addr", "status")
+	_, err := o.QueryTable("register").Filter("machine_role", machineRole).Limit(-1).Values(&serverList, "ip", "host_name", "hardware_addr", "status")
 	if err != nil {
 		this.Data["json"] = nil
 	} else {

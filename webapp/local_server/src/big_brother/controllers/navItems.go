@@ -20,7 +20,7 @@ func (this *NavItemsController) GetMachineDataGroupByStep() {
 	case "dabao":
 		role = "test"
 	case "fenbo":
-		role = "test"
+		role = "fenbo"
 	default:
 		role = ""
 	}
