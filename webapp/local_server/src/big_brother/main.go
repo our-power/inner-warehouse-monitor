@@ -38,8 +38,10 @@ func main() {
 	fmt.Printf("请访问：%s:%d\n", addr, port)
 
 	beego.Router("/", &controllers.HomeController{})
-	beego.Router("/api/serverindicator", &controllers.ApiController{}, "GET:GetServerIndicator")
-	beego.Router("/api/serverlist", &controllers.ApiController{}, "GET:GetServerList")
-	beego.Router("/servergroupbystep", &controllers.NavItemsController{}, "GET:GetServerDataGroupByStep")
+	beego.Router("/api/machine_indicator", &controllers.ApiController{}, "GET:GetMachineIndicator")
+	beego.Router("/api/machine_list", &controllers.ApiController{}, "GET:GetMachineList")
+	beego.Router("/machine_group_by_step", &controllers.NavItemsController{}, "GET:GetMachineDataGroupByStep")
+	beego.Router("/get_step_indicator_data", &controllers.IndicatorDataController{}, "GET:GetStepIndicatorData")
+	beego.Router("/get_machine_indicators_data", &controllers.IndicatorDataController{}, "GET:GetMachineIndicatorsData")
 	beego.Run()
 }

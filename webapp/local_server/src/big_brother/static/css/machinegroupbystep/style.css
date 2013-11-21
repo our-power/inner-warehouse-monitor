@@ -14,3 +14,7 @@
     left: 0;
     width: 100%;
 }
+
+#query_date_input {
+    margin-right: 50px;
+}

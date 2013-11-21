@@ -9,7 +9,7 @@ type NavItemsController struct {
 	beego.Controller
 }
 
-func (this *NavItemsController) GetServerDataGroupByStep() {
+func (this *NavItemsController) GetMachineDataGroupByStep() {
 	step := this.GetString("step")
 	var role string
 	switch step {
@@ -33,10 +33,10 @@ func (this *NavItemsController) GetServerDataGroupByStep() {
 		_, err := o.QueryTable("register").Filter("machine_role", role).Values(&maps)
 		if err == nil {
 			this.Data["nav_now"] = step
-			this.Data["server_info_list"] = &maps
+			this.Data["machine_info_list"] = &maps
 		}else{
-			this.Data["server_info_list"] = nil
+			this.Data["machine_info_list"] = nil
 		}
-		this.TplNames = "serverDataGroupByStep.html"
+		this.TplNames = "machineDataGroupByStep.html"
 	}
 }
