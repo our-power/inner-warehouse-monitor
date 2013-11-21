@@ -53,7 +53,7 @@ func (this *ApiController) GetServerIndicator() {
 }
 
 /*
-GET /api/serverinuse
+GET /api/serverlist
 */
 func (this *ApiController) GetServerList() {
 	var serverList []*models.Register
@@ -64,6 +64,37 @@ func (this *ApiController) GetServerList() {
 		this.Data["json"] = &serverList
 	}else {
 		this.Data["json"] = nil
+	}
+	this.ServeJson()
+}
+
+/*
+	GET /api/statusoverview?role=xxx
+*/
+func (this * ApiController) GetStatusOverview() {
+	machineRole := this.GetString("role")
+	var serverList []orm.Params
+	var available, shutdown, exception int
+	var one, zero int64
+	one = 1
+	zero = 0
+	o.Using("default")
+	_, err := o.QueryTable("register").Filter("machine_role", machineRole).Values(&serverList, "ip", "host_name", "hardware_addr", "status")
+	if err != nil {
+		this.Data["json"] = nil
+	} else {
+		for _, item := range serverList {
+			switch item["Status"] {
+			case one:
+				available++
+			case zero:
+				shutdown++
+			default:
+				exception++
+			}
+		}
+		statistics := []interface {}{available, shutdown, exception, &serverList}
+		this.Data["json"] = statistics
 	}
 	this.ServeJson()
 }
