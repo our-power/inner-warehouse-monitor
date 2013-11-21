@@ -45,7 +45,7 @@ func (this *IndicatorDataController) GetStepIndicatorData() {
 	date, _ := time.Parse("2006-01-02", queryDate)
 	dateStr := date.Format("20060102")
 
-	if role == "" || dataTable == ""{
+	if role == "" || dataTable == "" {
 		this.Data["json"] = nil
 	}else {
 		database := dataTable
@@ -57,27 +57,29 @@ func (this *IndicatorDataController) GetStepIndicatorData() {
 			if dataTable == "cpu_usage" || dataTable == "mem_usage" {
 				type ResultType struct {
 					Host_name string
-					Data	[]float64
+					Data	  []float64
 				}
 
-				results := make([]ResultType, 0, 50)
+				results := make([]ResultType,0, 50)
 				for _, machine := range maps {
 					var rows []orm.Params
 					num, err := o.QueryTable(dataTable).Filter("hardware_addr", machine["Hardware_addr"]).Filter("date", dateStr).OrderBy("time_index").Limit(-1).Values(&rows, "time_index", "usage")
-					dataContainerLength := int(rows[num-1]["Time_index"].(int64)) + 1
-					usageData := make([]float64, dataContainerLength)
-					for index :=0; index < dataContainerLength; index++ {
-						usageData[index] = -1;
-					}
-
-					if err == nil {
-						for _, row := range rows {
-							time_index, _ := row["Time_index"].(int64)
-							usageData[time_index] = row["Usage"].(float64)
+					if num > 0 {
+						dataContainerLength := int(rows[num - 1]["Time_index"].(int64)) + 1
+						usageData := make([]float64, dataContainerLength)
+						for index := 0; index < dataContainerLength; index++ {
+							usageData[index] = -1;
 						}
+
+						if err == nil {
+							for _, row := range rows {
+								time_index, _ := row["Time_index"].(int64)
+								usageData[time_index] = row["Usage"].(float64)
+							}
+						}
+						host_name, _ := machine["Host_name"].(string)
+						results = append(results, ResultType{Host_name: host_name, Data: usageData})
 					}
-					host_name, _ := machine["Host_name"].(string)
-					results = append(results, ResultType{Host_name: host_name, Data: usageData})
 				}
 				this.Data["json"] = results
 			}else if dataTable == "net_flow" {
@@ -99,7 +101,7 @@ func (this *IndicatorDataController) GetStepIndicatorData() {
 				*/
 			}
 
-		}else{
+		}else {
 			this.Data["json"] = nil
 		}
 	}

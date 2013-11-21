@@ -34,7 +34,7 @@ $(function () {
                 seriesName = "CPU使用率(%)";
                 break;
             case "memory_view":
-                title = queryDate + " , 内存使用量";
+                title = queryDate + " , 内存使用量(MB)";
                 xAxisTitle = "时间";
                 yAxisTitle = "使用量(MB)";
                 seriesName = "使用量(MB)";
@@ -51,10 +51,11 @@ $(function () {
         });
 
         req.done(function (resp) {
-            if (resp != null) {
+            $(href).empty()
+            if (resp != null && resp.length > 0) {
                 var machineCount = resp.length;
                 for (var index = 0; index < machineCount; index++) {
-                    $(href).empty().append($("<div></div>", {
+                    $(href).append($("<div></div>", {
                         "id": indicator + "_" + index
                     }));
                     var container = indicator + "_" + index
