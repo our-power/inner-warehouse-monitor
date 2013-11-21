@@ -1,4 +1,4 @@
-$(function() {
+$(document).ready(function() {
     function chart_pie(obj,titletext,series) {
         var chart = new Highcharts.Chart({
             chart : {
@@ -14,19 +14,19 @@ $(function() {
             title : {
                 text : titletext
             },
-
+            colors: [
+                '#228B22',
+                '#c0c0c0',
+                '#FF0000'
+            ],
             plotOptions : {
                 pie : {
                     allowPointSelect : true,
                     cursor : 'pointer',
                     dataLabels: {
-                        enabled: true,
-                        color: '#000000',
-                        connectorColor: '#000000',
-                        formatter: function() {
-                            return '<b>'+ this.point.name +'</b>: '+ parseInt(this.percentage) +' %';
-                        }
-                    }
+                        enabled: false
+                    },
+                    showInLegend: true
                 }
             },
             series : eval('('+series+')')
