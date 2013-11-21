@@ -33,7 +33,7 @@ $(document).ready(function() {
         });
     }
 
-    var groups = ["test@财务开票"]
+    var groups = ["test@财务开票", "fenbo@分拨"]
     for (var i in groups) {
         if (groups.hasOwnProperty(i)) {
             var sp = new Array();
@@ -51,7 +51,8 @@ $(document).ready(function() {
                 "class": "span7"
             });
             var table_table = $("<table></table>", {
-                "class": "table table-bordered table-condensed"
+                "class": "table table-bordered table-condensed",
+                "id": "table" + group
             });
             var table_head = $("<tr></tr>")
                 .append($("<th>MAC</th>"))
@@ -62,31 +63,34 @@ $(document).ready(function() {
             table_div.append(table_table);
             row.append(pie_div).append(table_div);
             $("#chart-div").append(row).append($("<hr />"));
-            $.getJSON("/api/status_overview?role=" + group, function(data){
-            console.log(data);
-                formatted = '[{"type":"pie", "name":"' + group + '", "data":[["正常", ' + data[0] + '], ["关机", ' + data[1] + '], ["异常", ' + data[2] +']]}]';
-                chart_pie(group, label + ' 概况', formatted);
-                for (var m in data[3]) {
-                    if(data[3].hasOwnProperty(m)){
-                        var status = data[3][m]["Status"];
-                        var desc;
-                        var bgc;
-                        if (status == 1) {
-                            desc = "正常运行中";
-                            bgc = "#e6fcf0";
-                        } else if (status == 0) {
-                            desc = "已正常关机";
-                            bgc = "#c0c0c0";
-                        } else {
-                            desc = "运行异常";
-                            bgc = "#FF6347";
+            $.ajax({
+                "url": "/api/status_overview?role=" + group,
+                "async": false,
+                "success": function(data) {
+                    formatted = '[{"type":"pie", "name":"' + group + '", "data":[["正常", ' + data[0] + '], ["关机", ' + data[1] + '], ["异常", ' + data[2] +']]}]';
+                    chart_pie(group, label + ' 概况', formatted);
+                    for (var m in data[3]) {
+                        if(data[3].hasOwnProperty(m)){
+                            var status = data[3][m]["Status"];
+                            var desc;
+                            var bgc;
+                            if (status == 1) {
+                                desc = "正常运行中";
+                                bgc = "#e6fcf0";
+                            } else if (status == 0) {
+                                desc = "已正常关机";
+                                bgc = "#c0c0c0";
+                            } else {
+                                desc = "运行异常";
+                                bgc = "#FF6347";
+                            }
+                            var data_row = $("<tr></tr>")
+                                .append($("<td>" + data[3][m]["Hardware_addr"] + "</td>"))
+                                .append($("<td>" + data[3][m]["Host_name"] + "</td>"))
+                                .append($("<td>" + desc + "</td>"));
+                            data_row.attr("style", "BACKGROUND-COLOR: " + bgc)
+                            $("#table"+group).append(data_row);
                         }
-                        var data_row = $("<tr></tr>")
-                            .append($("<td>" + data[3][m]["Hardware_addr"] + "</td>"))
-                            .append($("<td>" + data[3][m]["Host_name"] + "</td>"))
-                            .append($("<td>" + desc + "</td>"));
-                        data_row.attr("style", "BACKGROUND-COLOR: " + bgc)
-                        table_table.append(data_row);
                     }
                 }
             })
