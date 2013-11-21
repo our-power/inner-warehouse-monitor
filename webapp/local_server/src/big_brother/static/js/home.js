@@ -41,17 +41,17 @@ $(document).ready(function() {
             group = sp[0];
             label = sp[1];
             var row = $("<div></div>", {
-                class: "row-fluid"
+                "class": "row"
             });
             var pie_div = $("<div></div>", {
-                class: "span5",
-                id: group
+                "class": "span5",
+                "id": group
             });
             var table_div = $("<div></div>", {
-                class: "span7"
+                "class": "span7"
             });
             var table_table = $("<table></table>", {
-                class: "table table-bordered table-condensed"
+                "class": "table table-bordered table-condensed"
             });
             var table_head = $("<tr></tr>")
                 .append($("<th>MAC</th>"))
