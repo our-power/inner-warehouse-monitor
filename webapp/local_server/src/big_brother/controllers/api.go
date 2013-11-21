@@ -12,9 +12,9 @@ type ApiController struct {
 }
 
 /*
-GET /api/machine_indicator?hardwareaddr=xxxx&indicator=xxx&date=xxxx
+GET /api/serverindicator?hardwareaddr=xxxx&indicator=xxx&date=xxxx
 */
-func (this *ApiController) GetMachineIndicator() {
+func (this *ApiController) GetServerIndicator() {
 	hardware_addr := this.GetString("hardwareaddr")
 	indicator := this.GetString("indicator")
 	date, _ := time.Parse("2006-01-02", this.GetString("date"))
@@ -55,15 +55,46 @@ func (this *ApiController) GetMachineIndicator() {
 /*
 GET /api/machine_list
 */
-func (this *ApiController) GetMachineList() {
-	var machineList []*models.Register
+func (this *ApiController) GetServerList() {
+	var serverList []*models.Register
 	// 在ORM的数据库default中
 	o.Using("default")
-	_, err := o.QueryTable("register").All(&machineList)
+	_, err := o.QueryTable("register").All(&serverList)
 	if err == nil {
-		this.Data["json"] = &machineList
+		this.Data["json"] = &serverList
 	}else {
 		this.Data["json"] = nil
+	}
+	this.ServeJson()
+}
+
+/*
+	GET /api/statusoverview?role=xxx
+*/
+func (this * ApiController) GetStatusOverview() {
+	machineRole := this.GetString("role")
+	var serverList []orm.Params
+	var available, shutdown, exception int
+	var one, zero int64
+	one = 1
+	zero = 0
+	o.Using("default")
+	_, err := o.QueryTable("register").Filter("machine_role", machineRole).Values(&serverList, "ip", "host_name", "hardware_addr", "status")
+	if err != nil {
+		this.Data["json"] = nil
+	} else {
+		for _, item := range serverList {
+			switch item["Status"] {
+			case one:
+				available++
+			case zero:
+				shutdown++
+			default:
+				exception++
+			}
+		}
+		statistics := []interface {}{available, shutdown, exception, &serverList}
+		this.Data["json"] = statistics
 	}
 	this.ServeJson()
 }

@@ -3,7 +3,8 @@
 		{"name":"cpu_usage", "topic":"cpu_usage", "interval":"30", "type":"perf"},
 		{"name":"flow", "topic":"net_flow", "interval":"30", "type":"perf"},
 		{"name":"mem_usage", "topic":"mem_usage", "interval":"30", "type":"perf"},
-		{"name":"ping_ip", "topic":"accessibility", "interval":"30", "type":"exec"}
+		{"name":"ping_ip", "topic":"accessibility", "interval":"30", "type":"exec"},
+		{"name":"telnet_ip_port", "topic":"accessibility", "interval":"30", "type":"exec"}
 	],
 	"OutModules":[
 		{"name":"inner-warehouse", "url":"http://10.24.178.60:4151/put", "host":""}
