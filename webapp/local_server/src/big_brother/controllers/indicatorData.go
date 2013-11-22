@@ -1,7 +1,10 @@
 package controllers
 
 import (
+	"fmt"
 	"time"
+	"strings"
+	"strconv"
 
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
@@ -64,41 +67,82 @@ func (this *IndicatorDataController) GetStepIndicatorData() {
 				for _, machine := range maps {
 					var rows []orm.Params
 					num, err := o.QueryTable(dataTable).Filter("hardware_addr", machine["Hardware_addr"]).Filter("date", dateStr).OrderBy("time_index").Limit(-1).Values(&rows, "time_index", "usage")
-					if num > 0 {
+					if err == nil && num > 0 {
 						dataContainerLength := int(rows[num - 1]["Time_index"].(int64)) + 1
 						usageData := make([]float64, dataContainerLength)
 						for index := 0; index < dataContainerLength; index++ {
 							usageData[index] = -1;
 						}
 
-						if err == nil {
-							for _, row := range rows {
-								time_index, _ := row["Time_index"].(int64)
-								usageData[time_index] = row["Usage"].(float64)
-							}
+
+						for _, row := range rows {
+							time_index, _ := row["Time_index"].(int64)
+							usageData[time_index] = row["Usage"].(float64)
 						}
+
 						host_name, _ := machine["Host_name"].(string)
 						results = append(results, ResultType{Host_name: host_name, Data: usageData})
 					}
 				}
 				this.Data["json"] = results
 			}else if dataTable == "net_flow" {
-				/*
-				type UsageDataType struct {
-					Time_index int
-					Out_bytes string
-					In_bytes string
-					Out_packets string
-					In_packets string
+				fmt.Println("In net_flow handle process...")
+				type NcDataType struct {
+					Out_bytes   []float64
+					In_bytes    []float64
+					Out_packets []float64
+					In_packets  []float64
 				}
 				type ResultType struct {
 					Host_name string
-					Data	[]UsageDataType
+					Data	  []NcDataType
 				}
+				results := make([]ResultType,0, 50)
 				for _, machine := range maps {
-					_, err = o.QueryTable(dataTable).Filter("hardware_addr", machine["hardware_addr"]).Filter("date", dateStr)
+					var rows []orm.Params;
+					num, err := o.QueryTable(dataTable).Filter("hardware_addr", machine["Hardware_addr"]).Filter("date", dateStr).OrderBy("time_index").Limit(-1).Values(&rows, "time_index", "out_bytes", "in_bytes", "out_packets", "in_packets")
+					if err == nil && num > 0 {
+						dataContainerLength := int(rows[num - 1]["Time_index"].(int64)) + 1
+						ncNum := len(strings.Split(rows[0]["Out_bytes"].(string), ","))
+						ncData := make([]NcDataType, ncNum)
+						for index := 0; index < ncNum; index++ {
+							outBytes := make([]float64, dataContainerLength)
+							inBytes := make([]float64, dataContainerLength)
+							outPackets := make([]float64, dataContainerLength)
+							inPackets := make([]float64, dataContainerLength)
+							for index := 0; index < dataContainerLength; index++ {
+								outBytes[index] = -1
+								inBytes[index] = -1
+								outPackets[index] = -1
+								inPackets[index] = -1
+							}
+							ncData[index] = NcDataType{
+								Out_bytes: outBytes,
+								In_bytes: inBytes,
+								Out_packets: outPackets,
+								In_packets: inPackets,
+							}
+						}
+						for _, row := range rows {
+							ncsOutByte := strings.Split(row["Out_bytes"].(string), ",")
+							ncsInByte := strings.Split(row["In_bytes"].(string), ",")
+							ncsOutPacket := strings.Split(row["Out_packets"].(string), ",")
+							ncsInPacket := strings.Split(row["In_packets"].(string), ",")
+							for i := 0; i < ncNum; i++ {
+								ob, _ := strconv.ParseFloat(ncsOutByte[i], 32)
+								ncData[i].Out_bytes[int(row["Time_index"].(int64))] = ob
+								ib, _ := strconv.ParseFloat(ncsInByte[i], 32)
+								ncData[i].In_bytes[int(row["Time_index"].(int64))] = ib
+								op, _ := strconv.ParseFloat(ncsOutPacket[i], 32)
+								ncData[i].Out_packets[int(row["Time_index"].(int64))] = op
+								ip, _ := strconv.ParseFloat(ncsInPacket[i], 32)
+								ncData[i].In_packets[int(row["Time_index"].(int64))] = ip
+							}
+						}
+						results = append(results, ResultType{Host_name: machine["Host_name"].(string), Data: ncData})
+					}
 				}
-				*/
+				this.Data["json"] = results
 			}
 
 		}else {
