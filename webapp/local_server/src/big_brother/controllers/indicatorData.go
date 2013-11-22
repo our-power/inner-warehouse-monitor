@@ -1,13 +1,14 @@
 package controllers
 
 import (
-	"fmt"
+	//"fmt"
 	"time"
 	"strings"
 	"strconv"
 
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
+	"big_brother/models"
 )
 
 type IndicatorDataController struct {
@@ -86,12 +87,11 @@ func (this *IndicatorDataController) GetStepIndicatorData() {
 				}
 				this.Data["json"] = results
 			}else if dataTable == "net_flow" {
-				fmt.Println("In net_flow handle process...")
 				type NcDataType struct {
-					Out_bytes   []float64
-					In_bytes    []float64
-					Out_packets []float64
-					In_packets  []float64
+					Out_bytes   []int
+					In_bytes    []int
+					Out_packets []int
+					In_packets  []int
 				}
 				type ResultType struct {
 					Host_name string
@@ -106,10 +106,10 @@ func (this *IndicatorDataController) GetStepIndicatorData() {
 						ncNum := len(strings.Split(rows[0]["Out_bytes"].(string), ","))
 						ncData := make([]NcDataType, ncNum)
 						for index := 0; index < ncNum; index++ {
-							outBytes := make([]float64, dataContainerLength)
-							inBytes := make([]float64, dataContainerLength)
-							outPackets := make([]float64, dataContainerLength)
-							inPackets := make([]float64, dataContainerLength)
+							outBytes := make([]int, dataContainerLength)
+							inBytes := make([]int, dataContainerLength)
+							outPackets := make([]int, dataContainerLength)
+							inPackets := make([]int, dataContainerLength)
 							for index := 0; index < dataContainerLength; index++ {
 								outBytes[index] = -1
 								inBytes[index] = -1
@@ -130,13 +130,13 @@ func (this *IndicatorDataController) GetStepIndicatorData() {
 							ncsInPacket := strings.Split(row["In_packets"].(string), ",")
 							for i := 0; i < ncNum; i++ {
 								ob, _ := strconv.ParseFloat(ncsOutByte[i], 32)
-								ncData[i].Out_bytes[int(row["Time_index"].(int64))] = ob
+								ncData[i].Out_bytes[int(row["Time_index"].(int64))] = int(ob)
 								ib, _ := strconv.ParseFloat(ncsInByte[i], 32)
-								ncData[i].In_bytes[int(row["Time_index"].(int64))] = ib
+								ncData[i].In_bytes[int(row["Time_index"].(int64))] = int(ib)
 								op, _ := strconv.ParseFloat(ncsOutPacket[i], 32)
-								ncData[i].Out_packets[int(row["Time_index"].(int64))] = op
+								ncData[i].Out_packets[int(row["Time_index"].(int64))] = int(op)
 								ip, _ := strconv.ParseFloat(ncsInPacket[i], 32)
-								ncData[i].In_packets[int(row["Time_index"].(int64))] = ip
+								ncData[i].In_packets[int(row["Time_index"].(int64))] = int(ip)
 							}
 						}
 						results = append(results, ResultType{Host_name: machine["Host_name"].(string), Data: ncData})
@@ -152,7 +152,98 @@ func (this *IndicatorDataController) GetStepIndicatorData() {
 	this.ServeJson()
 }
 
+// 获取某一天某机器机器 CPU使用率 或 内存使用量 或 网卡数据
+func (this *IndicatorDataController) GetMachineIndicatorData() {
+	hardwareAddr := this.GetString("hardware_addr")
+	indicator := this.GetString("indicator")
+	queryDate := this.GetString("date")
+	date, _ := time.Parse("2006-01-02", queryDate)
+	dateStr := date.Format("20060102")
 
-func (this *IndicatorDataController) GetMachineIndicatorsData() {
-
+	if indicator == "cpu_usage" {
+		o.Using("cpu_usage")
+		var cpuUsageData []*models.Cpu_usage
+		num, err := o.QueryTable("cpu_usage").Filter("hardware_addr", hardwareAddr).Filter("date", dateStr).OrderBy("time_index").All(&cpuUsageData, "time_index", "usage")
+		if err == nil && num > 0 {
+			dataContainerLength := cpuUsageData[num - 1].Time_index + 1
+			results := make([]float32, dataContainerLength)
+			for index := 0; index < dataContainerLength; index++ {
+				results[index] = -1
+			}
+			for _, row := range cpuUsageData {
+				results[row.Time_index] = row.Usage
+			}
+			this.Data["json"] = results
+		}else {
+			this.Data["json"] = nil
+		}
+	}else if indicator == "mem_usage" {
+		o.Using("mem_usage")
+		var memUsageData []*models.Mem_usage
+		num, err := o.QueryTable("mem_usage").Filter("hardware_addr", hardwareAddr).Filter("date", dateStr).OrderBy("time_index").All(&memUsageData, "time_index", "usage")
+		if err == nil && num > 0 {
+			dataContainerLength := memUsageData[num - 1].Time_index + 1
+			results := make([]float32, dataContainerLength)
+			for index := 0; index < dataContainerLength; index++ {
+				results[index] = -1
+			}
+			for _, row := range memUsageData {
+				results[row.Time_index] = row.Usage
+			}
+			this.Data["json"] = results
+		}else {
+			this.Data["json"] = nil
+		}
+	}else {
+		o.Using("net_flow")
+		var netFlowData []*models.Net_flow
+		num, err := o.QueryTable("net_flow").Filter("hardware_addr", hardwareAddr).Filter("date", dateStr).OrderBy("time_index").All(&netFlowData, "time_index", "out_bytes", "in_bytes", "out_packets", "in_packets")
+		if err == nil && num > 0 {
+			dataContainerLength := netFlowData[num - 1].Time_index + 1
+			outBytes := make([]int, dataContainerLength)
+			inBytes := make([]int, dataContainerLength)
+			outPackets := make([]int, dataContainerLength)
+			inPackets := make([]int, dataContainerLength)
+			for index := 0; index < dataContainerLength; index++ {
+				outBytes[index] = -1
+				inBytes[index] = -1
+				outPackets[index] = -1
+				inPackets[index] = -1
+			}
+			networkCardNum := len(strings.Split(netFlowData[0].Out_bytes, ","))
+			type ResultType struct {
+				Out_bytes   []int
+				In_bytes    []int
+				Out_packets []int
+				In_packets  []int
+			}
+			results := make([]ResultType, networkCardNum)
+			for index := 0; index < networkCardNum; index++ {
+				results[index].Out_bytes = outBytes
+				results[index].In_bytes = inBytes
+				results[index].Out_packets = outPackets
+				results[index].In_packets = inPackets
+			}
+			for _, row := range netFlowData {
+				ncsOutBytes := strings.Split(row.Out_bytes, ",")
+				ncsInBytes := strings.Split(row.In_bytes, ",")
+				ncsOutPackets := strings.Split(row.Out_packets, ",")
+				ncsInPackets := strings.Split(row.In_packets, ",")
+				for index := 0; index < networkCardNum; index++ {
+					outBytesFloat, _ := strconv.ParseFloat(ncsOutBytes[index], 32)
+					results[index].Out_bytes[row.Time_index] = int(outBytesFloat)
+					inBytesFloat, _ := strconv.ParseFloat(ncsInBytes[index], 32)
+					results[index].In_bytes[row.Time_index] = int(inBytesFloat)
+					outPacketsFloat, _ := strconv.ParseFloat(ncsOutPackets[index], 32)
+					results[index].Out_packets[row.Time_index] = int(outPacketsFloat)
+					inPacketsFloat, _ := strconv.ParseFloat(ncsInPackets[index], 32)
+					results[index].In_packets[row.Time_index] = int(inPacketsFloat)
+				}
+			}
+			this.Data["json"] = results
+		}else {
+			this.Data["json"] = nil
+		}
+	}
+	this.ServeJson()
 }

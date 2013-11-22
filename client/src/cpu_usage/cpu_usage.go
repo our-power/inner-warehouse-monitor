@@ -2,7 +2,7 @@ package cpu_usage
 
 import (
 	"database/sql"
-	//"fmt"
+	"fmt"
 	"strings"
 	"strconv"
 	_ "github.com/mattn/go-sqlite3"
@@ -17,6 +17,7 @@ func (h *CPUUsageHandler) HandleMessage(m *nsq.Message)(err error){
 	/*
 	实现队列消息处理功能
 	*/
+	fmt.Printf("%s\n",m.Body)
 	bodyParts := strings.Split(string(m.Body), "\r\n")
 	time_index, err := strconv.Atoi(bodyParts[1])
 	sql := `

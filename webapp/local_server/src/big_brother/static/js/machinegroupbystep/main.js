@@ -64,7 +64,7 @@ $(function () {
             'class': 'wait-tips lead'
         });
         wait_tip_div.append($('<i></i>', {
-            'class': 'fa fa-spinner fa-spin fa-4x'
+            'class': 'fa fa-spinner fa-spin fa-3x'
         }));
         wait_tip_div.append(' 请稍等，我正努力地加载数据！');
         $(href).empty().append(wait_tip_div);
