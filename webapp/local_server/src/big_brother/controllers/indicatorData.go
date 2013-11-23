@@ -1,10 +1,11 @@
 package controllers
 
 import (
-	//"fmt"
 	"time"
 	"strings"
 	"strconv"
+
+	"runtime"
 
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
@@ -16,6 +17,10 @@ type IndicatorDataController struct {
 }
 
 func (this *IndicatorDataController) GetStepIndicatorData() {
+
+	// 主动触发垃圾回收，但还没测过效果
+	runtime.GC()
+
 	step := this.GetString("step")
 	queryDate := this.GetString("date")
 	indicator := this.GetString("indicator")
@@ -74,8 +79,6 @@ func (this *IndicatorDataController) GetStepIndicatorData() {
 						for index := 0; index < dataContainerLength; index++ {
 							usageData[index] = -1;
 						}
-
-
 						for _, row := range rows {
 							time_index, _ := row["Time_index"].(int64)
 							usageData[time_index] = row["Usage"].(float64)
@@ -103,7 +106,7 @@ func (this *IndicatorDataController) GetStepIndicatorData() {
 					num, err := o.QueryTable(dataTable).Filter("hardware_addr", machine["Hardware_addr"]).Filter("date", dateStr).OrderBy("time_index").Limit(-1).Values(&rows, "time_index", "out_bytes", "in_bytes", "out_packets", "in_packets")
 					if err == nil && num > 0 {
 						dataContainerLength := int(rows[num - 1]["Time_index"].(int64)) + 1
-						ncNum := len(strings.Split(rows[0]["Out_bytes"].(string), ","))
+						ncNum := len(strings.Split(rows[num-1]["Out_bytes"].(string), ","))
 						ncData := make([]NcDataType, ncNum)
 						for index := 0; index < ncNum; index++ {
 							outBytes := make([]int, dataContainerLength)
@@ -144,7 +147,6 @@ func (this *IndicatorDataController) GetStepIndicatorData() {
 				}
 				this.Data["json"] = results
 			}
-
 		}else {
 			this.Data["json"] = nil
 		}
@@ -154,6 +156,9 @@ func (this *IndicatorDataController) GetStepIndicatorData() {
 
 // 获取某一天某机器机器 CPU使用率 或 内存使用量 或 网卡数据
 func (this *IndicatorDataController) GetMachineIndicatorData() {
+
+	runtime.GC()
+
 	hardwareAddr := this.GetString("hardware_addr")
 	indicator := this.GetString("indicator")
 	queryDate := this.GetString("date")
@@ -200,17 +205,7 @@ func (this *IndicatorDataController) GetMachineIndicatorData() {
 		num, err := o.QueryTable("net_flow").Filter("hardware_addr", hardwareAddr).Filter("date", dateStr).OrderBy("time_index").All(&netFlowData, "time_index", "out_bytes", "in_bytes", "out_packets", "in_packets")
 		if err == nil && num > 0 {
 			dataContainerLength := netFlowData[num - 1].Time_index + 1
-			outBytes := make([]int, dataContainerLength)
-			inBytes := make([]int, dataContainerLength)
-			outPackets := make([]int, dataContainerLength)
-			inPackets := make([]int, dataContainerLength)
-			for index := 0; index < dataContainerLength; index++ {
-				outBytes[index] = -1
-				inBytes[index] = -1
-				outPackets[index] = -1
-				inPackets[index] = -1
-			}
-			networkCardNum := len(strings.Split(netFlowData[0].Out_bytes, ","))
+			networkCardNum := len(strings.Split(netFlowData[num-1].Out_bytes, ","))
 			type ResultType struct {
 				Out_bytes   []int
 				In_bytes    []int
@@ -219,6 +214,16 @@ func (this *IndicatorDataController) GetMachineIndicatorData() {
 			}
 			results := make([]ResultType, networkCardNum)
 			for index := 0; index < networkCardNum; index++ {
+				outBytes := make([]int, dataContainerLength)
+				inBytes := make([]int, dataContainerLength)
+				outPackets := make([]int, dataContainerLength)
+				inPackets := make([]int, dataContainerLength)
+				for index := 0; index < dataContainerLength; index++ {
+					outBytes[index] = -1
+					inBytes[index] = -1
+					outPackets[index] = -1
+					inPackets[index] = -1
+				}
 				results[index].Out_bytes = outBytes
 				results[index].In_bytes = inBytes
 				results[index].Out_packets = outPackets

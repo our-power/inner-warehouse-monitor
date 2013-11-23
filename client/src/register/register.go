@@ -32,9 +32,9 @@ func (h *RegisterToDBHandler) HandleMessage(m *nsq.Message) (err error) {
 	if bodyParts[5] == "shutdown" {
 		status = 0
 		sql := `
-		REPLACE INTO register (date, time_index, ip, host_name, hardware_addr, status) VALUES (?, ?, ?, ?, ?, ?);
+		UPDATE register SET date=?, time_index=?, ip=?, host_name=?, status=? WHERE hardware_addr=?;
 		`
-		_, err = h.db.Exec(sql, bodyParts[0], time_index, bodyParts[2], bodyParts[3], bodyParts[4], status)
+		_, err = h.db.Exec(sql, bodyParts[0], time_index, bodyParts[2], bodyParts[3], status, bodyParts[4])
 	} else {
 		status = 1
 		version_role := strings.Split(bodyParts[5], ",")
