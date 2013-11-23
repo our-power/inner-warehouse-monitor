@@ -56,7 +56,7 @@ $(function () {
 
         var req = $.ajax({
             "type": "get",
-            "url": "/get_step_indicator_data?step=" + step + "&date=" + queryDate + "&indicator=" + indicator,
+            "url": "/api/get_step_indicator_data?step=" + step + "&date=" + queryDate + "&indicator=" + indicator,
             "dataType": "json"
         });
 
