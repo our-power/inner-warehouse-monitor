@@ -39,6 +39,7 @@ func main() {
 
 	beego.Router("/", &controllers.HomeController{})
 	beego.Router("/machine_group_by_step", &controllers.NavItemsController{}, "GET:GetMachineDataGroupByStep")
+	beego.Router("/search_machine", &controllers.SearchController{}, "GET:GetSearchPage")
 
 	beego.Router("/api/get_machine_list", &controllers.ApiController{}, "GET:GetMachineList")
 	beego.Router("/api/get_step_indicator_data", &controllers.ApiController{}, "GET:GetStepIndicatorData")

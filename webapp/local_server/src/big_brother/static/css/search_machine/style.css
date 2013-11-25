@@ -1,0 +1,21 @@
+#below-navbar {
+    margin-top: 80px;
+}
+
+.footer {
+    text-align: center;
+    padding: 30px 0;
+    margin-top: 70px;
+    border-top: 1px solid #e5e5e5;
+    background-color: #f5f5f5;
+    left: 0;
+    width: 100%;
+}
+
+#machine-list {
+    vertical-align: top;
+}
+
+#query_date_input, #machine-list{
+    margin-right: 15px;
+}

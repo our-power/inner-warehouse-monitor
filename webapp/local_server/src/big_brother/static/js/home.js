@@ -38,8 +38,8 @@ $(document).ready(function () {
         if (groups.hasOwnProperty(i)) {
             var sp = new Array();
             sp = groups[i].split("@");
-            group = sp[0];
-            label = sp[1];
+            var group = sp[0];
+            var label = sp[1];
             var row = $("<div></div>", {
                 "class": "row"
             });
@@ -67,7 +67,7 @@ $(document).ready(function () {
                 "url": "/api/status_overview?role=" + group,
                 "async": false,
                 "success": function (data) {
-                    formatted = '[{"type":"pie", "name":"' + group + '", "data":[["正常", ' + data[0] + '], ["关机", ' + data[1] + '], ["异常", ' + data[2] + ']]}]';
+                    var formatted = '[{"type":"pie", "name":"' + group + '", "data":[["正常", ' + data[0] + '], ["关机", ' + data[1] + '], ["异常", ' + data[2] + ']]}]';
                     chart_pie(group, label + ' 概况', formatted);
                     for (var m in data[3]) {
                         if (data[3].hasOwnProperty(m)) {
