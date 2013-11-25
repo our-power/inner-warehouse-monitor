@@ -42,10 +42,10 @@ type Net_flow struct {
 	Ip string
 	Host_name string
 	Hardware_addr string
-	Out_bytes string
-	In_bytes string
-	Out_packets string
-	In_packets string
+	Out_bytes int
+	In_bytes int
+	Out_packets int
+	In_packets int
 }
 
 type Heart_beat struct {

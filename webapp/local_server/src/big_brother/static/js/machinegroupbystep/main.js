@@ -70,15 +70,13 @@ $(function () {
         $(href).empty().append(wait_tip_div);
 
         req.done(function (resp) {
-            $(href).empty();
-            if (resp != null && resp.length > 0) {
-                var machineCount = resp.length;
-                if (indicator === "netflow_view") {
-                    for (var x = 0; x < machineCount; x++) {
-                        var networkCardCount = resp[x].Data.length;
-                        for (var y = 0; y < networkCardCount; y++) {
-                            var packetsElementId = indicator + "_nc_" + y + "_packets_" + x;
-                            var bytesElementId = indicator + "_nc_" + y + "_bytes_" + x;
+                $(href).empty();
+                if (resp != null && resp.length > 0) {
+                    var machineCount = resp.length;
+                    if (indicator === "netflow_view") {
+                        for (var x = 0; x < machineCount; x++) {
+                            var packetsElementId = indicator + "_nc_packets_" + x;
+                            var bytesElementId = indicator + "_nc_bytes_" + x;
                             $(href).append($("<div></div>", {
                                     "id": packetsElementId
                                 })).append($("<div></div>", {
@@ -91,19 +89,19 @@ $(function () {
                                     name: "入包量(个)",
                                     pointInterval: 30 * 1000,
                                     pointStart: Date.UTC(new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate()),
-                                    data: resp[x].Data[y].In_packets
+                                    data: resp[x].Data.In_packets
                                 },
                                 {
                                     type: "area",
                                     name: "出包量(个)",
                                     pointInterval: 30 * 1000,
                                     pointStart: Date.UTC(new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate()),
-                                    data: resp[x].Data[y].Out_packets
+                                    data: resp[x].Data.Out_packets
                                 }
                             ];
                             var data = {
                                 container: packetsElementId,
-                                chartTitle: resp[x].Host_name + " 网卡" + y + " , " + netflow_packets_title,
+                                chartTitle: resp[x].Host_name + " , " + netflow_packets_title,
                                 xAxisTitle: netflow_xAxisTitle,
                                 yAxisTitle: netflow_packets_yAxisTitle,
                                 series: packetsSeries
@@ -117,54 +115,52 @@ $(function () {
                                     name: "入流量(byte)",
                                     pointInterval: 30 * 1000,
                                     pointStart: Date.UTC(new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate()),
-                                    data: resp[x].Data[y].In_bytes
+                                    data: resp[x].Data.In_bytes
                                 },
                                 {
                                     type: "area",
                                     name: "出流量(byte)",
                                     pointInterval: 30 * 1000,
                                     pointStart: Date.UTC(new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate()),
-                                    data: resp[x].Data[y].Out_bytes
+                                    data: resp[x].Data.Out_bytes
                                 }
                             ];
                             data = {
                                 container: bytesElementId,
-                                chartTitle: resp[x].Host_name + " 网卡" + y + " , " + netflow_bytes_title,
+                                chartTitle: resp[x].Host_name + " , " + netflow_bytes_title,
                                 xAxisTitle: netflow_xAxisTitle,
                                 yAxisTitle: netflow_bytes_yAxisTitle,
                                 series: bytesSeries
                             };
                             plotHighCharts(data);
                         }
-
-                    }
-                } else {
-                    for (var index = 0; index < machineCount; index++) {
-                        var elementId = indicator + "_" + index;
-                        $(href).append($("<div></div>", {
-                            "id": elementId
-                        }));
-                        var series = [
-                            {
-                                type: 'area',
-                                name: seriesName,
-                                pointInterval: 30 * 1000,
-                                pointStart: Date.UTC(new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate()),
-                                data: resp[index].Data
+                    } else {
+                        for (var index = 0; index < machineCount; index++) {
+                            var elementId = indicator + "_" + index;
+                            $(href).append($("<div></div>", {
+                                "id": elementId
+                            }));
+                            var series = [
+                                {
+                                    type: 'area',
+                                    name: seriesName,
+                                    pointInterval: 30 * 1000,
+                                    pointStart: Date.UTC(new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate()),
+                                    data: resp[index].Data
+                                }
+                            ];
+                            var data = {
+                                container: elementId,
+                                chartTitle: resp[index].Host_name + " , " + title,
+                                xAxisTitle: xAxisTitle,
+                                yAxisTitle: yAxisTitle,
+                                series: series
                             }
-                        ];
-                        var data = {
-                            container: elementId,
-                            chartTitle: resp[index].Host_name + " , " + title,
-                            xAxisTitle: xAxisTitle,
-                            yAxisTitle: yAxisTitle,
-                            series: series
+                            plotHighCharts(data);
                         }
-                        plotHighCharts(data);
                     }
                 }
-            }
-        });
+            });
     });
 
     function plotHighCharts(data) {

@@ -1,9 +1,8 @@
 package controllers
 
 import (
+	//"fmt"
 	"time"
-	"strings"
-	"strconv"
 
 	"runtime"
 
@@ -76,11 +75,11 @@ func (this *ApiController) GetStepIndicatorData() {
 	var role string
 	switch step {
 	case "kaipiao":
-		role = "test"
+		role = "kaipiao"
 	case "ercifenjian":
-		role = "test"
+		role = "ercifenjian"
 	case "dabao":
-		role = "test"
+		role = "dabao"
 	case "fenbo":
 		role = "fenbo"
 	default:
@@ -116,7 +115,6 @@ func (this *ApiController) GetStepIndicatorData() {
 					Host_name string
 					Data	  []float64
 				}
-
 				results := make([]ResultType,0, 50)
 				for _, machine := range maps {
 					var rows []orm.Params
@@ -146,7 +144,7 @@ func (this *ApiController) GetStepIndicatorData() {
 				}
 				type ResultType struct {
 					Host_name string
-					Data	  []NcDataType
+					Data	  NcDataType
 				}
 				results := make([]ResultType,0, 50)
 				for _, machine := range maps {
@@ -154,41 +152,28 @@ func (this *ApiController) GetStepIndicatorData() {
 					num, err := o.QueryTable(dataTable).Filter("hardware_addr", machine["Hardware_addr"]).Filter("date", dateStr).OrderBy("time_index").Limit(-1).Values(&rows, "time_index", "out_bytes", "in_bytes", "out_packets", "in_packets")
 					if err == nil && num > 0 {
 						dataContainerLength := int(rows[num - 1]["Time_index"].(int64)) + 1
-						ncNum := len(strings.Split(rows[num-1]["Out_bytes"].(string), ","))
-						ncData := make([]NcDataType, ncNum)
-						for index := 0; index < ncNum; index++ {
-							outBytes := make([]int, dataContainerLength)
-							inBytes := make([]int, dataContainerLength)
-							outPackets := make([]int, dataContainerLength)
-							inPackets := make([]int, dataContainerLength)
-							for index := 0; index < dataContainerLength; index++ {
-								outBytes[index] = -1
-								inBytes[index] = -1
-								outPackets[index] = -1
-								inPackets[index] = -1
-							}
-							ncData[index] = NcDataType{
-								Out_bytes: outBytes,
-								In_bytes: inBytes,
-								Out_packets: outPackets,
-								In_packets: inPackets,
-							}
+
+						outBytes := make([]int, dataContainerLength)
+						inBytes := make([]int, dataContainerLength)
+						outPackets := make([]int, dataContainerLength)
+						inPackets := make([]int, dataContainerLength)
+						for index := 0; index < dataContainerLength; index++ {
+							outBytes[index] = -1
+							inBytes[index] = -1
+							outPackets[index] = -1
+							inPackets[index] = -1
+						}
+						ncData := NcDataType{
+							Out_bytes: outBytes,
+							In_bytes: inBytes,
+							Out_packets: outPackets,
+							In_packets: inPackets,
 						}
 						for _, row := range rows {
-							ncsOutByte := strings.Split(row["Out_bytes"].(string), ",")
-							ncsInByte := strings.Split(row["In_bytes"].(string), ",")
-							ncsOutPacket := strings.Split(row["Out_packets"].(string), ",")
-							ncsInPacket := strings.Split(row["In_packets"].(string), ",")
-							for i := 0; i < ncNum; i++ {
-								ob, _ := strconv.ParseFloat(ncsOutByte[i], 32)
-								ncData[i].Out_bytes[int(row["Time_index"].(int64))] = int(ob)
-								ib, _ := strconv.ParseFloat(ncsInByte[i], 32)
-								ncData[i].In_bytes[int(row["Time_index"].(int64))] = int(ib)
-								op, _ := strconv.ParseFloat(ncsOutPacket[i], 32)
-								ncData[i].Out_packets[int(row["Time_index"].(int64))] = int(op)
-								ip, _ := strconv.ParseFloat(ncsInPacket[i], 32)
-								ncData[i].In_packets[int(row["Time_index"].(int64))] = int(ip)
-							}
+							ncData.Out_bytes[int(row["Time_index"].(int64))] = int(row["Out_bytes"].(int64))
+							ncData.In_bytes[int(row["Time_index"].(int64))] = int(row["In_bytes"].(int64))
+							ncData.Out_packets[int(row["Time_index"].(int64))] = int(row["Out_packets"].(int64))
+							ncData.In_packets[int(row["Time_index"].(int64))] = int(row["In_packets"].(int64))
 						}
 						results = append(results, ResultType{Host_name: machine["Host_name"].(string), Data: ncData})
 					}
@@ -254,45 +239,28 @@ func (this *ApiController) GetMachineIndicatorData() {
 		num, err := o.QueryTable("net_flow").Filter("hardware_addr", hardwareAddr).Filter("date", dateStr).OrderBy("time_index").All(&netFlowData, "time_index", "out_bytes", "in_bytes", "out_packets", "in_packets")
 		if err == nil && num > 0 {
 			dataContainerLength := netFlowData[num - 1].Time_index + 1
-			networkCardNum := len(strings.Split(netFlowData[num-1].Out_bytes, ","))
 			type ResultType struct {
 				Out_bytes   []int
 				In_bytes    []int
 				Out_packets []int
 				In_packets  []int
 			}
-			results := make([]ResultType, networkCardNum)
-			for index := 0; index < networkCardNum; index++ {
-				outBytes := make([]int, dataContainerLength)
-				inBytes := make([]int, dataContainerLength)
-				outPackets := make([]int, dataContainerLength)
-				inPackets := make([]int, dataContainerLength)
-				for index := 0; index < dataContainerLength; index++ {
-					outBytes[index] = -1
-					inBytes[index] = -1
-					outPackets[index] = -1
-					inPackets[index] = -1
-				}
-				results[index].Out_bytes = outBytes
-				results[index].In_bytes = inBytes
-				results[index].Out_packets = outPackets
-				results[index].In_packets = inPackets
+			outBytes := make([]int, dataContainerLength)
+			inBytes := make([]int, dataContainerLength)
+			outPackets := make([]int, dataContainerLength)
+			inPackets := make([]int, dataContainerLength)
+			for index := 0; index < dataContainerLength; index++ {
+				outBytes[index] = -1
+				inBytes[index] = -1
+				outPackets[index] = -1
+				inPackets[index] = -1
 			}
+			results := ResultType{Out_bytes: outBytes, In_bytes: inBytes, Out_packets: outPackets, In_packets: inPackets}
 			for _, row := range netFlowData {
-				ncsOutBytes := strings.Split(row.Out_bytes, ",")
-				ncsInBytes := strings.Split(row.In_bytes, ",")
-				ncsOutPackets := strings.Split(row.Out_packets, ",")
-				ncsInPackets := strings.Split(row.In_packets, ",")
-				for index := 0; index < networkCardNum; index++ {
-					outBytesFloat, _ := strconv.ParseFloat(ncsOutBytes[index], 32)
-					results[index].Out_bytes[row.Time_index] = int(outBytesFloat)
-					inBytesFloat, _ := strconv.ParseFloat(ncsInBytes[index], 32)
-					results[index].In_bytes[row.Time_index] = int(inBytesFloat)
-					outPacketsFloat, _ := strconv.ParseFloat(ncsOutPackets[index], 32)
-					results[index].Out_packets[row.Time_index] = int(outPacketsFloat)
-					inPacketsFloat, _ := strconv.ParseFloat(ncsInPackets[index], 32)
-					results[index].In_packets[row.Time_index] = int(inPacketsFloat)
-				}
+				results.Out_bytes[row.Time_index] = row.Out_bytes
+				results.In_bytes[row.Time_index] = row.In_bytes
+				results.Out_packets[row.Time_index] = row.Out_packets
+				results.In_packets[row.Time_index] = row.In_packets
 			}
 			this.Data["json"] = results
 		}else {

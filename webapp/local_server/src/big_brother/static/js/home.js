@@ -1,39 +1,39 @@
-$(document).ready(function() {
-    function chart_pie(obj,titletext,series) {
+$(document).ready(function () {
+    function chart_pie(obj, titletext, series) {
         var chart = new Highcharts.Chart({
-            chart : {
-                renderTo : obj,
-                plotBackgroundColor : null,
-                plotBorderWidth : null,
-                plotShadow : false,
-                height:300
+            chart: {
+                renderTo: obj,
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false,
+                height: 300
             },
             credits: {
-                enabled : false
+                enabled: false
             },
-            title : {
-                text : titletext
+            title: {
+                text: titletext
             },
             colors: [
                 '#228B22',
                 '#c0c0c0',
                 '#FF0000'
             ],
-            plotOptions : {
-                pie : {
-                    allowPointSelect : true,
-                    cursor : 'pointer',
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
                     dataLabels: {
                         enabled: false
                     },
                     showInLegend: true
                 }
             },
-            series : eval('('+series+')')
+            series: eval('(' + series + ')')
         });
     }
 
-    var groups = ["test@财务开票", "fenbo@分拨"]
+    var groups = ["kaipiao@财务开票", "ercifenjian@二次分拣", "dabao@打包", "fenbo@分拨"]
     for (var i in groups) {
         if (groups.hasOwnProperty(i)) {
             var sp = new Array();
@@ -66,11 +66,11 @@ $(document).ready(function() {
             $.ajax({
                 "url": "/api/status_overview?role=" + group,
                 "async": false,
-                "success": function(data) {
-                    formatted = '[{"type":"pie", "name":"' + group + '", "data":[["正常", ' + data[0] + '], ["关机", ' + data[1] + '], ["异常", ' + data[2] +']]}]';
+                "success": function (data) {
+                    formatted = '[{"type":"pie", "name":"' + group + '", "data":[["正常", ' + data[0] + '], ["关机", ' + data[1] + '], ["异常", ' + data[2] + ']]}]';
                     chart_pie(group, label + ' 概况', formatted);
                     for (var m in data[3]) {
-                        if(data[3].hasOwnProperty(m)){
+                        if (data[3].hasOwnProperty(m)) {
                             var status = data[3][m]["Status"];
                             var desc;
                             var bgc;
@@ -89,7 +89,7 @@ $(document).ready(function() {
                                 .append($("<td>" + data[3][m]["Host_name"] + "</td>"))
                                 .append($("<td>" + desc + "</td>"));
                             data_row.attr("style", "BACKGROUND-COLOR: " + bgc)
-                            $("#table"+group).append(data_row);
+                            $("#table" + group).append(data_row);
                         }
                     }
                 }

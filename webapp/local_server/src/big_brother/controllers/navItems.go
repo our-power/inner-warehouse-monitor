@@ -14,11 +14,11 @@ func (this *NavItemsController) GetMachineDataGroupByStep() {
 	var role string
 	switch step {
 	case "kaipiao":
-		role = "test"
+		role = "kaipiao"
 	case "ercifenjian":
-		role = "test"
+		role = "ercifenjian"
 	case "dabao":
-		role = "test"
+		role = "dabao"
 	case "fenbo":
 		role = "fenbo"
 	default:

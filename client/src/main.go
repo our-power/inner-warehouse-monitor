@@ -69,7 +69,7 @@ func getDBLink(dbDriver string, dbSourceName string) (link *sql.DB, err error) {
 		}
 
 		sql = `
-		CREATE TABLE net_flow (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, date TEXT, time_index INTEGER, ip TEXT, host_name TEXT, hardware_addr TEXT, out_bytes TEXT, in_bytes TEXT, out_packets TEXT, in_packets TEXT);
+		CREATE TABLE net_flow (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, date TEXT, time_index INTEGER, ip TEXT, host_name TEXT, hardware_addr TEXT, out_bytes INTEGER, in_bytes INTEGER, out_packets INTEGER, in_packets  INTEGER);
         DELETE FROM net_flow;
 		`
 		_, err = link.Exec(sql)

@@ -16,24 +16,46 @@ type NetFlowHandler struct {
 func (h *NetFlowHandler) HandleMessage(m *nsq.Message) (err error) {
 	/*
 	实现队列消息处理功能
+
+	按指标叠加所有网卡的数据
 	*/
 
 	bodyParts := strings.Split(string(m.Body), "\r\n")
 	time_index, err := strconv.Atoi(bodyParts[1])
 	netFlowDataParts := strings.Split(bodyParts[5], ",")[1:]
 	networkCardNum := len(netFlowDataParts)/4
+
 	beginIndex := 0
 	endIndex := networkCardNum
-	outBytes := strings.Join(netFlowDataParts[beginIndex:endIndex], ",")
+	outBytes := 0
+	for index := beginIndex; index < endIndex; index++ {
+		oneOutByteFloat, _ := strconv.ParseFloat(netFlowDataParts[index], 32)
+		outBytes += int(oneOutByteFloat)
+	}
 	beginIndex = endIndex
 	endIndex += networkCardNum
-	inBytes := strings.Join(netFlowDataParts[beginIndex:endIndex], ",")
+	inBytes := 0
+	for index := beginIndex; index < endIndex; index++ {
+		oneInByteFloat, _ := strconv.ParseFloat(netFlowDataParts[index], 32)
+		inBytes += int(oneInByteFloat)
+	}
+
 	beginIndex = endIndex
 	endIndex += networkCardNum
-	outPackets := strings.Join(netFlowDataParts[beginIndex:endIndex], ",")
+	outPackets := 0
+	for index := beginIndex; index < endIndex; index++ {
+		oneOutPacketFloat, _ := strconv.ParseFloat(netFlowDataParts[index], 32)
+		outPackets += int(oneOutPacketFloat)
+	}
+
 	beginIndex = endIndex
 	endIndex += networkCardNum
-	inPackets := strings.Join(netFlowDataParts[beginIndex:endIndex], ",")
+	inPackets := 0
+	for index := beginIndex; index < endIndex; index++ {
+		oneInPacketsFloat, _ := strconv.ParseFloat(netFlowDataParts[index], 32)
+		inPackets += int(oneInPacketsFloat)
+	}
+
 	sql := `
 	INSERT INTO net_flow (date, time_index, ip, host_name, hardware_addr, out_bytes, in_bytes, out_packets, in_packets) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
 	`
