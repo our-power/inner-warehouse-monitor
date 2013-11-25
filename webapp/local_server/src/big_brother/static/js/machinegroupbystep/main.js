@@ -17,6 +17,7 @@ $(function () {
         e.preventDefault();
         var step = $(".navbar .active>a").attr("href").split("=")[1];
         var queryDate = $("#query_date_input").val();
+        var objDate = new Date(queryDate);
         var href = $(this).find("a").attr("href");
         var indicator = href.substr(1)
         if (indicator === "machine_list") {
@@ -88,14 +89,14 @@ $(function () {
                                     type: "area",
                                     name: "入包量(个)",
                                     pointInterval: 30 * 1000,
-                                    pointStart: Date.UTC(new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate()),
+                                    pointStart: Date.UTC(objDate.getFullYear(), objDate.getMonth() + 1, objDate.getDate()),
                                     data: resp[x].Data.In_packets
                                 },
                                 {
                                     type: "area",
                                     name: "出包量(个)",
                                     pointInterval: 30 * 1000,
-                                    pointStart: Date.UTC(new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate()),
+                                    pointStart: Date.UTC(objDate.getFullYear(), objDate.getMonth() + 1, objDate.getDate()),
                                     data: resp[x].Data.Out_packets
                                 }
                             ];
@@ -114,14 +115,14 @@ $(function () {
                                     type: "area",
                                     name: "入流量(byte)",
                                     pointInterval: 30 * 1000,
-                                    pointStart: Date.UTC(new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate()),
+                                    pointStart: Date.UTC(objDate.getFullYear(), objDate.getMonth() + 1, objDate.getDate()),
                                     data: resp[x].Data.In_bytes
                                 },
                                 {
                                     type: "area",
                                     name: "出流量(byte)",
                                     pointInterval: 30 * 1000,
-                                    pointStart: Date.UTC(new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate()),
+                                    pointStart: Date.UTC(objDate.getFullYear(), objDate.getMonth() + 1, objDate.getDate()),
                                     data: resp[x].Data.Out_bytes
                                 }
                             ];
@@ -145,7 +146,7 @@ $(function () {
                                     type: 'area',
                                     name: seriesName,
                                     pointInterval: 30 * 1000,
-                                    pointStart: Date.UTC(new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate()),
+                                    pointStart: Date.UTC(objDate.getFullYear(), objDate.getMonth() + 1, objDate.getDate()),
                                     data: resp[index].Data
                                 }
                             ];
