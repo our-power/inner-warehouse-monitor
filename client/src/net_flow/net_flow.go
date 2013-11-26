@@ -1,16 +1,15 @@
 package net_flow
 
 import (
-	"database/sql"
-	//"fmt"
 	"strings"
 	"strconv"
+	"util"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/bitly/go-nsq"
 )
 
 type NetFlowHandler struct {
-	db *sql.DB
+	db *util.DbLink
 }
 
 func (h *NetFlowHandler) HandleMessage(m *nsq.Message) (err error) {
@@ -56,15 +55,19 @@ func (h *NetFlowHandler) HandleMessage(m *nsq.Message) (err error) {
 		inPackets += int(oneInPacketsFloat)
 	}
 
+	db, err := h.db.GetLink(bodyParts[0], bodyParts[4], "net_flow")
+	if err != nil {
+		return err
+	}
 	sql := `
 	INSERT INTO net_flow (date, time_index, ip, host_name, hardware_addr, out_bytes, in_bytes, out_packets, in_packets) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
 	`
-	_, err = h.db.Exec(sql, bodyParts[0], time_index, bodyParts[2], bodyParts[3], bodyParts[4], outBytes, inBytes, outPackets, inPackets)
+	_, err = db.Exec(sql, bodyParts[0], time_index, bodyParts[2], bodyParts[3], bodyParts[4], outBytes, inBytes, outPackets, inPackets)
 
 	return err
 }
 
-func NewNetFlowHandler(dbLink *sql.DB) (netFlowHandler *NetFlowHandler, err error) {
+func NewNetFlowHandler(dbLink *util.DbLink) (netFlowHandler *NetFlowHandler, err error) {
 	netFlowHandler = &NetFlowHandler {
 		db: dbLink,
 	}

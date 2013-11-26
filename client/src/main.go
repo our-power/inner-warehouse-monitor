@@ -8,17 +8,16 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	//"strings"
 	"time"
 	"util"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/bitly/go-nsq"
-	//"cpu_usage"
+	"cpu_usage"
 	"mem_usage"
-	/*"net_flow"
+	"net_flow"
 	"heartbeat"
 	"accessibility"
-	"register"*/
+	"register"
 )
 
 var (
@@ -43,7 +42,7 @@ func getDBLink(dbDriver string, dbSourceName string) (link *sql.DB, err error) {
 
 	return
 }
-/*
+
 func runCpuUsageClient(cuh *cpu_usage.CPUUsageHandler) (cuTodb *nsq.Reader, err error) {
 	cuTodb, err = nsq.NewReader("cpu_usage", "multidb")
 	if err != nil {
@@ -70,7 +69,7 @@ func runCpuUsageClient(cuh *cpu_usage.CPUUsageHandler) (cuTodb *nsq.Reader, err 
 	}
 	return
 }
-*/
+
 func runMemUsageClient(muh *mem_usage.MemUsageHandler) (muTodb *nsq.Reader, err error) {
 	muTodb, err = nsq.NewReader("mem_usage", "multidb")
 	if err != nil {
@@ -98,7 +97,7 @@ func runMemUsageClient(muh *mem_usage.MemUsageHandler) (muTodb *nsq.Reader, err 
 	}
 	return
 }
-/*
+
 func runNetFlowClient(nfh *net_flow.NetFlowHandler) (nfTodb *nsq.Reader, err error) {
 	nfTodb, err = nsq.NewReader("net_flow", "multidb")
 	if err != nil {
@@ -238,7 +237,7 @@ func runRegisterToDBClient(rh *register.RegisterToDBHandler) (registerTodb *nsq.
 	}
 	return
 }
-*/
+
 func main() {
 	flag.Parse()
 
@@ -263,21 +262,12 @@ func main() {
 
 
 	date := time.Now().Format("20060102")
-	/*
-	if !strings.HasSuffix(*dbPath, "/") {
-		*dbPath = *dbPath + "/"
-	}
-	*/
 	// 初始化各种指标的处理类
-	/*cpu_usage_db_link, err := getDBLink("sqlite3", *dbPath + "cpu_usage_sqlite.db")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+	cpu_usage_db_link := util.NewDbLink(date)
 	cpuUsageHandler, err := cpu_usage.NewCPUUsageHandler(cpu_usage_db_link)
 	if err != nil {
 		fmt.Println(err)
-	}*/
+	}
 
 	mem_usage_db_link := util.NewDbLink(date)
 	memUsageHandler, err := mem_usage.NewMemUsageHandler(mem_usage_db_link)
@@ -285,37 +275,24 @@ func main() {
 		fmt.Println(err)
 	}
 
-	/*net_flow_db_link, err := getDBLink("sqlite3", *dbPath + "net_flow_sqlite.db")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+	net_flow_db_link := util.NewDbLink(date)
 	netFlowHandler, err := net_flow.NewNetFlowHandler(net_flow_db_link)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	heartbeat_db_link, err := getDBLink("sqlite3", *dbPath + "heartbeat_sqlite.db")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+	heartbeat_db_link := util.NewDbLink(date)
 	heartBeatHandler, err := heartbeat.NewHeartBeatHandler(heartbeat_db_link)
 	if err != nil {
 		fmt.Println(err)
 	}
-
-	accessibility_db_link, err := getDBLink("sqlite3", *dbPath + "accessibility_sqlite.db")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+/*
+	accessibility_db_link := util.NewDbLink(date)
 	accessibilityToDBHandler, err := accessibility.NewAccessibilityToDBHandler(accessibility_db_link)
 	if err != nil {
 		fmt.Println(err)
 	}
-
-
+*/
 	// 可达性异常检测处理类，无需读写DB
 	accessibilityCheckHandler, err := accessibility.NewAccessibilityCheckHandler()
 	if err != nil {
@@ -336,13 +313,13 @@ func main() {
 	cuTodb, err := runCpuUsageClient(cpuUsageHandler)
 	if err != nil {
 		fmt.Println(err)
-	}*/
+	}
 
 	muTodb, err := runMemUsageClient(memUsageHandler)
 	if err != nil {
 		fmt.Println(err)
 	}
-/*
+
 	nfTodb, err := runNetFlowClient(netFlowHandler)
 	if err != nil {
 		fmt.Println(err)
@@ -354,11 +331,11 @@ func main() {
 	}
 
 
-	aTodb, err := runAccessibilityToDBClient(accessibilityToDBHandler)
+/*	aTodb, err := runAccessibilityToDBClient(accessibilityToDBHandler)
 	if err != nil {
 		fmt.Println(err)
 	}
-
+*/
 	aCheck, err := runAccessibilityCheckClient(accessibilityCheckHandler)
 	if err != nil {
 		fmt.Println(err)
@@ -368,32 +345,32 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
-*/
+
 	for {
 		select {
 		case <-muTodb.ExitChan:
 			return
-		/*case <-cuTodb.ExitChan:
+		case <-cuTodb.ExitChan:
 			return
 		case <-nfTodb.ExitChan:
 			return
 		case <-hbTodb.ExitChan:
 			return
-		case <-aTodb.ExitChan:
-			return
+//		case <-aTodb.ExitChan:
+//			return
 		case <-aCheck.ExitChan:
 			return
 		case <-rTodb.ExitChan:
-			return*/
+			return
 
 		case <-termChan:
-			/*cuTodb.Stop()*/
+			cuTodb.Stop()
 			muTodb.Stop()
-			/*nfTodb.Stop()
+			nfTodb.Stop()
 			hbTodb.Stop()
-			aTodb.Stop()
+//			aTodb.Stop()
 			aCheck.Stop()
-			rTodb.Stop()*/
+			rTodb.Stop()
 		}
 	}
 }
