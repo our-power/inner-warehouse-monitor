@@ -1,13 +1,13 @@
 package accessibility
 
 import (
-	"database/sql"
-	"fmt"
 	"strings"
 	"strconv"
-	"time"
+	"util"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/bitly/go-nsq"
+	"fmt"
+	"time"
 )
 
 /*
@@ -15,7 +15,7 @@ import (
  */
 
 type AccessibilityToDBHandler struct {
-	db *sql.DB
+	db *util.DbLink
 }
 
 func (h *AccessibilityToDBHandler) HandleMessage(m *nsq.Message) (err error) {
@@ -26,8 +26,12 @@ func (h *AccessibilityToDBHandler) HandleMessage(m *nsq.Message) (err error) {
 
 	bodyParts := strings.Split(string(m.Body), "\r\n")
 	time_index, err := strconv.Atoi(bodyParts[1])
+	db, err := h.db.GetLink(bodyParts[0], bodyParts[4], "accessibility")
+	if err != nil {
+		return err
+	}
 	if bodyParts[5] == "1" {
-		tx, err := h.db.Begin()
+		tx, err := db.Begin()
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -51,7 +55,7 @@ func (h *AccessibilityToDBHandler) HandleMessage(m *nsq.Message) (err error) {
 	}
 	if bodyParts[5] == "2" {
 
-		tx, err := h.db.Begin()
+		tx, err := db.Begin()
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -75,7 +79,7 @@ func (h *AccessibilityToDBHandler) HandleMessage(m *nsq.Message) (err error) {
 	return err
 }
 
-func NewAccessibilityToDBHandler(dbLink *sql.DB) (accessibilityToDBHandler *AccessibilityToDBHandler, err error) {
+func NewAccessibilityToDBHandler(dbLink *util.DbLink) (accessibilityToDBHandler *AccessibilityToDBHandler, err error) {
 	accessibilityToDBHandler = &AccessibilityToDBHandler {
 		db: dbLink,
 	}

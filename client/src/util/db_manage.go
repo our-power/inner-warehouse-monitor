@@ -50,7 +50,7 @@ func (link *DbLink) GetLink(date string, hardware_addr string, indicator string)
 			c := time.Tick(5 * time.Minute)
 			for _ = range c {
 				for k, v := range link.Links {
-					if k != key {
+					if !strings.HasPrefix(k, date) {
 						v.Close()
 						fmt.Println(k, "to be deleted")
 						delete(link.Links, k)
@@ -97,14 +97,10 @@ func createTable(indicator string, link *sql.DB) {
 		DELETE FROM register;
 		`
 
-	case "ping_accessibility":
+	case "accessibility":
 		sql = `
 		CREATE TABLE IF NOT EXISTS ping_accessibility (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, date TEXT, time_index INTEGER, ip TEXT, host_name TEXT, hardware_addr TEXT, target_ip TEXT, response_time TEXT);
 		DELETE FROM ping_accessibility;
-		`
-
-	case "telnet_accessibility":
-		sql = `
 		CREATE TABLE IF NOT EXISTS telnet_accessibility (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, date TEXT, time_index INTEGER, ip TEXT, host_name TEXT, hardware_addr TEXT, target_url TEXT, status TEXT);
 		DELETE FROM telnet_accessibility;
 		`
