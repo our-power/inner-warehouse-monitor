@@ -13,12 +13,12 @@ import (
 	"util"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/bitly/go-nsq"
-	"cpu_usage"
+	//"cpu_usage"
 	"mem_usage"
-	"net_flow"
+	/*"net_flow"
 	"heartbeat"
 	"accessibility"
-	"register"
+	"register"*/
 )
 
 var (
@@ -38,88 +38,14 @@ func init() {
 }
 
 func getDBLink(dbDriver string, dbSourceName string) (link *sql.DB, err error) {
-	/*
-	notExist := false
-	if _, e := os.Stat(dbSourceName); os.IsNotExist(e) {
-		notExist = true
-	}
-	*/
+
 	link, err = sql.Open(dbDriver, dbSourceName)
-	/*
-	if err != nil {
-		log.Fatal(err)
-	}
-	if notExist {
-		sql := `
-        CREATE TABLE cpu_usage (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, date TEXT, time_index INTEGER, ip TEXT, host_name TEXT, hardware_addr TEXT, usage REAL);
-        DELETE FROM cpu_usage;
-        `
-		_, err = link.Exec(sql)
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		sql = `
-		CREATE TABLE mem_usage (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, date TEXT, time_index INTEGER, ip TEXT, host_name TEXT, hardware_addr TEXT, usage REAL);
-        DELETE FROM mem_usage;
-		`
-		_, err = link.Exec(sql)
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		sql = `
-		CREATE TABLE net_flow (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, date TEXT, time_index INTEGER, ip TEXT, host_name TEXT, hardware_addr TEXT, out_bytes INTEGER, in_bytes INTEGER, out_packets INTEGER, in_packets  INTEGER);
-        DELETE FROM net_flow;
-		`
-		_, err = link.Exec(sql)
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		sql = `
-		CREATE TABLE heartbeat (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, date TEXT, time_index INTEGER, ip TEXT, host_name TEXT, hardware_addr TEXT, alive INTEGER NOT NULL);
-        DELETE FROM heartbeat;
-		`
-		_, err = link.Exec(sql)
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		sql = `
-		CREATE TABLE register (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, date TEXT, time_index INTEGER, ip TEXT, host_name TEXT, hardware_addr TEXT UNIQUE, agent_version TEXT, machine_role TEXT, status INTEGER);
-        DELETE FROM register;
-		`
-		_, err = link.Exec(sql)
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		sql = `
-		CREATE TABLE ping_accessibility (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, date TEXT, time_index INTEGER, ip TEXT, host_name TEXT, hardware_addr TEXT, target_ip TEXT, response_time TEXT);
-        DELETE FROM ping_accessibility;
-		`
-		_, err = link.Exec(sql)
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		sql = `
-		CREATE TABLE telnet_accessibility (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, date TEXT, time_index INTEGER, ip TEXT, host_name TEXT, hardware_addr TEXT, target_url TEXT, status TEXT);
-        DELETE FROM telnet_accessibility;
-		`
-		_, err = link.Exec(sql)
-		if err != nil {
-			fmt.Println(err)
-		}
-	}
-	*/
 
 	return
 }
-
+/*
 func runCpuUsageClient(cuh *cpu_usage.CPUUsageHandler) (cuTodb *nsq.Reader, err error) {
-	cuTodb, err = nsq.NewReader("cpu_usage", "todb")
+	cuTodb, err = nsq.NewReader("cpu_usage", "multidb")
 	if err != nil {
 		log.Fatalf(err.Error())
 	}
@@ -144,9 +70,9 @@ func runCpuUsageClient(cuh *cpu_usage.CPUUsageHandler) (cuTodb *nsq.Reader, err 
 	}
 	return
 }
-
+*/
 func runMemUsageClient(muh *mem_usage.MemUsageHandler) (muTodb *nsq.Reader, err error) {
-	muTodb, err = nsq.NewReader("mem_usage", "todb")
+	muTodb, err = nsq.NewReader("mem_usage", "multidb")
 	if err != nil {
 		log.Fatalf(err.Error())
 	}
@@ -172,9 +98,9 @@ func runMemUsageClient(muh *mem_usage.MemUsageHandler) (muTodb *nsq.Reader, err 
 	}
 	return
 }
-
+/*
 func runNetFlowClient(nfh *net_flow.NetFlowHandler) (nfTodb *nsq.Reader, err error) {
-	nfTodb, err = nsq.NewReader("net_flow", "todb")
+	nfTodb, err = nsq.NewReader("net_flow", "multidb")
 	if err != nil {
 		log.Fatalf(err.Error())
 	}
@@ -202,7 +128,7 @@ func runNetFlowClient(nfh *net_flow.NetFlowHandler) (nfTodb *nsq.Reader, err err
 }
 
 func runHeartBeatClient(hbh *heartbeat.HeartBeatHandler) (hbTodb *nsq.Reader, err error) {
-	hbTodb, err = nsq.NewReader("heartbeat", "todb")
+	hbTodb, err = nsq.NewReader("heartbeat", "multidb")
 	if err != nil {
 		log.Fatalf(err.Error())
 	}
@@ -230,7 +156,7 @@ func runHeartBeatClient(hbh *heartbeat.HeartBeatHandler) (hbTodb *nsq.Reader, er
 }
 
 func runAccessibilityToDBClient(ath *accessibility.AccessibilityToDBHandler) (aTodb *nsq.Reader, err error) {
-	aTodb, err = nsq.NewReader("accessibility", "todb")
+	aTodb, err = nsq.NewReader("accessibility", "multidb")
 	if err != nil {
 		log.Fatalf(err.Error())
 	}
@@ -286,7 +212,7 @@ func runAccessibilityCheckClient(ach *accessibility.AccessibilityCheckHandler) (
 }
 
 func runRegisterToDBClient(rh *register.RegisterToDBHandler) (registerTodb *nsq.Reader, err error) {
-	registerTodb, err = nsq.NewReader("register", "todb")
+	registerTodb, err = nsq.NewReader("register", "multidb")
 	if err != nil {
 		log.Fatalf(err.Error())
 	}
@@ -312,7 +238,7 @@ func runRegisterToDBClient(rh *register.RegisterToDBHandler) (registerTodb *nsq.
 	}
 	return
 }
-
+*/
 func main() {
 	flag.Parse()
 
@@ -336,14 +262,14 @@ func main() {
 	signal.Notify(termChan, syscall.SIGINT, syscall.SIGTERM)
 
 
-	//date := time.Now().Format("2006-01-02")
+	date := time.Now().Format("20060102")
 	/*
 	if !strings.HasSuffix(*dbPath, "/") {
 		*dbPath = *dbPath + "/"
 	}
 	*/
 	// 初始化各种指标的处理类
-	cpu_usage_db_link, err := getDBLink("sqlite3", *dbPath + "cpu_usage_sqlite.db")
+	/*cpu_usage_db_link, err := getDBLink("sqlite3", *dbPath + "cpu_usage_sqlite.db")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -351,19 +277,15 @@ func main() {
 	cpuUsageHandler, err := cpu_usage.NewCPUUsageHandler(cpu_usage_db_link)
 	if err != nil {
 		fmt.Println(err)
-	}
+	}*/
 
-	mem_usage_db_link, err := getDBLink("sqlite3", *dbPath + "mem_usage_sqlite.db")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+	mem_usage_db_link := util.NewDbLink(date)
 	memUsageHandler, err := mem_usage.NewMemUsageHandler(mem_usage_db_link)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	net_flow_db_link, err := getDBLink("sqlite3", *dbPath + "net_flow_sqlite.db")
+	/*net_flow_db_link, err := getDBLink("sqlite3", *dbPath + "net_flow_sqlite.db")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -414,13 +336,13 @@ func main() {
 	cuTodb, err := runCpuUsageClient(cpuUsageHandler)
 	if err != nil {
 		fmt.Println(err)
-	}
+	}*/
 
 	muTodb, err := runMemUsageClient(memUsageHandler)
 	if err != nil {
 		fmt.Println(err)
 	}
-
+/*
 	nfTodb, err := runNetFlowClient(netFlowHandler)
 	if err != nil {
 		fmt.Println(err)
@@ -446,12 +368,12 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
-
+*/
 	for {
 		select {
 		case <-muTodb.ExitChan:
 			return
-		case <-cuTodb.ExitChan:
+		/*case <-cuTodb.ExitChan:
 			return
 		case <-nfTodb.ExitChan:
 			return
@@ -462,16 +384,16 @@ func main() {
 		case <-aCheck.ExitChan:
 			return
 		case <-rTodb.ExitChan:
-			return
+			return*/
 
 		case <-termChan:
-			cuTodb.Stop()
+			/*cuTodb.Stop()*/
 			muTodb.Stop()
-			nfTodb.Stop()
+			/*nfTodb.Stop()
 			hbTodb.Stop()
 			aTodb.Stop()
 			aCheck.Stop()
-			rTodb.Stop()
+			rTodb.Stop()*/
 		}
 	}
 }
