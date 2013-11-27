@@ -202,7 +202,7 @@ func (this *ApiController) GetMachineIndicatorData() {
 	if indicator == "cpu_usage" {
 		o.Using("cpu_usage")
 		var cpuUsageData []*models.Cpu_usage
-		num, err := o.QueryTable("cpu_usage").Filter("hardware_addr", hardwareAddr).Filter("date", dateStr).OrderBy("time_index").All(&cpuUsageData, "time_index", "usage")
+		num, err := o.QueryTable("cpu_usage").Filter("hardware_addr", hardwareAddr).Filter("date", dateStr).OrderBy("time_index").Limit(-1).All(&cpuUsageData, "time_index", "usage")
 		if err == nil && num > 0 {
 			dataContainerLength := cpuUsageData[num - 1].Time_index + 1
 			results := make([]float32, dataContainerLength)
@@ -219,7 +219,7 @@ func (this *ApiController) GetMachineIndicatorData() {
 	}else if indicator == "mem_usage" {
 		o.Using("mem_usage")
 		var memUsageData []*models.Mem_usage
-		num, err := o.QueryTable("mem_usage").Filter("hardware_addr", hardwareAddr).Filter("date", dateStr).OrderBy("time_index").All(&memUsageData, "time_index", "usage")
+		num, err := o.QueryTable("mem_usage").Filter("hardware_addr", hardwareAddr).Filter("date", dateStr).OrderBy("time_index").Limit(-1).All(&memUsageData, "time_index", "usage")
 		if err == nil && num > 0 {
 			dataContainerLength := memUsageData[num - 1].Time_index + 1
 			results := make([]float32, dataContainerLength)
@@ -236,7 +236,7 @@ func (this *ApiController) GetMachineIndicatorData() {
 	}else {
 		o.Using("net_flow")
 		var netFlowData []*models.Net_flow
-		num, err := o.QueryTable("net_flow").Filter("hardware_addr", hardwareAddr).Filter("date", dateStr).OrderBy("time_index").All(&netFlowData, "time_index", "out_bytes", "in_bytes", "out_packets", "in_packets")
+		num, err := o.QueryTable("net_flow").Filter("hardware_addr", hardwareAddr).Filter("date", dateStr).OrderBy("time_index").Limit(-1).All(&netFlowData, "time_index", "out_bytes", "in_bytes", "out_packets", "in_packets")
 		if err == nil && num > 0 {
 			dataContainerLength := netFlowData[num - 1].Time_index + 1
 			type ResultType struct {
