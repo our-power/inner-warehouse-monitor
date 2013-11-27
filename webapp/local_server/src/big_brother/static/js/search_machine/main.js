@@ -61,22 +61,23 @@ $(function () {
         });
     }
 
-    function newIEDate(dateStr){
+    function newIEDate(dateStr) {
         // dateStr的格式：xxxx-xx-xx
         var dateParts = dateStr.split("-");
         return new Date(parseInt(dateParts[0]), parseInt(dateParts[1]), parseInt(dateParts[2]));
     }
+
     function getMachineIndicatorData(jqObj) {
         var queryDate = $("#query_date_input").val();
         var objDate;
-        if($.browser.msie){
+        if ($.browser.msie) {
             objDate = newIEDate(queryDate);
-        }else{
+        } else {
             objDate = new Date(queryDate);
         }
 
         var href = jqObj.find("a").attr("href");
-        var indicator = href.substr(1)
+        var indicator = href.substr(1);
         if (indicator === "machine_list") {
             $("#form-machine-list").show();
             $("#form-date").hide();
@@ -140,9 +141,9 @@ $(function () {
                         date = new Date();
                         var sameYear = objDate.getFullYear() === date.getFullYear();
                         var sameMonth;
-                        if($.browser.msie){
-                            sameMonth = objDate.getMonth() === date.getMonth()+1;
-                        }else{
+                        if ($.browser.msie) {
+                            sameMonth = objDate.getMonth() === date.getMonth() + 1;
+                        } else {
                             sameMonth = objDate.getMonth() === date.getMonth();
                         }
                         var sameDate = objDate.getDate() === date.getDate();
@@ -153,7 +154,7 @@ $(function () {
                         } else {
                             timeIndexNum = 23 * 60 * 2 + 59 * 2 + 1;
                         }
-                       var seriesPointStart = Date.UTC(objDate.getFullYear(), objDate.getMonth() + 1, objDate.getDate());
+                        var seriesPointStart = Date.UTC(objDate.getFullYear(), objDate.getMonth() + 1, objDate.getDate());
                         if (indicator === "netflow_view") {
                             if (resp === null) {
                                 resp = {
@@ -288,15 +289,6 @@ $(function () {
     });
     $("#query_date_input").datepicker("setDate", new Date());
 
-    $("#data-tab a").on("click", function (e) {
-        e.preventDefault();
-        if ($(this).attr("href") != "#machine-list" && $.trim($("#machine_list>table>tbody").html()) === "") {
-            alertify.alert("请先查询机器！");
-            return false;
-        }
-        $(this).tab('show');
-    });
-
     // 搜索过滤要查询的机器，支持域名/ip/MAC地址，并将结果展示在“机器列表”中
     $("#search").on("click", function (e) {
         e.preventDefault();
@@ -376,10 +368,40 @@ $(function () {
         }
     });
 
-    $("#data-tab>li ").on("click", function (e) {
+    $("#data-tab>li").on("click", function (e) {
         e.preventDefault();
-        var that = $(this);
-        getMachineIndicatorData(that);
+        var targetTab = $(this).find("a").attr("href");
+        if (targetTab != "#machine-list" && $.trim($("#machine_list>table>tbody").html()) === "") {
+            alertify.alert("请先查询机器！");
+            return false;
+        }
+
+        $(this).find("a").tab('show');
+
+        if (targetTab === "#accessibility") {
+            var hardwareAddrList = $("#machine_list .hardware-addr");
+            var machineNum = hardwareAddrList.length;
+            for (var index = 0; index < machineNum; index++) {
+                var hardwareAddr = $.trim($(hardwareAddrList[index]).text());
+                if (hardwareAddr != "") {
+                    var machineStatus = $(hardwareAddrList[index]).siblings(".machine-status").text();
+                    if(machineStatus === "正常运行中"){
+                        var req = $.ajax({
+                            "async": false,
+                            "type": "get",
+                            "url": "/api/get_machine_accessibility_data?hardware_addr=" + hardwareAddr,
+                            "dataType": "json"
+                        });
+                        req.done(function(resp){
+                            console.log(resp);
+                        });
+                    }
+                }
+            }
+        } else {
+            var that = $(this);
+            getMachineIndicatorData(that);
+        }
     });
 })
 ;

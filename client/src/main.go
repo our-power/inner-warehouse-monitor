@@ -96,7 +96,7 @@ func getDBLink(dbDriver string, dbSourceName string) (link *sql.DB, err error) {
 		}
 
 		sql = `
-		CREATE TABLE ping_accessibility (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, date TEXT, time_index INTEGER, ip TEXT, host_name TEXT, hardware_addr TEXT, target_ip TEXT, response_time TEXT);
+		CREATE TABLE ping_accessibility (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, date TEXT, time_index INTEGER, ip TEXT, host_name TEXT, hardware_addr TEXT, target_ip TEXT, response_time INTEGER);
         DELETE FROM ping_accessibility;
 		`
 		_, err = link.Exec(sql)
