@@ -26,10 +26,6 @@ func NewDbLink(date string) (link *DbLink) {
 }
 
 func (link *DbLink) GetLink(date string, hardware_addr string, indicator string) (dbLink *sql.DB, err error) {
-	var dbPath, dbSourceName string
-	dbPath = "D:/" + date + "/" + strings.Replace(hardware_addr, ":", "_", -1) + "/"
-	dbSourceName = dbPath + indicator + ".db"
-	os.MkdirAll(dbPath, 0666)
 	key := date + "_" + hardware_addr
 	dbLink, ok := link.Links[key]
 	// 如果已经存在，则认为没有日期变更，且数据库连接已经打开
@@ -38,6 +34,10 @@ func (link *DbLink) GetLink(date string, hardware_addr string, indicator string)
 		return dbLink, nil
 	} else {
 		// 否则为新的日期打开新的数据库连接，并延时关闭原有日期对应的数据库连接，且删除其在本结构体中的注册条目
+		var dbPath, dbSourceName string
+		dbPath = "D:/" + date + "/" + strings.Replace(hardware_addr, ":", "_", -1) + "/"
+		dbSourceName = dbPath + indicator + ".db"
+		os.MkdirAll(dbPath, 0666)
 		link.Changing = true
 		link.Today = date
 		newLink, err := sql.Open("sqlite3", dbSourceName)
@@ -101,9 +101,15 @@ func createTable(indicator string, link *sql.DB) {
 		sql = `
 		CREATE TABLE IF NOT EXISTS ping_accessibility (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, date TEXT, time_index INTEGER, ip TEXT, host_name TEXT, hardware_addr TEXT, target_ip TEXT, response_time TEXT);
 		DELETE FROM ping_accessibility;
+		`
+		sql0 := `
 		CREATE TABLE IF NOT EXISTS telnet_accessibility (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, date TEXT, time_index INTEGER, ip TEXT, host_name TEXT, hardware_addr TEXT, target_url TEXT, status TEXT);
 		DELETE FROM telnet_accessibility;
 		`
+		_, err := link.Exec(sql0)
+		if err != nil {
+			fmt.Println(err)
+		}
 	default:
 		return
 	}

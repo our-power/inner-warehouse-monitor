@@ -286,13 +286,13 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
-/*
+
 	accessibility_db_link := util.NewDbLink(date)
 	accessibilityToDBHandler, err := accessibility.NewAccessibilityToDBHandler(accessibility_db_link)
 	if err != nil {
 		fmt.Println(err)
 	}
-*/
+
 	// 可达性异常检测处理类，无需读写DB
 	accessibilityCheckHandler, err := accessibility.NewAccessibilityCheckHandler()
 	if err != nil {
@@ -331,11 +331,11 @@ func main() {
 	}
 
 
-/*	aTodb, err := runAccessibilityToDBClient(accessibilityToDBHandler)
+	aTodb, err := runAccessibilityToDBClient(accessibilityToDBHandler)
 	if err != nil {
 		fmt.Println(err)
 	}
-*/
+
 	aCheck, err := runAccessibilityCheckClient(accessibilityCheckHandler)
 	if err != nil {
 		fmt.Println(err)
@@ -356,8 +356,8 @@ func main() {
 			return
 		case <-hbTodb.ExitChan:
 			return
-//		case <-aTodb.ExitChan:
-//			return
+		case <-aTodb.ExitChan:
+			return
 		case <-aCheck.ExitChan:
 			return
 		case <-rTodb.ExitChan:
@@ -368,7 +368,7 @@ func main() {
 			muTodb.Stop()
 			nfTodb.Stop()
 			hbTodb.Stop()
-//			aTodb.Stop()
+			aTodb.Stop()
 			aCheck.Stop()
 			rTodb.Stop()
 		}
