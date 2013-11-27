@@ -4,6 +4,7 @@ import (
 	"os"
 	"fmt"
 	"time"
+	"strconv"
 	"strings"
 	"database/sql"
 	_ "github.com/mattn/go-sqlite3"
@@ -39,7 +40,12 @@ func (link *DbLink) GetLink(date string, hardware_addr string, indicator string)
 		dbSourceName = dbPath + indicator + ".db"
 		os.MkdirAll(dbPath, 0666)
 		link.Changing = true
-		link.Today = date
+		inComingDate, _ := strconv.Atoi(date)
+		currentDate, _ := strconv.Atoi(link.Today)
+		if inComingDate > currentDate {
+			// 仅当后来的日期比保存的日期更晚时，更新结构体中的Today值
+			link.Today = date
+		}
 		newLink, err := sql.Open("sqlite3", dbSourceName)
 		link.Links[key] = newLink
 		if err != nil {
@@ -50,7 +56,8 @@ func (link *DbLink) GetLink(date string, hardware_addr string, indicator string)
 			c := time.Tick(5 * time.Minute)
 			for _ = range c {
 				for k, v := range link.Links {
-					if !strings.HasPrefix(k, date) {
+					// 如果缓存中有非Today的日期，表示已经过期，可以执行延时关闭
+					if !strings.HasPrefix(k, link.Today) {
 						v.Close()
 						fmt.Println(k, "to be deleted")
 						delete(link.Links, k)
