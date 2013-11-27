@@ -40,10 +40,9 @@ func NewHeartBeatHandler(dbLink *sql.DB) (heartBeatHandler *HeartBeatHandler, er
 func updateMachineStatus(h *HeartBeatHandler, registerDB *sql.DB) {
 	for {
 		c := time.Tick(3*time.Minute)
-		for cTime := range c {
-			fmt.Printf("*** %d ***\n", cTime)
+		for _ := range c {
 			sql := "SELECT hardware_addr, status FROM register"
-			rows, _ := registerDB.Query(sql)
+			rows, err := registerDB.Query(sql)
 			type machineStatus struct {
 				Hardware_addr string
 				Status        int
@@ -56,6 +55,7 @@ func updateMachineStatus(h *HeartBeatHandler, registerDB *sql.DB) {
 				rows.Scan(&hardwareAddr, &status)
 				machineListWithStatus = append(machineListWithStatus, machineStatus{Hardware_addr: hardwareAddr, Status: status})
 			}
+			rows.Close()
 			now := time.Now()
 			dateStr := now.Format("20060102")
 			nowTimeIndex := now.Hour()*60*2 + now.Minute()*2 + now.Second()/30
@@ -69,13 +69,20 @@ func updateMachineStatus(h *HeartBeatHandler, registerDB *sql.DB) {
 						rows.Scan(&count)
 						break
 					}
+					rows.Close()
+					sql = "UPDATE register SET date=?, time_index=?, status=? WHERE hardware_addr=?"
+					newStatus := 0
 					if count == 0 && item.Status == 1 {
-						sql = "UPDATE register SET date=?, time_index=?, status=? WHERE hardware_addr=?"
-						registerDB.Exec(sql, dateStr, nowTimeIndex, -1, item.Hardware_addr)
+						newStatus = -1
 					}
 					if count > 0 && item.Status == -1 {
-						sql = "UPDATE register SET date=?, time_index=?, status=? WHERE hardware_addr=?"
-						registerDB.Exec(sql, dateStr, nowTimeIndex, 1, item.Hardware_addr)
+						newStatus = 1
+					}
+					if newStatus == 1 || newStatus == -1 {
+						_, err := registerDB.Exec(sql, dateStr, nowTimeIndex, newStatus, item.Hardware_addr)
+						if err != nil {
+							fmt.Println(err)
+						}
 					}
 				}
 			}
