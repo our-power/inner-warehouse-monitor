@@ -273,7 +273,8 @@ func (this *ApiController) GetMachineIndicatorData() {
 // 获取机器最新的可达性数据
 func (this *ApiController) GetMachineAccessibilityData() {
 	hardwareAddr := this.GetString("hardware_addr")
-	dateStr := time.Now().Format("20060102")
+	now := time.Now()
+	dateStr := now.Format("20060102")
 
 	type PingResultType struct {
 		Target_ip     string
@@ -286,10 +287,12 @@ func (this *ApiController) GetMachineAccessibilityData() {
 	}
 
 	type ResultType struct{
+		Hardware_addr string
+		Date              string
 		Ping_time_index   int
 		Ping_results      []PingResultType
 		Telnet_time_index int
-		Telnet_results   []TelnetResultType
+		Telnet_results    []TelnetResultType
 	}
 
 	pingResults := make([]PingResultType,0, 100)
@@ -325,6 +328,6 @@ func (this *ApiController) GetMachineAccessibilityData() {
 			}
 		}
 	}
-	this.Data["json"] = ResultType{Ping_time_index: pingTimeIndex, Ping_results: pingResults, Telnet_time_index: telnetTimeIndex, Telnet_results: telnetResults}
+	this.Data["json"] = ResultType{Hardware_addr: hardwareAddr, Date: now.Format("2006-01-02"), Ping_time_index: pingTimeIndex, Ping_results: pingResults, Telnet_time_index: telnetTimeIndex, Telnet_results: telnetResults}
 	this.ServeJson()
 }

@@ -79,10 +79,12 @@ $(function () {
         var href = jqObj.find("a").attr("href");
         var indicator = href.substr(1);
         if (indicator === "machine_list") {
+            $("form.form-inline").show();
             $("#form-machine-list").show();
             $("#form-date").hide();
             return false
         } else {
+            $("form.form-inline").show();
             $("#form-machine-list").hide();
             $("#form-date").show();
         }
@@ -368,6 +370,111 @@ $(function () {
         }
     });
 
+    function raphaelDrawAccessibility(HTMLElement, pingData, telnetData) {
+        var pingDataLength = pingData.length;
+        var angleRange,
+            beginAngle = 270;
+        if (pingDataLength <= 10) {
+            angleRange = 180;
+        } else {
+            angleRange = 360;
+        }
+        var unitAngle = angleRange / pingDataLength;
+
+        var svgWidth = 1000,
+            svgHeight = 600;
+        var radius = 200;
+
+        var pingCircleCenterX = 240,
+            pingCircleCenterY = 240;
+
+        var paper = Raphael(HTMLElement, svgWidth, svgHeight);
+        paper.circle(pingCircleCenterX, pingCircleCenterY, 8).attr({fill: "yellow"});
+        paper.text(pingCircleCenterX - 25, pingCircleCenterY, "ping").attr({"font-weight": "bold", "font-size": 15});
+
+        var x, y;
+        var xOffset, yOffset;
+        for (var pingIndex = 0; pingIndex < pingDataLength; pingIndex++) {
+            x = radius * Math.cos(Raphael.rad(beginAngle + pingIndex * unitAngle));
+            y = radius * Math.sin(Raphael.rad(beginAngle + pingIndex * unitAngle));
+            paper.circle(pingCircleCenterX + x, pingCircleCenterY + y, 8).attr({fill: "yellow"});
+            paper.path(
+                    ['M', pingCircleCenterX, pingCircleCenterY,
+                        'l', x, y
+                    ]).attr({
+                    stroke: ((pingData[pingIndex].Response_time == -1) ? "red" : "green"),
+                    "stroke-dasharray": ((pingData[pingIndex].Response_time == -1) ? "." : ""),
+                    "stroke-width": 3,
+                    'arrow-end': 'block-midium-long',
+                    'arrow-start': 'none',
+                    title: ((pingData[pingIndex].Response_time == -1) ? "不通" : pingData[pingIndex].Response_time + "ms")
+                });
+            if (x < 0) {
+                xOffset = -15;
+            } else {
+                xOffset = 15;
+            }
+            if (y < 0) {
+                yOffset = -15;
+            } else {
+                yOffset = 15;
+            }
+            paper.text(pingCircleCenterX + x / 2, pingCircleCenterY + y / 2, ((pingData[pingIndex].Response_time == -1) ? "不通" : pingData[pingIndex].Response_time + "ms")).attr({"font-weight": "bold"});
+            paper.text(pingCircleCenterX + x + xOffset, pingCircleCenterY + y + yOffset, pingData[pingIndex].Target_ip).attr({"font-size": 14, "font-weight": "bold"});
+        }
+
+        var telnetDataLength = telnetData.length;
+        var telnetCircleCenterX = 740,
+            telnetCircleCenterY = 240;
+        paper.circle(telnetCircleCenterX, telnetCircleCenterY, 8).attr({fill: "yellow"});
+        paper.text(telnetCircleCenterX - 25, telnetCircleCenterY, "telnet").attr({"font-weight": "bold", "font-size": 15});
+
+        for (var telnetIndex = 0; telnetIndex < telnetDataLength; telnetIndex++) {
+            x = radius * Math.cos(Raphael.rad(beginAngle + telnetIndex * unitAngle));
+            y = radius * Math.sin(Raphael.rad(beginAngle + telnetIndex * unitAngle));
+            paper.circle(telnetCircleCenterX + x, telnetCircleCenterY + y, 8).attr({fill: "yellow"});
+            paper.path(
+                    ['M', telnetCircleCenterX, telnetCircleCenterY,
+                        'l', x, y
+                    ]).attr({
+                    stroke: ((telnetData[telnetIndex].Status === "OK") ? "green" : "red"),
+                    "stroke-dasharray": ((telnetData[telnetIndex].Status === "OK") ? "" : "."),
+                    "stroke-width": 3,
+                    'arrow-end': 'block-midium-long',
+                    'arrow-start': 'none',
+                    title: (telnetData[telnetIndex].Status)
+                });
+            if (x < 0) {
+                xOffset = -15;
+            } else {
+                xOffset = 15;
+            }
+            if (y < 0) {
+                yOffset = -15;
+            } else {
+                yOffset = 15;
+            }
+            paper.text(telnetCircleCenterX + x / 2, telnetCircleCenterY + y / 2, ((telnetData[telnetIndex].Status === "NotOK") ? "不通" : "OK")).attr({"font-weight": "bold"});
+            paper.text(telnetCircleCenterX + x + xOffset, telnetCircleCenterY + y + yOffset, telnetData[telnetIndex].Target_url).attr({"font-size": 14, "font-weight": "bold"});
+        }
+    }
+
+    function formatTime(time_index) {
+        var hours = Math.floor(time_index / 2 / 60);
+        var minutes = Math.floor(time_index / 2) % 60;
+        var seconds = time_index % 2 * 30;
+        if (hours < 10) {
+            hours = "0" + hours;
+        }
+        if (minutes < 10) {
+            minutes = "0" + minutes;
+        }
+        if (seconds === 0) {
+            seconds = "00";
+        }
+        return hours + ":" + minutes + ":" + seconds;
+    }
+
     $("#data-tab>li").on("click", function (e) {
         e.preventDefault();
         var targetTab = $(this).find("a").attr("href");
@@ -379,21 +486,29 @@ $(function () {
         $(this).find("a").tab('show');
 
         if (targetTab === "#accessibility") {
+            $("form.form-inline").hide();
+            $("#accessibility").empty();
             var hardwareAddrList = $("#machine_list .hardware-addr");
             var machineNum = hardwareAddrList.length;
             for (var index = 0; index < machineNum; index++) {
                 var hardwareAddr = $.trim($(hardwareAddrList[index]).text());
                 if (hardwareAddr != "") {
                     var machineStatus = $(hardwareAddrList[index]).siblings(".machine-status").text();
-                    if(machineStatus === "正常运行中"){
+                    if (machineStatus === "正常运行中") {
                         var req = $.ajax({
-                            "async": false,
                             "type": "get",
                             "url": "/api/get_machine_accessibility_data?hardware_addr=" + hardwareAddr,
                             "dataType": "json"
                         });
-                        req.done(function(resp){
-                            console.log(resp);
+                        req.done(function (resp) {
+                            var pingTimeIndex = formatTime(resp.Ping_time_index);
+                            var telnetTimeIndex = formatTime(resp.Telnet_time_index);
+                            $("#accessibility").append($("<p></p>", {
+                                    html: "<strong>机器</strong>：" + resp.Hardware_addr + "，<strong>日期</strong>：" + resp.Date + "，<strong>ping 时间</strong>：" + pingTimeIndex + "，<strong>telnet 时间</strong>：" + telnetTimeIndex
+                                })).append("<hr>").append($("<div></div>", {
+                                    "id": "accessibility_" + resp.Hardware_addr.replace(":", "")
+                                }));
+                            raphaelDrawAccessibility("accessibility_" + resp.Hardware_addr.replace(":", ""), resp.Ping_results, resp.Telnet_results)
                         });
                     }
                 }
