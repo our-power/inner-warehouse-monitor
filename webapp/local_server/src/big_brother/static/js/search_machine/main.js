@@ -79,14 +79,13 @@ $(function () {
         var href = jqObj.find("a").attr("href");
         var indicator = href.substr(1);
         if (indicator === "machine_list") {
-            $("form.form-inline").show();
             $("#form-machine-list").show();
             $("#form-date").hide();
             return false
         } else {
-            $("form.form-inline").show();
             $("#form-machine-list").hide();
             $("#form-date").show();
+            $("input#query_date_input").prop('disabled', false);
         }
         var title = "";
         var xAxisTitle = "";
@@ -381,12 +380,29 @@ $(function () {
         }
         var unitAngle = angleRange / pingDataLength;
 
-        var svgWidth = 1000,
-            svgHeight = 600;
-        var radius = 200;
+        var svgWidth,
+            svgHeight = 500,
+            radius,
+            pingCircleCenterX,
+            pingCircleCenterY,
+            telnetCircleCenterX = 740,
+            telnetCircleCenterY = 240;
 
-        var pingCircleCenterX = 240,
+        if ($.browser.msie) {
+            svgWidth = 800;
+            radius = 160;
+            pingCircleCenterX = 180;
+            pingCircleCenterY = 180;
+            telnetCircleCenterX = 570;
+            telnetCircleCenterY = 180;
+        } else {
+            svgWidth = 1000;
+            radius = 200;
+            pingCircleCenterX = 240;
             pingCircleCenterY = 240;
+            telnetCircleCenterX = 740;
+            telnetCircleCenterY = 240;
+        }
 
         var paper = Raphael(HTMLElement, svgWidth, svgHeight);
         paper.circle(pingCircleCenterX, pingCircleCenterY, 8).attr({fill: "yellow"});
@@ -424,8 +440,6 @@ $(function () {
         }
 
         var telnetDataLength = telnetData.length;
-        var telnetCircleCenterX = 740,
-            telnetCircleCenterY = 240;
         paper.circle(telnetCircleCenterX, telnetCircleCenterY, 8).attr({fill: "yellow"});
         paper.text(telnetCircleCenterX - 25, telnetCircleCenterY, "telnet").attr({"font-weight": "bold", "font-size": 15});
 
@@ -486,7 +500,9 @@ $(function () {
         $(this).find("a").tab('show');
 
         if (targetTab === "#accessibility") {
-            $("form.form-inline").hide();
+            $("#form-machine-list").hide();
+            $("#form-date").show();
+            $("input#query_date_input").prop('disabled', true);
             $("#accessibility").empty();
             var hardwareAddrList = $("#machine_list .hardware-addr");
             var machineNum = hardwareAddrList.length;
@@ -506,9 +522,9 @@ $(function () {
                             $("#accessibility").append($("<p></p>", {
                                     html: "<strong>机器</strong>：" + resp.Hardware_addr + "，<strong>日期</strong>：" + resp.Date + "，<strong>ping 时间</strong>：" + pingTimeIndex + "，<strong>telnet 时间</strong>：" + telnetTimeIndex
                                 })).append("<hr>").append($("<div></div>", {
-                                    "id": "accessibility_" + resp.Hardware_addr.replace(":", "")
+                                    "id": "accessibility_" + resp.Hardware_addr
                                 }));
-                            raphaelDrawAccessibility("accessibility_" + resp.Hardware_addr.replace(":", ""), resp.Ping_results, resp.Telnet_results)
+                            raphaelDrawAccessibility("accessibility_" + resp.Hardware_addr, resp.Ping_results, resp.Telnet_results)
                         });
                     }
                 }
