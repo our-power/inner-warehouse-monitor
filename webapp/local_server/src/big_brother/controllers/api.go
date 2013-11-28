@@ -1,35 +1,19 @@
 package controllers
 
 import (
-	//"fmt"
 	"time"
-
 	"runtime"
-
+	"strings"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
-	"big_brother/models"
+	"database/sql"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 type ApiController struct {
 	beego.Controller
 }
 
-/*
-GET /api/get_machine_list
-*/
-func (this *ApiController) GetMachineList() {
-	var serverList []*models.Register
-	// 在ORM的数据库default中
-	o.Using("default")
-	_, err := o.QueryTable("register").All(&serverList)
-	if err == nil {
-		this.Data["json"] = &serverList
-	}else {
-		this.Data["json"] = nil
-	}
-	this.ServeJson()
-}
 
 /*
 	GET /api/status_overview?role=xxx
@@ -62,129 +46,20 @@ func (this * ApiController) GetStatusOverview() {
 	this.ServeJson()
 }
 
-// GET  /api/get_step_indicator_data?step=xxx&date=xxx&indicator=xxx
-func (this *ApiController) GetStepIndicatorData() {
-
-	// 主动触发垃圾回收，但还没测过效果
-	runtime.GC()
-
-	step := this.GetString("step")
-	queryDate := this.GetString("date")
-	indicator := this.GetString("indicator")
-
-	var role string
-	switch step {
-	case "kaipiao":
-		role = "kaipiao"
-	case "ercifenjian":
-		role = "ercifenjian"
-	case "dabao":
-		role = "dabao"
-	case "fenbo":
-		role = "fenbo"
-	default:
-		role = ""
+func getContainerLength(indicator string, db *sql.DB) int {
+	rows, err := db.Query("select time_index from " + indicator + " order by time_index desc limit 1")
+	if err != nil {
+		return 0
 	}
-
-	var dataTable string
-	switch indicator{
-	case "cpu_view":
-		dataTable = "cpu_usage"
-	case "memory_view":
-		dataTable = "mem_usage"
-	case "netflow_view":
-		dataTable = "net_flow"
-	default:
-		dataTable = ""
-	}
-
-	date, _ := time.Parse("2006-01-02", queryDate)
-	dateStr := date.Format("20060102")
-
-	if role == "" || dataTable == "" {
-		this.Data["json"] = nil
-	}else {
-		database := dataTable
-		var maps []orm.Params
-		o.Using("default")
-		_, err := o.QueryTable("register").Filter("machine_role", role).Limit(-1).Values(&maps, "host_name", "hardware_addr")
+	var dataContainerLength int = 0
+	for rows.Next() {
+		var time_index int
+		err = rows.Scan(&time_index)
 		if err == nil {
-			o.Using(database)
-			if dataTable == "cpu_usage" || dataTable == "mem_usage" {
-				type ResultType struct {
-					Host_name string
-					Data	  []float64
-				}
-				results := make([]ResultType,0, 50)
-				for _, machine := range maps {
-					var rows []orm.Params
-					num, err := o.QueryTable(dataTable).Filter("hardware_addr", machine["Hardware_addr"]).Filter("date", dateStr).OrderBy("time_index").Limit(-1).Values(&rows, "time_index", "usage")
-					if err == nil && num > 0 {
-						dataContainerLength := int(rows[num - 1]["Time_index"].(int64)) + 1
-						usageData := make([]float64, dataContainerLength)
-						for index := 0; index < dataContainerLength; index++ {
-							usageData[index] = -1;
-						}
-						for _, row := range rows {
-							time_index, _ := row["Time_index"].(int64)
-							usageData[time_index] = row["Usage"].(float64)
-						}
-
-						host_name, _ := machine["Host_name"].(string)
-						results = append(results, ResultType{Host_name: host_name, Data: usageData})
-					}
-				}
-				this.Data["json"] = results
-			}else if dataTable == "net_flow" {
-				type NcDataType struct {
-					Out_bytes   []int
-					In_bytes    []int
-					Out_packets []int
-					In_packets  []int
-				}
-				type ResultType struct {
-					Host_name string
-					Data	  NcDataType
-				}
-				results := make([]ResultType,0, 50)
-				for _, machine := range maps {
-					var rows []orm.Params;
-					num, err := o.QueryTable(dataTable).Filter("hardware_addr", machine["Hardware_addr"]).Filter("date", dateStr).OrderBy("time_index").Limit(-1).Values(&rows, "time_index", "out_bytes", "in_bytes", "out_packets", "in_packets")
-					if err == nil && num > 0 {
-						dataContainerLength := int(rows[num - 1]["Time_index"].(int64)) + 1
-
-						outBytes := make([]int, dataContainerLength)
-						inBytes := make([]int, dataContainerLength)
-						outPackets := make([]int, dataContainerLength)
-						inPackets := make([]int, dataContainerLength)
-						for index := 0; index < dataContainerLength; index++ {
-							outBytes[index] = -1
-							inBytes[index] = -1
-							outPackets[index] = -1
-							inPackets[index] = -1
-						}
-						ncData := NcDataType{
-							Out_bytes: outBytes,
-							In_bytes: inBytes,
-							Out_packets: outPackets,
-							In_packets: inPackets,
-						}
-						for _, row := range rows {
-							ncData.Out_bytes[int(row["Time_index"].(int64))] = int(row["Out_bytes"].(int64))
-							ncData.In_bytes[int(row["Time_index"].(int64))] = int(row["In_bytes"].(int64))
-							ncData.Out_packets[int(row["Time_index"].(int64))] = int(row["Out_packets"].(int64))
-							ncData.In_packets[int(row["Time_index"].(int64))] = int(row["In_packets"].(int64))
-						}
-						results = append(results, ResultType{Host_name: machine["Host_name"].(string), Data: ncData})
-					}
-				}
-				this.Data["json"] = results
-			}
-		}else {
-			this.Data["json"] = nil
+			dataContainerLength = time_index + 1
 		}
 	}
-	this.ServeJson()
+	return dataContainerLength
 }
 
 // 获取某一天某机器机器 CPU使用率 或 内存使用量 或 网卡数据
@@ -199,46 +74,71 @@ func (this *ApiController) GetMachineIndicatorData() {
 	date, _ := time.Parse("2006-01-02", queryDate)
 	dateStr := date.Format("20060102")
 
+	var dataContainerLength int
+	path := beego.AppConfig.String("multidb") + dateStr + "/" + strings.Replace(hardwareAddr, ":", "_", -1) + "/"
+	dbName := path
+	dbName = dbName + indicator + ".db"
+	db, err := sql.Open("sqlite3", dbName)
+	if err != nil {
+		this.Data["json"] = nil
+		goto RETURN
+	}
+	defer db.Close()
+	dataContainerLength = getContainerLength(indicator, db)
+
 	if indicator == "cpu_usage" {
-		o.Using("cpu_usage")
-		var cpuUsageData []*models.Cpu_usage
-		num, err := o.QueryTable("cpu_usage").Filter("hardware_addr", hardwareAddr).Filter("date", dateStr).OrderBy("time_index").Limit(-1).All(&cpuUsageData, "time_index", "usage")
-		if err == nil && num > 0 {
-			dataContainerLength := cpuUsageData[num - 1].Time_index + 1
-			results := make([]float32, dataContainerLength)
+		var results []float32
+		if dataContainerLength > 0 {
+			results = make([]float32, dataContainerLength)
 			for index := 0; index < dataContainerLength; index++ {
 				results[index] = -1
 			}
-			for _, row := range cpuUsageData {
-				results[row.Time_index] = row.Usage
-			}
-			this.Data["json"] = results
-		}else {
+		} else {
 			this.Data["json"] = nil
+			goto RETURN
 		}
-	}else if indicator == "mem_usage" {
-		o.Using("mem_usage")
-		var memUsageData []*models.Mem_usage
-		num, err := o.QueryTable("mem_usage").Filter("hardware_addr", hardwareAddr).Filter("date", dateStr).OrderBy("time_index").Limit(-1).All(&memUsageData, "time_index", "usage")
-		if err == nil && num > 0 {
-			dataContainerLength := memUsageData[num - 1].Time_index + 1
-			results := make([]float32, dataContainerLength)
+		rows, err := db.Query("select time_index,usage from cpu_usage order by time_index")
+		if err != nil {
+			this.Data["json"] = nil
+			goto RETURN
+		}
+		for rows.Next() {
+			var time_index int
+			var usage float32
+			err = rows.Scan(&time_index, &usage)
+			if err == nil {
+				results[time_index] = usage
+			}
+		}
+		this.Data["json"] = results
+
+	} else if indicator == "mem_usage" {
+		var results []float32
+		if dataContainerLength > 0 {
+			results = make([]float32, dataContainerLength)
 			for index := 0; index < dataContainerLength; index++ {
 				results[index] = -1
 			}
-			for _, row := range memUsageData {
-				results[row.Time_index] = row.Usage
-			}
-			this.Data["json"] = results
-		}else {
+		} else {
 			this.Data["json"] = nil
+			goto RETURN
 		}
-	}else {
-		o.Using("net_flow")
-		var netFlowData []*models.Net_flow
-		num, err := o.QueryTable("net_flow").Filter("hardware_addr", hardwareAddr).Filter("date", dateStr).OrderBy("time_index").Limit(-1).All(&netFlowData, "time_index", "out_bytes", "in_bytes", "out_packets", "in_packets")
-		if err == nil && num > 0 {
-			dataContainerLength := netFlowData[num - 1].Time_index + 1
+		rows, err := db.Query("select time_index,usage from mem_usage order by time_index")
+		if err != nil {
+			this.Data["json"] = nil
+			goto RETURN
+		}
+		for rows.Next() {
+			var time_index int
+			var usage float32
+			err = rows.Scan(&time_index, &usage)
+			if err == nil {
+				results[time_index] = usage
+			}
+		}
+		this.Data["json"] = results
+	} else if indicator == "net_flow" {
+		if dataContainerLength > 0 {
 			type ResultType struct {
 				Out_bytes   []int
 				In_bytes    []int
@@ -256,16 +156,27 @@ func (this *ApiController) GetMachineIndicatorData() {
 				inPackets[index] = -1
 			}
 			results := ResultType{Out_bytes: outBytes, In_bytes: inBytes, Out_packets: outPackets, In_packets: inPackets}
-			for _, row := range netFlowData {
-				results.Out_bytes[row.Time_index] = row.Out_bytes
-				results.In_bytes[row.Time_index] = row.In_bytes
-				results.Out_packets[row.Time_index] = row.Out_packets
-				results.In_packets[row.Time_index] = row.In_packets
+			rows, err := db.Query("select time_index,out_bytes,in_bytes,out_packets,in_packets from net_flow order by time_index")
+			if err != nil {
+				this.Data["json"] = nil
+				goto RETURN
+			}
+			for rows.Next() {
+				var time_index int
+				var out_bytes, in_bytes, out_packets, in_packets int
+				err = rows.Scan(&time_index, &out_bytes, &in_bytes, &out_packets, &in_packets)
+				if err == nil {
+					results.Out_bytes[time_index] = out_bytes
+					results.In_bytes[time_index] = in_bytes
+					results.Out_packets[time_index] = out_packets
+					results.In_packets[time_index] = in_packets
+				}
 			}
 			this.Data["json"] = results
-		}else {
+		} else {
 			this.Data["json"] = nil
 		}
 	}
+RETURN:
 	this.ServeJson()
 }

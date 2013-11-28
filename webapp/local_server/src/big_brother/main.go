@@ -41,8 +41,6 @@ func main() {
 	beego.Router("/search_machine", &controllers.SearchController{}, "GET:GetSearchPage")
 	beego.Router("/filter_machine_list", &controllers.SearchController{}, "GET:FilterMachineList")
 
-	beego.Router("/api/get_machine_list", &controllers.ApiController{}, "GET:GetMachineList")
-	beego.Router("/api/get_step_indicator_data", &controllers.ApiController{}, "GET:GetStepIndicatorData")
 	beego.Router("/api/get_machine_indicator_data", &controllers.ApiController{}, "GET:GetMachineIndicatorData")
 	beego.Router("/api/status_overview", &controllers.ApiController{}, "GET:GetStatusOverview")
 
