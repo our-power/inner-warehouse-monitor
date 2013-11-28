@@ -69,6 +69,7 @@ $(function () {
 
     function ajaxCallbackClosure(params) {
         params.req.done(function (resp) {
+                $(params.wait_tips_id).remove();
                 var date, timeIndexNum, numToReplenish, data;
                 // 对于非“正常运行中”的机器，补充最后收到数据的时间点之后时间点的数据
                 date = new Date();
@@ -214,6 +215,8 @@ $(function () {
 
         var href = jqObj.find("a").attr("href");
         var indicator = href.substr(1);
+
+        $("button#search").prop("disabled", false);
         if (indicator === "machine_list") {
             $("#form-machine-list").show();
             $("#form-date").hide();
@@ -264,6 +267,18 @@ $(function () {
         for (var index = 0; index < machineNum; index++) {
             var hardwareAddr = $.trim($(hardwareAddrList[index]).text());
             if (hardwareAddr != "") {
+
+                // 加载等待提示
+                var wait_tip_div = $('<div></div>', {
+                    'class': 'wait-tips lead',
+                    'id': "wait-tips-" + index
+                });
+                wait_tip_div.append($('<i></i>', {
+                    'class': 'fa fa-spinner fa-spin fa-3x'
+                }));
+                wait_tip_div.append(' 请稍等，我正努力地加载数据！');
+                $(href).append(wait_tip_div);
+
                 var machineInChartTitle = $(hardwareAddrList[index]).siblings(".target-machine").text();
                 var machineStatus = $(hardwareAddrList[index]).siblings(".machine-status").text();
                 var req = $.ajax({
@@ -278,7 +293,8 @@ $(function () {
                     objDate: objDate,
                     hardware_addr: hardwareAddr,
                     machine_status: machineStatus,
-                    search_target: machineInChartTitle
+                    search_target: machineInChartTitle,
+                   wait_tips_id: "#wait-tips-" + index
                 };
                 if (indicator === "netflow_view") {
                     params["netflow_xAxisTitle"] = netflow_xAxisTitle;
@@ -384,7 +400,24 @@ $(function () {
                             if (resp[index].IsExisted) {
                                 machineExistList.push(resp[index].SearchItem)
                             }
-                            $("#machine_list tbody").append("<tr><td>" + (index + 1) + "</td><td class='target-machine'>" + resp[index].SearchItem + "</td><td class='host-name'>" + resp[index].Host_name + "</td><td class='hardware-addr'>" + resp[index].Hardware_addr + "</td><td>" + resp[index].Ip + "</td><td>" + resp[index].Machine_role + "</td><td class='machine-status'>" + resp[index].Status + "</td></tr>");
+                            var trStatusClass;
+                            switch (resp[index].Status) {
+                                case "正常运行中":
+                                    trStatusClass = "normal";
+                                    break;
+                                case "运行异常":
+                                    trStatusClass = "abnormal";
+                                    break;
+                                case "已正常关机":
+                                    trStatusClass = "closed";
+                                    break;
+                                case "不再使用":
+                                    trStatusClass = "not_use"
+                                    break;
+                                default:
+                                    trStatusClass = "";
+                            }
+                            $("#machine_list tbody").append("<tr class='" + trStatusClass + "'><td>" + (index + 1) + "</td><td class='target-machine'>" + resp[index].SearchItem + "</td><td class='host-name'>" + resp[index].Host_name + "</td><td class='hardware-addr'>" + resp[index].Hardware_addr + "</td><td>" + resp[index].Ip + "</td><td>" + resp[index].Machine_role + "</td><td class='machine-status'>" + resp[index].Status + "</td></tr>");
                         }
                     }
                     $("#machine-list").val(machineExistList.join("\n"))
@@ -530,6 +563,7 @@ $(function () {
             $("#form-machine-list").hide();
             $("#form-date").show();
             $("input#query_date_input").prop('disabled', true);
+            $("button#search").prop("disabled", true);
             $("#accessibility").empty();
             var hardwareAddrList = $("#machine_list .hardware-addr");
             var machineNum = hardwareAddrList.length;
