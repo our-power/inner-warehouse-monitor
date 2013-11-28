@@ -67,6 +67,142 @@ $(function () {
         return new Date(parseInt(dateParts[0]), parseInt(dateParts[1]), parseInt(dateParts[2]));
     }
 
+    function ajaxCallbackClosure(params) {
+        params.req.done(function (resp) {
+                var date, timeIndexNum, numToReplenish, data;
+                // 对于非“正常运行中”的机器，补充最后收到数据的时间点之后时间点的数据
+                date = new Date();
+                var sameYear = params.objDate.getFullYear() === date.getFullYear();
+                var sameMonth;
+                if ($.browser.msie) {
+                    sameMonth = params.objDate.getMonth() === date.getMonth() + 1;
+                } else {
+                    sameMonth = params.objDate.getMonth() === date.getMonth();
+                }
+                var sameDate = params.objDate.getDate() === date.getDate();
+                if (sameYear && sameMonth && sameDate) {
+                    if (params.machine_status != "正常运行中") {
+                        timeIndexNum = date.getHours() * 60 * 2 + date.getMinutes() * 2;
+                    }
+                } else {
+                    timeIndexNum = 23 * 60 * 2 + 59 * 2 + 1;
+                }
+                var seriesPointStart = Date.UTC(params.objDate.getFullYear(), params.objDate.getMonth() + 1, params.objDate.getDate());
+                if (params.indicator === "netflow_view") {
+                    if (resp === null) {
+                        resp = {
+                            In_packets: [],
+                            Out_packets: [],
+                            In_bytes: [],
+                            Out_bytes: []
+                        };
+                    }
+                    numToReplenish = timeIndexNum - resp.In_packets.length;
+                    if (numToReplenish > 0) {
+                        while (numToReplenish) {
+                            resp.In_packets.push(-1);
+                            resp.Out_packets.push(-1);
+                            resp.In_bytes.push(-1);
+                            resp.Out_bytes.push(-1);
+                            numToReplenish--;
+                        }
+                    }
+                    var packetsElementId = params.indicator + "_nc_packets_" + params.hardware_addr;
+                    var bytesElementId = params.indicator + "_nc_bytes_" + params.hardware_addr;
+                    $(params.href).append($("<div></div>", {
+                            "id": packetsElementId
+                        })).append($("<div></div>", {
+                            "id": bytesElementId
+                        }));
+                    // 先绘制包量数据图
+                    var packetsSeries = [
+                        {
+                            type: "area",
+                            name: "入包量(个)",
+                            pointInterval: 30 * 1000,
+                            pointStart: seriesPointStart,
+                            data: resp.In_packets
+                        },
+                        {
+                            type: "area",
+                            name: "出包量(个)",
+                            pointInterval: 30 * 1000,
+                            pointStart: seriesPointStart,
+                            data: resp.Out_packets
+                        }
+                    ];
+                    data = {
+                        container: packetsElementId,
+                        chartTitle: params.search_target + " , " + params.netflow_packets_title,
+                        xAxisTitle: params.netflow_xAxisTitle,
+                        yAxisTitle: params.netflow_packets_yAxisTitle,
+                        series: packetsSeries
+                    };
+                    plotHighCharts(data);
+
+                    // 再绘制流量数据图
+                    var bytesSeries = [
+                        {
+                            type: "area",
+                            name: "入流量(byte)",
+                            pointInterval: 30 * 1000,
+                            pointStart: seriesPointStart,
+                            data: resp.In_bytes
+                        },
+                        {
+                            type: "area",
+                            name: "出流量(byte)",
+                            pointInterval: 30 * 1000,
+                            pointStart: seriesPointStart,
+                            data: resp.Out_bytes
+                        }
+                    ];
+                    data = {
+                        container: bytesElementId,
+                        chartTitle: params.search_target + " , " + params.netflow_bytes_title,
+                        xAxisTitle: params.netflow_xAxisTitle,
+                        yAxisTitle: params.netflow_bytes_yAxisTitle,
+                        series: bytesSeries
+                    };
+                    plotHighCharts(data);
+                } else {
+                    if (resp === null) {
+                        resp = []
+                    }
+                    numToReplenish = timeIndexNum - resp.length;
+                    if (numToReplenish > 0) {
+                        while (numToReplenish) {
+                            resp.push(-1);
+                            numToReplenish--;
+                        }
+                    }
+                    var elementId = params.indicator + "_" + params.hardware_addr;
+                    $(params.href).append($("<div></div>", {
+                        "id": elementId
+                    }));
+                    var series = [
+                        {
+                            type: 'area',
+                            name: params.seriesName,
+                            pointInterval: 30 * 1000,
+                            pointStart: seriesPointStart,
+                            data: resp
+                        }
+                    ];
+                    data = {
+                        container: elementId,
+                        chartTitle: params.search_target + " , " + params.title,
+                        xAxisTitle: params.xAxisTitle,
+                        yAxisTitle: params.yAxisTitle,
+                        series: series
+                    };
+                    plotHighCharts(data);
+                }
+            }
+        )
+        ;
+    }
+
     function getMachineIndicatorData(jqObj) {
         var queryDate = $("#query_date_input").val();
         var objDate;
@@ -132,143 +268,31 @@ $(function () {
                 var machineStatus = $(hardwareAddrList[index]).siblings(".machine-status").text();
                 var req = $.ajax({
                     "type": "get",
-                    "url": "/api/get_machine_indicator_data?hardware_addr=" + hardwareAddr + "&date=" + queryDate + "&indicator=" + trueIndicator + "&machine_status=" + machineStatus + "&search_target=" + machineInChartTitle,
+                    "url": "/api/get_machine_indicator_data?hardware_addr=" + hardwareAddr + "&date=" + queryDate + "&indicator=" + trueIndicator,
                     "dataType": "json"
                 });
-
-                req.done(function (resp) {
-                        var date, timeIndexNum, numToReplenish, data;
-                        // 对于非“正常运行中”的机器，补充最后收到数据的时间点之后时间点的数据
-                        date = new Date();
-                        var sameYear = objDate.getFullYear() === date.getFullYear();
-                        var sameMonth;
-                        if ($.browser.msie) {
-                            sameMonth = objDate.getMonth() === date.getMonth() + 1;
-                        } else {
-                            sameMonth = objDate.getMonth() === date.getMonth();
-                        }
-                        var sameDate = objDate.getDate() === date.getDate();
-                        if (sameYear && sameMonth && sameDate) {
-                            if (resp.Machine_status != "正常运行中") {
-                                timeIndexNum = date.getHours() * 60 * 2 + date.getMinutes() * 2;
-                            }
-                        } else {
-                            timeIndexNum = 23 * 60 * 2 + 59 * 2 + 1;
-                        }
-                        var seriesPointStart = Date.UTC(objDate.getFullYear(), objDate.getMonth() + 1, objDate.getDate());
-                        if (indicator === "netflow_view") {
-                            if (resp === null) {
-                                resp = {
-                                    In_packets: [],
-                                    Out_packets: [],
-                                    In_bytes: [],
-                                    Out_bytes: []
-                                };
-                            }
-                            numToReplenish = timeIndexNum - resp.In_packets.length
-                            if (numToReplenish > 0) {
-                                while (numToReplenish) {
-                                    resp.In_packets.push(-1);
-                                    resp.Out_packets.push(-1);
-                                    resp.In_bytes.push(-1);
-                                    resp.Out_bytes.push(-1);
-                                    numToReplenish--;
-                                }
-                            }
-                            var packetsElementId = indicator + "_nc_packets_" + resp.Hardware_addr;
-                            var bytesElementId = indicator + "_nc_bytes_" + resp.Hardware_addr;
-                            $(href).append($("<div></div>", {
-                                    "id": packetsElementId
-                                })).append($("<div></div>", {
-                                    "id": bytesElementId
-                                }));
-                            // 先绘制包量数据图
-                            var packetsSeries = [
-                                {
-                                    type: "area",
-                                    name: "入包量(个)",
-                                    pointInterval: 30 * 1000,
-                                    pointStart: seriesPointStart,
-                                    data: resp.In_packets
-                                },
-                                {
-                                    type: "area",
-                                    name: "出包量(个)",
-                                    pointInterval: 30 * 1000,
-                                    pointStart: seriesPointStart,
-                                    data: resp.Out_packets
-                                }
-                            ];
-                            data = {
-                                container: packetsElementId,
-                                chartTitle: resp.Search_target + " , " + netflow_packets_title,
-                                xAxisTitle: netflow_xAxisTitle,
-                                yAxisTitle: netflow_packets_yAxisTitle,
-                                series: packetsSeries
-                            };
-                            plotHighCharts(data);
-
-                            // 再绘制流量数据图
-                            var bytesSeries = [
-                                {
-                                    type: "area",
-                                    name: "入流量(byte)",
-                                    pointInterval: 30 * 1000,
-                                    pointStart: seriesPointStart,
-                                    data: resp.In_bytes
-                                },
-                                {
-                                    type: "area",
-                                    name: "出流量(byte)",
-                                    pointInterval: 30 * 1000,
-                                    pointStart: seriesPointStart,
-                                    data: resp.Out_bytes
-                                }
-                            ];
-                            data = {
-                                container: bytesElementId,
-                                chartTitle: resp.Search_target + " , " + netflow_bytes_title,
-                                xAxisTitle: netflow_xAxisTitle,
-                                yAxisTitle: netflow_bytes_yAxisTitle,
-                                series: bytesSeries
-                            };
-                            plotHighCharts(data);
-                        } else {
-                            if (resp === null) {
-                                resp = []
-                            }
-                            numToReplenish = timeIndexNum - resp.length;
-                            if (numToReplenish > 0) {
-                                while (numToReplenish) {
-                                    resp.push(-1);
-                                    numToReplenish--;
-                                }
-                            }
-                            var elementId = indicator + "_" + resp.Hardware_addr;
-                            $(href).append($("<div></div>", {
-                                "id": elementId
-                            }));
-                            var series = [
-                                {
-                                    type: 'area',
-                                    name: seriesName,
-                                    pointInterval: 30 * 1000,
-                                    pointStart: seriesPointStart,
-                                    data: resp.Data
-                                }
-                            ];
-                            data = {
-                                container: elementId,
-                                chartTitle: resp.Search_target + " , " + title,
-                                xAxisTitle: xAxisTitle,
-                                yAxisTitle: yAxisTitle,
-                                series: series
-                            }
-                            plotHighCharts(data);
-                        }
-                    }
-                )
-                ;
+                var params = {
+                    req: req,
+                    indicator: indicator,
+                    href: href,
+                    objDate: objDate,
+                    hardware_addr: hardwareAddr,
+                    machine_status: machineStatus,
+                    search_target: machineInChartTitle
+                };
+                if (indicator === "netflow_view") {
+                    params["netflow_xAxisTitle"] = netflow_xAxisTitle;
+                    params["netflow_packets_yAxisTitle"] = netflow_packets_yAxisTitle;
+                    params["netflow_bytes_yAxisTitle"] = netflow_bytes_yAxisTitle;
+                    params["netflow_packets_title"] = netflow_packets_title;
+                    params["netflow_bytes_title"] = netflow_bytes_title;
+                } else {
+                    params["xAxisTitle"] = xAxisTitle;
+                    params["yAxisTitle"] = yAxisTitle;
+                    params["seriesName"] = seriesName;
+                    params["title"] = title;
+                }
+                ajaxCallbackClosure(params);
             }
         }
     }
@@ -386,15 +410,17 @@ $(function () {
             pingCircleCenterX,
             pingCircleCenterY,
             telnetCircleCenterX = 740,
-            telnetCircleCenterY = 240;
+            telnetCircleCenterY = 240,
+            notOk;
 
         if ($.browser.msie) {
-            svgWidth = 800;
-            radius = 160;
+            svgWidth = 820;
+            radius = 150;
             pingCircleCenterX = 180;
             pingCircleCenterY = 180;
             telnetCircleCenterX = 570;
             telnetCircleCenterY = 180;
+            notOk = "fail to connect"
         } else {
             svgWidth = 1000;
             radius = 200;
@@ -402,6 +428,7 @@ $(function () {
             pingCircleCenterY = 240;
             telnetCircleCenterX = 740;
             telnetCircleCenterY = 240;
+            notOk = "不通"
         }
 
         var paper = Raphael(HTMLElement, svgWidth, svgHeight);
@@ -423,7 +450,7 @@ $(function () {
                     "stroke-width": 3,
                     'arrow-end': 'block-midium-long',
                     'arrow-start': 'none',
-                    title: ((pingData[pingIndex].Response_time == -1) ? "不通" : pingData[pingIndex].Response_time + "ms")
+                    title: ((pingData[pingIndex].Response_time == -1) ? notOk : pingData[pingIndex].Response_time + "ms")
                 });
             if (x < 0) {
                 xOffset = -15;
@@ -435,7 +462,7 @@ $(function () {
             } else {
                 yOffset = 15;
             }
-            paper.text(pingCircleCenterX + x / 2, pingCircleCenterY + y / 2, ((pingData[pingIndex].Response_time == -1) ? "不通" : pingData[pingIndex].Response_time + "ms")).attr({"font-weight": "bold"});
+            paper.text(pingCircleCenterX + x / 2, pingCircleCenterY + y / 2, ((pingData[pingIndex].Response_time == -1) ? notOk : pingData[pingIndex].Response_time + "ms")).attr({"font-weight": "bold"});
             paper.text(pingCircleCenterX + x + xOffset, pingCircleCenterY + y + yOffset, pingData[pingIndex].Target_ip).attr({"font-size": 14, "font-weight": "bold"});
         }
 
@@ -468,7 +495,7 @@ $(function () {
             } else {
                 yOffset = 15;
             }
-            paper.text(telnetCircleCenterX + x / 2, telnetCircleCenterY + y / 2, ((telnetData[telnetIndex].Status === "NotOK") ? "不通" : "OK")).attr({"font-weight": "bold"});
+            paper.text(telnetCircleCenterX + x / 2, telnetCircleCenterY + y / 2, ((telnetData[telnetIndex].Status === "NotOK") ? notOk : "OK")).attr({"font-weight": "bold"});
             paper.text(telnetCircleCenterX + x + xOffset, telnetCircleCenterY + y + yOffset, telnetData[telnetIndex].Target_url).attr({"font-size": 14, "font-weight": "bold"});
         }
     }

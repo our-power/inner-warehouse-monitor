@@ -196,18 +196,10 @@ func (this *ApiController) GetMachineIndicatorData() {
 	hardwareAddr := this.GetString("hardware_addr")
 	indicator := this.GetString("indicator")
 	queryDate := this.GetString("date")
-	machineStatus := this.GetString("machine_status")
-	searchTarget := this.GetString("search_target")
 	date, _ := time.Parse("2006-01-02", queryDate)
 	dateStr := date.Format("20060102")
 
 	if indicator == "cpu_usage" {
-		type ResultType struct {
-			Hardware_addr string
-			Machine_status string
-			Search_target string
-			Data          []float32
-		}
 		o.Using("cpu_usage")
 		var cpuUsageData []*models.Cpu_usage
 		num, err := o.QueryTable("cpu_usage").Filter("hardware_addr", hardwareAddr).Filter("date", dateStr).OrderBy("time_index").Limit(-1).All(&cpuUsageData, "time_index", "usage")
@@ -220,17 +212,11 @@ func (this *ApiController) GetMachineIndicatorData() {
 			for _, row := range cpuUsageData {
 				results[row.Time_index] = row.Usage
 			}
-			this.Data["json"] = ResultType{Hardware_addr: hardwareAddr, Machine_status: machineStatus, Search_target: searchTarget, Data: results}
+			this.Data["json"] =  results
 		}else {
 			this.Data["json"] = nil
 		}
 	}else if indicator == "mem_usage" {
-		type ResultType struct {
-			Hardware_addr string
-			Machine_status string
-			Search_target string
-			Data          []float32
-		}
 		o.Using("mem_usage")
 		var memUsageData []*models.Mem_usage
 		num, err := o.QueryTable("mem_usage").Filter("hardware_addr", hardwareAddr).Filter("date", dateStr).OrderBy("time_index").Limit(-1).All(&memUsageData, "time_index", "usage")
@@ -243,7 +229,7 @@ func (this *ApiController) GetMachineIndicatorData() {
 			for _, row := range memUsageData {
 				results[row.Time_index] = row.Usage
 			}
-			this.Data["json"] = ResultType{Hardware_addr: hardwareAddr, Machine_status: machineStatus, Search_target: searchTarget, Data: results}
+			this.Data["json"] =  results
 		}else {
 			this.Data["json"] = nil
 		}
@@ -254,9 +240,6 @@ func (this *ApiController) GetMachineIndicatorData() {
 		if err == nil && num > 0 {
 			dataContainerLength := netFlowData[num - 1].Time_index + 1
 			type ResultType struct {
-				Hardware_addr string
-				Machine_status string
-				Search_target string
 				Out_bytes     []int
 				In_bytes      []int
 				Out_packets   []int
@@ -272,7 +255,7 @@ func (this *ApiController) GetMachineIndicatorData() {
 				outPackets[index] = -1
 				inPackets[index] = -1
 			}
-			results := ResultType{Hardware_addr: hardwareAddr, Machine_status: machineStatus, Search_target: searchTarget, Out_bytes: outBytes, In_bytes: inBytes, Out_packets: outPackets, In_packets: inPackets}
+			results := ResultType{Out_bytes: outBytes, In_bytes: inBytes, Out_packets: outPackets, In_packets: inPackets}
 			for _, row := range netFlowData {
 				results.Out_bytes[row.Time_index] = row.Out_bytes
 				results.In_bytes[row.Time_index] = row.In_bytes
