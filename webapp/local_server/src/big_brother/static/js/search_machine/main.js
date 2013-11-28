@@ -131,13 +131,13 @@ $(function () {
                 var machineInChartTitle = $(hardwareAddrList[index]).siblings(".target-machine").text();
                 var machineStatus = $(hardwareAddrList[index]).siblings(".machine-status").text();
                 var req = $.ajax({
-                    "async": false,
                     "type": "get",
-                    "url": "/api/get_machine_indicator_data?hardware_addr=" + hardwareAddr + "&date=" + queryDate + "&indicator=" + trueIndicator,
+                    "url": "/api/get_machine_indicator_data?hardware_addr=" + hardwareAddr + "&date=" + queryDate + "&indicator=" + trueIndicator + "&machine_status=" + machineStatus + "&search_target=" + machineInChartTitle,
                     "dataType": "json"
                 });
+
                 req.done(function (resp) {
-                        var date, timeIndexNum;
+                        var date, timeIndexNum, numToReplenish, data;
                         // 对于非“正常运行中”的机器，补充最后收到数据的时间点之后时间点的数据
                         date = new Date();
                         var sameYear = objDate.getFullYear() === date.getFullYear();
@@ -149,7 +149,7 @@ $(function () {
                         }
                         var sameDate = objDate.getDate() === date.getDate();
                         if (sameYear && sameMonth && sameDate) {
-                            if (machineStatus != "正常运行中") {
+                            if (resp.Machine_status != "正常运行中") {
                                 timeIndexNum = date.getHours() * 60 * 2 + date.getMinutes() * 2;
                             }
                         } else {
@@ -165,7 +165,7 @@ $(function () {
                                     Out_bytes: []
                                 };
                             }
-                            var numToReplenish = timeIndexNum - resp.In_packets.length
+                            numToReplenish = timeIndexNum - resp.In_packets.length
                             if (numToReplenish > 0) {
                                 while (numToReplenish) {
                                     resp.In_packets.push(-1);
@@ -175,8 +175,8 @@ $(function () {
                                     numToReplenish--;
                                 }
                             }
-                            var packetsElementId = indicator + "_nc_packets_" + index
-                            var bytesElementId = indicator + "_nc_bytes_" + index
+                            var packetsElementId = indicator + "_nc_packets_" + resp.Hardware_addr;
+                            var bytesElementId = indicator + "_nc_bytes_" + resp.Hardware_addr;
                             $(href).append($("<div></div>", {
                                     "id": packetsElementId
                                 })).append($("<div></div>", {
@@ -199,9 +199,9 @@ $(function () {
                                     data: resp.Out_packets
                                 }
                             ];
-                            var data = {
+                            data = {
                                 container: packetsElementId,
-                                chartTitle: machineInChartTitle + " , " + netflow_packets_title,
+                                chartTitle: resp.Search_target + " , " + netflow_packets_title,
                                 xAxisTitle: netflow_xAxisTitle,
                                 yAxisTitle: netflow_packets_yAxisTitle,
                                 series: packetsSeries
@@ -227,7 +227,7 @@ $(function () {
                             ];
                             data = {
                                 container: bytesElementId,
-                                chartTitle: machineInChartTitle + " , " + netflow_bytes_title,
+                                chartTitle: resp.Search_target + " , " + netflow_bytes_title,
                                 xAxisTitle: netflow_xAxisTitle,
                                 yAxisTitle: netflow_bytes_yAxisTitle,
                                 series: bytesSeries
@@ -237,14 +237,14 @@ $(function () {
                             if (resp === null) {
                                 resp = []
                             }
-                            var numToReplenish = timeIndexNum - resp.length
+                            numToReplenish = timeIndexNum - resp.length;
                             if (numToReplenish > 0) {
                                 while (numToReplenish) {
                                     resp.push(-1);
                                     numToReplenish--;
                                 }
                             }
-                            var elementId = indicator + "_" + index;
+                            var elementId = indicator + "_" + resp.Hardware_addr;
                             $(href).append($("<div></div>", {
                                 "id": elementId
                             }));
@@ -254,12 +254,12 @@ $(function () {
                                     name: seriesName,
                                     pointInterval: 30 * 1000,
                                     pointStart: seriesPointStart,
-                                    data: resp
+                                    data: resp.Data
                                 }
                             ];
-                            var data = {
+                            data = {
                                 container: elementId,
-                                chartTitle: machineInChartTitle + " , " + title,
+                                chartTitle: resp.Search_target + " , " + title,
                                 xAxisTitle: xAxisTitle,
                                 yAxisTitle: yAxisTitle,
                                 series: series
