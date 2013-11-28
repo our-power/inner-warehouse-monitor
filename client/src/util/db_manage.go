@@ -36,7 +36,7 @@ func (link *DbLink) GetLink(date string, hardware_addr string, indicator string)
 	} else {
 		// 否则为新的日期打开新的数据库连接，并延时关闭原有日期对应的数据库连接，且删除其在本结构体中的注册条目
 		var dbPath, dbSourceName string
-		dbPath = "D:/" + date + "/" + strings.Replace(hardware_addr, ":", "_", -1) + "/"
+		dbPath = "../db/" + date + "/" + strings.Replace(hardware_addr, ":", "_", -1) + "/"
 		dbSourceName = dbPath + indicator + ".db"
 		os.MkdirAll(dbPath, 0666)
 		link.Changing = true

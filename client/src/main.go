@@ -27,7 +27,6 @@ var (
 	maxInFlight        = flag.Int("max-in-flight", 200, "max number of messages to allow in flight")
 	verbose            = flag.Bool("verbose", false, "enable verbose logging")
 	maxBackoffDuration = flag.Duration("max-backoff-duration", 120*time.Second, "the maximum backoff duration")
-	dbPath             = flag.String("dbPath", "D:\\", "the path to store db file")
 	termChan chan os.Signal
 )
 
@@ -36,12 +35,6 @@ func init() {
 	flag.Var(&lookupdHTTPAddrs, "lookupd-http-address", "lookupd HTTP address (may be given multiple times)")
 }
 
-func getDBLink(dbDriver string, dbSourceName string) (link *sql.DB, err error) {
-
-	link, err = sql.Open(dbDriver, dbSourceName)
-
-	return
-}
 
 func runCpuUsageClient(cuh *cpu_usage.CPUUsageHandler) (cuTodb *nsq.Reader, err error) {
 	cuTodb, err = nsq.NewReader("cpu_usage", "multidb")
@@ -299,7 +292,7 @@ func main() {
 		fmt.Println(err)
 	}
 
-	register_db_link, err := getDBLink("sqlite3", *dbPath + "register_sqlite.db")
+	register_db_link, err := sql.Open("sqlite3", "../db/register.db")
 	if err != nil {
 		fmt.Println(err)
 		return

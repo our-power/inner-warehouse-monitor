@@ -2,28 +2,16 @@ package main
 
 import (
 	"fmt"
-	"strings"
-
-	"github.com/astaxie/beego"
-
 	"big_brother/controllers"
 	"big_brother/models"
-
+	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	_ "github.com/mattn/go-sqlite3"
 )
 
 func init() {
-	dbSourceList := strings.Split(beego.AppConfig.String("dbsourcename"), ";")
-	for _, dbSource := range dbSourceList {
-		dbName_DbSource := strings.Split(dbSource, ",")
-		if dbName_DbSource[0] == "register" {
-			// beego的ORM要求必须要有个default的数据库
-			orm.RegisterDataBase("default", beego.AppConfig.String("dbdriver"), dbName_DbSource[1])
-		}else{
-			orm.RegisterDataBase(dbName_DbSource[0], beego.AppConfig.String("dbdriver"), dbName_DbSource[1])
-		}
-	}
+	registerDB := beego.AppConfig.String("multidb") + "register.db"
+	orm.RegisterDataBase("default", beego.AppConfig.String("dbdriver"), registerDB)
 	models.InitModels()
 	controllers.InitControllers()
 }
