@@ -204,6 +204,19 @@ $(function () {
         ;
     }
 
+    function loadWaitTips(parentID, tipsID) {
+        // 加载等待提示
+        var wait_tip_div = $('<div></div>', {
+            'class': 'wait-tips lead',
+            'id': tipsID
+        });
+        wait_tip_div.append($('<i></i>', {
+            'class': 'fa fa-spinner fa-spin fa-3x'
+        }));
+        wait_tip_div.append(' 请稍等，我正努力地加载数据！');
+        $(parentID).append(wait_tip_div);
+    }
+
     function getMachineIndicatorData(jqObj) {
         var queryDate = $("#query_date_input").val();
         var objDate;
@@ -269,15 +282,7 @@ $(function () {
             if (hardwareAddr != "") {
 
                 // 加载等待提示
-                var wait_tip_div = $('<div></div>', {
-                    'class': 'wait-tips lead',
-                    'id': "wait-tips-" + index
-                });
-                wait_tip_div.append($('<i></i>', {
-                    'class': 'fa fa-spinner fa-spin fa-3x'
-                }));
-                wait_tip_div.append(' 请稍等，我正努力地加载数据！');
-                $(href).append(wait_tip_div);
+                loadWaitTips(href, "wait-tips-" + index);
 
                 var machineInChartTitle = $(hardwareAddrList[index]).siblings(".target-machine").text();
                 var machineStatus = $(hardwareAddrList[index]).siblings(".machine-status").text();
@@ -294,7 +299,7 @@ $(function () {
                     hardware_addr: hardwareAddr,
                     machine_status: machineStatus,
                     search_target: machineInChartTitle,
-                   wait_tips_id: "#wait-tips-" + index
+                    wait_tips_id: "#wait-tips-" + index
                 };
                 if (indicator === "netflow_view") {
                     params["netflow_xAxisTitle"] = netflow_xAxisTitle;
@@ -382,14 +387,8 @@ $(function () {
                     "dataType": "json"
                 });
 
-                var wait_tip_div = $('<div></div>', {
-                    'class': 'wait-tips lead'
-                });
-                wait_tip_div.append($('<i></i>', {
-                    'class': 'fa fa-spinner fa-spin fa-3x'
-                }));
-                wait_tip_div.append(' 请稍等，我正努力地加载数据！');
-                $("#machine_list tbody").append(wait_tip_div);
+                // 加载等待提示
+                loadWaitTips("#machine_list tbody", "");
 
                 req.done(function (resp) {
                     $("#machine_list tbody").empty();
@@ -572,6 +571,10 @@ $(function () {
                 if (hardwareAddr != "") {
                     var machineStatus = $(hardwareAddrList[index]).siblings(".machine-status").text();
                     if (machineStatus === "正常运行中") {
+
+                        // 加载等待提示
+                        loadWaitTips("#accessibility", "wait-tips-" + hardwareAddr.replace(/:/g, ""));
+
                         var req = $.ajax({
                             "type": "get",
                             "url": "/api/get_machine_accessibility_data?hardware_addr=" + hardwareAddr,
@@ -585,6 +588,11 @@ $(function () {
                                 })).append("<hr>").append($("<div></div>", {
                                     "id": "accessibility_" + resp.Hardware_addr
                                 }));
+
+                            // 删除等待提示信息
+                            var waitTipsID = "#wait-tips-" + resp.Hardware_addr.replace(/:/g, "");
+                            $(waitTipsID).remove();
+
                             raphaelDrawAccessibility("accessibility_" + resp.Hardware_addr, resp.Ping_results, resp.Telnet_results)
                         });
                     }
