@@ -43,10 +43,13 @@ func NewHeartBeatHandler(dbLink *util.DbLink) (heartBeatHandler *HeartBeatHandle
 
 func updateMachineStatus(h *HeartBeatHandler, registerDB *sql.DB) {
 	for {
-		c := time.Tick(3*time.Minute)
+		c := time.Tick(1*time.Minute)
 		for _ = range c {
 			sql := "SELECT hardware_addr, status FROM register"
-			rows, _ := registerDB.Query(sql)
+			rows, err := registerDB.Query(sql)
+			if err != nil {
+				fmt.Println(err)
+			}
 			type machineStatus struct {
 				Hardware_addr string
 				Status        int
@@ -70,7 +73,7 @@ func updateMachineStatus(h *HeartBeatHandler, registerDB *sql.DB) {
 					if err != nil {
 						fmt.Println(err)
 					}
-					sql = "SELECT count(*) FROM heartbeat AND time_index > ?"
+					sql = "SELECT count(*) FROM heartbeat WHERE time_index > ?"
 					rows, _ := db.Query(sql, criticalTimeIndex)
 					var count int
 					for rows.Next() {

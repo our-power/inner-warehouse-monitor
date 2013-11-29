@@ -31,7 +31,7 @@ func (link *DbLink) GetLink(date string, hardware_addr string, indicator string)
 	dbLink, ok := link.Links[key]
 	// 如果已经存在，则认为没有日期变更，且数据库连接已经打开
 	if ok {
-		fmt.Println("bingo!") //命中已经打开的数据库连接
+		// fmt.Println("bingo!") //命中已经打开的数据库连接
 		return dbLink, nil
 	} else {
 		// 否则为新的日期打开新的数据库连接，并延时关闭原有日期对应的数据库连接，且删除其在本结构体中的注册条目
