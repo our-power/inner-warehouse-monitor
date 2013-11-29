@@ -6,6 +6,7 @@ import (
 	"util"
 	"time"
 	"fmt"
+	"database/sql"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/bitly/go-nsq"
 )
@@ -33,7 +34,7 @@ func (h *HeartBeatHandler) HandleMessage(m *nsq.Message) (err error) {
 	return err
 }
 
-func NewHeartBeatHandler(dbLink *sql.DB) (heartBeatHandler *HeartBeatHandler, err error) {
+func NewHeartBeatHandler(dbLink *util.DbLink) (heartBeatHandler *HeartBeatHandler, err error) {
 	heartBeatHandler = &HeartBeatHandler {
 		db: dbLink,
 	}
@@ -65,8 +66,12 @@ func updateMachineStatus(h *HeartBeatHandler, registerDB *sql.DB) {
 			criticalTimeIndex := nowTimeIndex - 6
 			for _, item := range machineListWithStatus {
 				if item.Status == 1 || item.Status == -1 {
-					sql = "SELECT count(*) FROM heartbeat WHERE hardware_addr = ? AND date = ? AND time_index > ?"
-					rows, _ := h.db.Query(sql, item.Hardware_addr, dateStr, criticalTimeIndex)
+					db, err := h.db.GetLink(dateStr, item.Hardware_addr, "heartbeat")
+					if err != nil {
+						fmt.Println(err)
+					}
+					sql = "SELECT count(*) FROM heartbeat AND time_index > ?"
+					rows, _ := db.Query(sql, criticalTimeIndex)
 					var count int
 					for rows.Next() {
 						rows.Scan(&count)

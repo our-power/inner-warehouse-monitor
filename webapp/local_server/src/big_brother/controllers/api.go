@@ -189,7 +189,7 @@ func (this *ApiController) GetMachineAccessibilityData() {
 
 	type PingResultType struct {
 		Target_ip     string
-		Response_time int
+		Response_time string
 	}
 
 	type TelnetResultType struct {
@@ -210,32 +210,59 @@ func (this *ApiController) GetMachineAccessibilityData() {
 	telnetResults := make([]TelnetResultType,0, 100)
 	var pingTimeIndex int
 	var telnetTimeIndex int
-	o.Using("accessibility")
-	var pingItems []*models.Ping_accessibility
-	// 这里使用的Limit(20)是假设最多有20个服务
-	num, err := o.QueryTable("ping_accessibility").Filter("hardware_addr", hardwareAddr).Filter("date", dateStr).OrderBy("-time_index").Limit(100).All(&pingItems)
-	if err == nil && num > 0 {
-		newestTimeIndex := pingItems[0].Time_index
-		pingTimeIndex = newestTimeIndex
-		for _, item := range pingItems {
-			if item.Time_index < newestTimeIndex {
-				break
-			}else {
-				pingResults = append(pingResults, PingResultType{Target_ip: item.Target_ip, Response_time: item.Response_time})
+
+	path := beego.AppConfig.String("multidb") + dateStr + "/" + strings.Replace(hardwareAddr, ":", "_", -1) + "/"
+	dbName := path + "accessibility.db"
+	db, err := sql.Open("sqlite3", dbName)
+	if err != nil {
+		this.Data["json"] = nil
+		this.ServeJson()
+		return
+	}
+	defer db.Close()
+
+	rows, err := db.Query("select time_index,target_ip,response_time from ping_accessibility order by time_index desc limit 100")
+	if err != nil {
+		this.Data["json"] = nil
+		this.ServeJson()
+		return
+	}
+	var latest int = 0
+	for rows.Next() {
+		var time_index int
+		var target_ip, response_time string
+		err = rows.Scan(&time_index, &target_ip, &response_time)
+		if err == nil {
+			if latest == 0 {
+				latest = time_index
+			}
+			if time_index < latest {
+				continue
+			} else {
+				pingResults = append(pingResults, PingResultType{Target_ip: target_ip, Response_time: response_time})
 			}
 		}
 	}
 
-	var telnetItems []*models.Telnet_accessibility
-	num, err = o.QueryTable("telnet_accessibility").Filter("hardware_addr", hardwareAddr).Filter("date", dateStr).OrderBy("-time_index").Limit(100).All(&telnetItems)
-	if err == nil && num > 0 {
-		newestTimeIndex := telnetItems[0].Time_index
-		telnetTimeIndex = newestTimeIndex
-		for _, item := range telnetItems {
-			if item.Time_index < newestTimeIndex {
-				break
-			}else {
-				telnetResults = append(telnetResults, TelnetResultType{Target_url: item.Target_url, Status: item.Status})
+	rows, err = db.Query("select time_index,target_url,status from telnet_accessibility order by time_index desc limit 100")
+	if err != nil {
+		this.Data["json"] = nil
+		this.ServeJson()
+		return
+	}
+	latest = 0
+	for rows.Next() {
+		var time_index int
+		var target_url, status string
+		err = rows.Scan(&time_index, &target_url, &status)
+		if err == nil {
+			if latest == 0 {
+				latest = time_index
+			}
+			if time_index < latest {
+				continue
+			} else {
+				telnetResults = append(telnetResults, TelnetResultType{Target_url: target_url, Status: status})
 			}
 		}
 	}
