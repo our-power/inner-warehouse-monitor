@@ -27,3 +27,19 @@
 body {
     padding-top: 80px;
 }
+
+.normal{
+    background-color: #e6fcf0;
+}
+
+.abnormal {
+    background-color: #FF6347;
+}
+
+.closed {
+    background-color: #c0c0c0;
+}
+
+.no_use {
+    background-color: yellowgreen;
+}

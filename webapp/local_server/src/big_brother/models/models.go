@@ -78,7 +78,7 @@ type Ping_accessibility struct {
 	Host_name string
 	Hardware_addr string
 	Target_ip string
-	Response_time string
+	Response_time int
 }
 
 type Telnet_accessibility struct {

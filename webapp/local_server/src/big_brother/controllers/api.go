@@ -140,10 +140,10 @@ func (this *ApiController) GetMachineIndicatorData() {
 	} else if indicator == "net_flow" {
 		if dataContainerLength > 0 {
 			type ResultType struct {
-				Out_bytes   []int
-				In_bytes    []int
-				Out_packets []int
-				In_packets  []int
+				Out_bytes     []int
+				In_bytes      []int
+				Out_packets   []int
+				In_packets    []int
 			}
 			outBytes := make([]int, dataContainerLength)
 			inBytes := make([]int, dataContainerLength)
@@ -178,5 +178,67 @@ func (this *ApiController) GetMachineIndicatorData() {
 		}
 	}
 RETURN:
+	this.ServeJson()
+}
+
+// 获取机器最新的可达性数据
+func (this *ApiController) GetMachineAccessibilityData() {
+	hardwareAddr := this.GetString("hardware_addr")
+	now := time.Now()
+	dateStr := now.Format("20060102")
+
+	type PingResultType struct {
+		Target_ip     string
+		Response_time int
+	}
+
+	type TelnetResultType struct {
+		Target_url string
+		Status     string
+	}
+
+	type ResultType struct{
+		Hardware_addr     string
+		Date              string
+		Ping_time_index   int
+		Ping_results      []PingResultType
+		Telnet_time_index int
+		Telnet_results    []TelnetResultType
+	}
+
+	pingResults := make([]PingResultType,0, 100)
+	telnetResults := make([]TelnetResultType,0, 100)
+	var pingTimeIndex int
+	var telnetTimeIndex int
+	o.Using("accessibility")
+	var pingItems []*models.Ping_accessibility
+	// 这里使用的Limit(20)是假设最多有20个服务
+	num, err := o.QueryTable("ping_accessibility").Filter("hardware_addr", hardwareAddr).Filter("date", dateStr).OrderBy("-time_index").Limit(100).All(&pingItems)
+	if err == nil && num > 0 {
+		newestTimeIndex := pingItems[0].Time_index
+		pingTimeIndex = newestTimeIndex
+		for _, item := range pingItems {
+			if item.Time_index < newestTimeIndex {
+				break
+			}else {
+				pingResults = append(pingResults, PingResultType{Target_ip: item.Target_ip, Response_time: item.Response_time})
+			}
+		}
+	}
+
+	var telnetItems []*models.Telnet_accessibility
+	num, err = o.QueryTable("telnet_accessibility").Filter("hardware_addr", hardwareAddr).Filter("date", dateStr).OrderBy("-time_index").Limit(100).All(&telnetItems)
+	if err == nil && num > 0 {
+		newestTimeIndex := telnetItems[0].Time_index
+		telnetTimeIndex = newestTimeIndex
+		for _, item := range telnetItems {
+			if item.Time_index < newestTimeIndex {
+				break
+			}else {
+				telnetResults = append(telnetResults, TelnetResultType{Target_url: item.Target_url, Status: item.Status})
+			}
+		}
+	}
+	this.Data["json"] = ResultType{Hardware_addr: hardwareAddr, Date: now.Format("2006-01-02"), Ping_time_index: pingTimeIndex, Ping_results: pingResults, Telnet_time_index: telnetTimeIndex, Telnet_results: telnetResults}
 	this.ServeJson()
 }
