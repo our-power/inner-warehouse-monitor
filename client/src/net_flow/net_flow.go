@@ -21,46 +21,47 @@ func (h *NetFlowHandler) HandleMessage(m *nsq.Message) (err error) {
 	*/
 
 	bodyParts := strings.Split(string(m.Body), "\r\n")
-	time_index, err := strconv.Atoi(bodyParts[1])
-	netFlowDataParts := strings.Split(bodyParts[5], ",")[1:]
-	networkCardNum := len(netFlowDataParts)/4
+	if len(bodyParts) == 6 {
+		time_index, err := strconv.Atoi(bodyParts[1])
+		netFlowDataParts := strings.Split(bodyParts[5], ",")[1:]
+		networkCardNum := len(netFlowDataParts)/4
 
-	beginIndex := 0
-	endIndex := networkCardNum
-	outBytes := 0
-	for index := beginIndex; index < endIndex; index++ {
-		oneOutByteFloat, _ := strconv.ParseFloat(netFlowDataParts[index], 32)
-		outBytes += int(oneOutByteFloat)
-	}
-	beginIndex = endIndex
-	endIndex += networkCardNum
-	inBytes := 0
-	for index := beginIndex; index < endIndex; index++ {
-		oneInByteFloat, _ := strconv.ParseFloat(netFlowDataParts[index], 32)
-		inBytes += int(oneInByteFloat)
-	}
+		beginIndex := 0
+		endIndex := networkCardNum
+		outBytes := 0
+		for index := beginIndex; index < endIndex; index++ {
+			oneOutByteFloat, _ := strconv.ParseFloat(netFlowDataParts[index], 32)
+			outBytes += int(oneOutByteFloat)
+		}
+		beginIndex = endIndex
+		endIndex += networkCardNum
+		inBytes := 0
+		for index := beginIndex; index < endIndex; index++ {
+			oneInByteFloat, _ := strconv.ParseFloat(netFlowDataParts[index], 32)
+			inBytes += int(oneInByteFloat)
+		}
 
-	beginIndex = endIndex
-	endIndex += networkCardNum
-	outPackets := 0
-	for index := beginIndex; index < endIndex; index++ {
-		oneOutPacketFloat, _ := strconv.ParseFloat(netFlowDataParts[index], 32)
-		outPackets += int(oneOutPacketFloat)
-	}
+		beginIndex = endIndex
+		endIndex += networkCardNum
+		outPackets := 0
+		for index := beginIndex; index < endIndex; index++ {
+			oneOutPacketFloat, _ := strconv.ParseFloat(netFlowDataParts[index], 32)
+			outPackets += int(oneOutPacketFloat)
+		}
 
-	beginIndex = endIndex
-	endIndex += networkCardNum
-	inPackets := 0
-	for index := beginIndex; index < endIndex; index++ {
-		oneInPacketsFloat, _ := strconv.ParseFloat(netFlowDataParts[index], 32)
-		inPackets += int(oneInPacketsFloat)
-	}
+		beginIndex = endIndex
+		endIndex += networkCardNum
+		inPackets := 0
+		for index := beginIndex; index < endIndex; index++ {
+			oneInPacketsFloat, _ := strconv.ParseFloat(netFlowDataParts[index], 32)
+			inPackets += int(oneInPacketsFloat)
+		}
 
-	sql := `
+		sql := `
 	INSERT INTO net_flow (date, time_index, ip, host_name, hardware_addr, out_bytes, in_bytes, out_packets, in_packets) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
 	`
-	_, err = h.db.Exec(sql, bodyParts[0], time_index, bodyParts[2], bodyParts[3], bodyParts[4], outBytes, inBytes, outPackets, inPackets)
-
+		_, err = h.db.Exec(sql, bodyParts[0], time_index, bodyParts[2], bodyParts[3], bodyParts[4], outBytes, inBytes, outPackets, inPackets)
+	}
 	return err
 }
 
