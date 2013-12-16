@@ -43,6 +43,7 @@ func (h *RegisterToDBHandler) HandleMessage(m *nsq.Message) (err error) {
 		}
 		return err
 	}
+	return nil
 }
 
 func NewRegisterToDBHandler(dbLink *sql.DB) (registerToDBHandler *RegisterToDBHandler, err error) {

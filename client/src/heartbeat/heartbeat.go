@@ -29,6 +29,7 @@ func (h *HeartBeatHandler) HandleMessage(m *nsq.Message) (err error) {
 		_, err = h.db.Exec(sql, bodyParts[0], time_index, bodyParts[2], bodyParts[3], bodyParts[4], 1)
 		return err
 	}
+	return nil
 }
 
 func NewHeartBeatHandler(dbLink *sql.DB) (heartBeatHandler *HeartBeatHandler, err error) {

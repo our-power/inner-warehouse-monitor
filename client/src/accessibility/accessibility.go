@@ -74,6 +74,7 @@ func (h *AccessibilityToDBHandler) HandleMessage(m *nsq.Message) (err error) {
 		}
 		return err
 	}
+	return  nil
 }
 
 func NewAccessibilityToDBHandler(dbLink *sql.DB) (accessibilityToDBHandler *AccessibilityToDBHandler, err error) {
@@ -134,6 +135,7 @@ func (h *AccessibilityCheckHandler) HandleMessage(m *nsq.Message) (err error) {
 		}
 		return err
 	}
+	return nil
 }
 
 func NewAccessibilityCheckHandler() (accessibilityCheckHandler *AccessibilityCheckHandler, err error) {
