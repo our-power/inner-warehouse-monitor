@@ -41,8 +41,8 @@ func (h *RegisterToDBHandler) HandleMessage(m *nsq.Message) (err error) {
 		`
 			_, err = h.db.Exec(sql, bodyParts[0], time_index, bodyParts[2], bodyParts[3], bodyParts[4], version_role[0], version_role[1], status)
 		}
+		return err
 	}
-	return err
 }
 
 func NewRegisterToDBHandler(dbLink *sql.DB) (registerToDBHandler *RegisterToDBHandler, err error) {

@@ -25,54 +25,55 @@ func (h *AccessibilityToDBHandler) HandleMessage(m *nsq.Message) (err error) {
 	//fmt.Printf("%s\n", m.Body)
 
 	bodyParts := strings.Split(string(m.Body), "\r\n")
-	time_index, err := strconv.Atoi(bodyParts[1])
-	if bodyParts[5] == "1" {
-		tx, err := h.db.Begin()
-		if err != nil {
-			fmt.Println(err)
-		}
-		stmt, err := tx.Prepare("INSERT INTO ping_accessibility (date, time_index, ip, host_name, hardware_addr, target_ip, response_time) VALUES (?, ?, ?, ?, ?, ?, ?)")
-		if err != nil {
-			fmt.Println(err)
-		}
-		defer stmt.Close()
-		validData := bodyParts[6:len(bodyParts) - 1]
-		for _, item := range validData {
-			targetAndPingResult := strings.Split(item, ",")
-			pingResult := strings.Split(targetAndPingResult[1], "=")
-			responseTime := -1
-			if pingResult[0] == "ResponseTime" {
-				responseTime, err = strconv.Atoi(pingResult[1])
+	if len(bodyParts) >= 6 {
+		time_index, err := strconv.Atoi(bodyParts[1])
+		if bodyParts[5] == "1" {
+			tx, err := h.db.Begin()
+			if err != nil {
+				fmt.Println(err)
 			}
-			_, err = stmt.Exec(bodyParts[0], time_index, bodyParts[2], bodyParts[3], bodyParts[4], targetAndPingResult[0], responseTime)
-		}
-
-		tx.Commit()
-	}
-	if bodyParts[5] == "2" {
-
-		tx, err := h.db.Begin()
-		if err != nil {
-			fmt.Println(err)
-		}
-		stmt, err := tx.Prepare("INSERT INTO telnet_accessibility (date, time_index, ip, host_name, hardware_addr, target_url, status) VALUES (?, ?, ?, ?, ?, ?, ?)")
-		if err != nil {
-			fmt.Println(err)
-		}
-		defer stmt.Close()
-		validData := bodyParts[6:len(bodyParts) - 1]
-		for _, item := range validData {
-			targetAndTelnetResult := strings.Split(item, ",")
-			status := targetAndTelnetResult[1]
-			if status == "" {
-				status = "NotOK"
+			stmt, err := tx.Prepare("INSERT INTO ping_accessibility (date, time_index, ip, host_name, hardware_addr, target_ip, response_time) VALUES (?, ?, ?, ?, ?, ?, ?)")
+			if err != nil {
+				fmt.Println(err)
 			}
-			_, err = stmt.Exec(bodyParts[0], time_index, bodyParts[2], bodyParts[3], bodyParts[4], targetAndTelnetResult[0], status)
-		}
-		tx.Commit()
-	}
+			defer stmt.Close()
+			validData := bodyParts[6:len(bodyParts) - 1]
+			for _, item := range validData {
+				targetAndPingResult := strings.Split(item, ",")
+				pingResult := strings.Split(targetAndPingResult[1], "=")
+				responseTime := -1
+				if pingResult[0] == "ResponseTime" {
+					responseTime, err = strconv.Atoi(pingResult[1])
+				}
+				_, err = stmt.Exec(bodyParts[0], time_index, bodyParts[2], bodyParts[3], bodyParts[4], targetAndPingResult[0], responseTime)
+			}
 
-	return err
+			tx.Commit()
+		}
+		if bodyParts[5] == "2" {
+
+			tx, err := h.db.Begin()
+			if err != nil {
+				fmt.Println(err)
+			}
+			stmt, err := tx.Prepare("INSERT INTO telnet_accessibility (date, time_index, ip, host_name, hardware_addr, target_url, status) VALUES (?, ?, ?, ?, ?, ?, ?)")
+			if err != nil {
+				fmt.Println(err)
+			}
+			defer stmt.Close()
+			validData := bodyParts[6:len(bodyParts) - 1]
+			for _, item := range validData {
+				targetAndTelnetResult := strings.Split(item, ",")
+				status := targetAndTelnetResult[1]
+				if status == "" {
+					status = "NotOK"
+				}
+				_, err = stmt.Exec(bodyParts[0], time_index, bodyParts[2], bodyParts[3], bodyParts[4], targetAndTelnetResult[0], status)
+			}
+			tx.Commit()
+		}
+		return err
+	}
 }
 
 func NewAccessibilityToDBHandler(dbLink *sql.DB) (accessibilityToDBHandler *AccessibilityToDBHandler, err error) {
@@ -131,8 +132,8 @@ func (h *AccessibilityCheckHandler) HandleMessage(m *nsq.Message) (err error) {
 				}
 			}
 		}
+		return err
 	}
-	return err
 }
 
 func NewAccessibilityCheckHandler() (accessibilityCheckHandler *AccessibilityCheckHandler, err error) {
