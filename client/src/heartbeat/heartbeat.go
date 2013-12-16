@@ -21,7 +21,7 @@ func (h *HeartBeatHandler) HandleMessage(m *nsq.Message) (err error) {
 	//fmt.Printf("%s\n", m.Body)
 
 	bodyParts := strings.Split(string(m.Body), "\r\n")
-	if len(bodyParts) == 5 {
+	if len(bodyParts) == 6 {
 		time_index, err := strconv.Atoi(bodyParts[1])
 		sql := `
 	INSERT INTO heartbeat (date, time_index, ip, host_name, hardware_addr, alive) VALUES (?, ?, ?, ?, ?, ?);
