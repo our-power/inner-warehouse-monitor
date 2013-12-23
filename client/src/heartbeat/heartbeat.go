@@ -26,12 +26,16 @@ func (h *HeartBeatHandler) HandleMessage(m *nsq.Message) (err error) {
 	if err != nil {
 		return err
 	}
-	sql := `
-	INSERT INTO heartbeat (date, time_index, ip, host_name, hardware_addr, alive) VALUES (?, ?, ?, ?, ?, ?);
-	`
-	_, err = db.Exec(sql, bodyParts[0], time_index, bodyParts[2], bodyParts[3], bodyParts[4], 1)
 
-	return err
+	if len(bodyParts) == 6 {
+		time_index, err := strconv.Atoi(bodyParts[1])
+		sql := `
+        INSERT INTO heartbeat (date, time_index, ip, host_name, hardware_addr, alive) VALUES (?, ?, ?, ?, ?, ?);
+        `
+        _, err = db.Exec(sql, bodyParts[0], time_index, bodyParts[2], bodyParts[3], bodyParts[4], 1)
+        return err
+	}
+	return nil
 }
 
 func NewHeartBeatHandler(dbLink *util.DbLink) (heartBeatHandler *HeartBeatHandler, err error) {
@@ -43,7 +47,7 @@ func NewHeartBeatHandler(dbLink *util.DbLink) (heartBeatHandler *HeartBeatHandle
 
 func updateMachineStatus(h *HeartBeatHandler, registerDB *sql.DB) {
 	for {
-		c := time.Tick(1*time.Minute)
+		c := time.Tick(3*time.Minute)
 		for _ = range c {
 			sql := "SELECT hardware_addr, status FROM register"
 			rows, err := registerDB.Query(sql)
