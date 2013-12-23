@@ -1,16 +1,19 @@
 package register
 
 import (
-	"database/sql"
 	"strings"
 	"strconv"
-	_ "github.com/mattn/go-sqlite3"
 	"github.com/bitly/go-nsq"
+    "github.com/influxdb/influxdb-go"
+    "util"
 )
 
 type RegisterToDBHandler struct {
-	db *sql.DB
+	db_client *influxdb.Client
+    table_name string
 }
+
+var column_names = []string{"time", "date", "time_index", "ip", "host_name", "hardware_addr", "agent_version", "machine_role", "status"}
 
 func (h *RegisterToDBHandler) HandleMessage(m *nsq.Message) (err error) {
 	/*
@@ -19,7 +22,7 @@ func (h *RegisterToDBHandler) HandleMessage(m *nsq.Message) (err error) {
 	bodyParts := strings.Split(string(m.Body), "\r\n")
 	if len(bodyParts) == 6 {
 		time_index, err := strconv.Atoi(bodyParts[1])
-
+        time_index := util.FormatTime(bodyParts[0], time_index)
 		/*
 		0:机器正常关闭
 		1:机器正在运行
@@ -46,9 +49,10 @@ func (h *RegisterToDBHandler) HandleMessage(m *nsq.Message) (err error) {
 	return nil
 }
 
-func NewRegisterToDBHandler(dbLink *sql.DB) (registerToDBHandler *RegisterToDBHandler, err error) {
+func NewRegisterToDBHandler(client *influxdb.Client) (registerToDBHandler *RegisterToDBHandler, err error) {
 	registerToDBHandler = &RegisterToDBHandler {
-		db: dbLink,
+		db_client: client,
+        table_name: "register",
 	}
 	return registerToDBHandler, err
 }

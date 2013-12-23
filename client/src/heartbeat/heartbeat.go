@@ -1,18 +1,21 @@
 package heartbeat
 
 import (
-	"database/sql"
 	"fmt"
 	"strings"
 	"strconv"
 	"time"
-	_ "github.com/mattn/go-sqlite3"
 	"github.com/bitly/go-nsq"
+    "github.com/influxdb/influxdb-go"
+    "util"
 )
 
 type HeartBeatHandler struct {
-	db *sql.DB
+	db_client *influxdb.Client
+    table_name string
 }
+
+var column_names = []string{"time", "ip", "host_name", "hardware_addr", "alive"}
 
 func (h *HeartBeatHandler) HandleMessage(m *nsq.Message) (err error) {
 	/*
@@ -23,22 +26,26 @@ func (h *HeartBeatHandler) HandleMessage(m *nsq.Message) (err error) {
 	bodyParts := strings.Split(string(m.Body), "\r\n")
 	if len(bodyParts) == 6 {
 		time_index, err := strconv.Atoi(bodyParts[1])
-		sql := `
-	INSERT INTO heartbeat (date, time_index, ip, host_name, hardware_addr, alive) VALUES (?, ?, ?, ?, ?, ?);
-	`
-		_, err = h.db.Exec(sql, bodyParts[0], time_index, bodyParts[2], bodyParts[3], bodyParts[4], 1)
-		return err
+        time_int := util.FormatTime(bodyParts[0], time_index)
+        heartbeat_msg := influxdb.Series{
+            Name: h.table_name,
+            Columns: column_names,
+            Points: [][]interface{}{time_int, bodyParts[2], bodyParts[3], bodyParts[4], 1}
+        }
+		err = h.db_client.WriteSeries([]influxdb.Series{heartbeat_msg})
+        return err
 	}
 	return nil
 }
 
-func NewHeartBeatHandler(dbLink *sql.DB) (heartBeatHandler *HeartBeatHandler, err error) {
+func NewHeartBeatHandler(client *influxdb.Client) (heartBeatHandler *HeartBeatHandler, err error) {
 	heartBeatHandler = &HeartBeatHandler {
-		db: dbLink,
+		db_client: client,
+        table_name: "heartbeat",
 	}
 	return heartBeatHandler, err
 }
-
+/*
 func updateMachineStatus(h *HeartBeatHandler, registerDB *sql.DB) {
 	for {
 		c := time.Tick(3*time.Minute)
@@ -95,3 +102,4 @@ func updateMachineStatus(h *HeartBeatHandler, registerDB *sql.DB) {
 func (h *HeartBeatHandler) CheckPeriodically(registerDB *sql.DB) {
 	go updateMachineStatus(h, registerDB)
 }
+*/

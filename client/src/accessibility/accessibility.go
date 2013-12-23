@@ -1,13 +1,13 @@
 package accessibility
 
 import (
-	"database/sql"
 	"fmt"
 	"strings"
 	"strconv"
 	"time"
-	_ "github.com/mattn/go-sqlite3"
 	"github.com/bitly/go-nsq"
+    "github.com/influxdb/influxdb-go"
+    "util"
 )
 
 /*
@@ -15,8 +15,13 @@ import (
  */
 
 type AccessibilityToDBHandler struct {
-	db *sql.DB
+	db_client *influxdb.Client
+    ping_table_name string
+    telnet_table_name string
 }
+
+var ping_column_names = []string{"time", "date", "time_index", "ip", "host_name", "hardware_addr", "target_ip", "response_time"}
+var telnet_column_names = []string{"time", "date", "time_index", "ip", "host_name", "hardware_addr", "target_url", "status"}
 
 func (h *AccessibilityToDBHandler) HandleMessage(m *nsq.Message) (err error) {
 	/*
@@ -27,17 +32,11 @@ func (h *AccessibilityToDBHandler) HandleMessage(m *nsq.Message) (err error) {
 	bodyParts := strings.Split(string(m.Body), "\r\n")
 	if len(bodyParts) >= 6 {
 		time_index, err := strconv.Atoi(bodyParts[1])
+        time_int := util.FormatTime(bodyParts[0], time_index)
+
 		if bodyParts[5] == "1" {
-			tx, err := h.db.Begin()
-			if err != nil {
-				fmt.Println(err)
-			}
-			stmt, err := tx.Prepare("INSERT INTO ping_accessibility (date, time_index, ip, host_name, hardware_addr, target_ip, response_time) VALUES (?, ?, ?, ?, ?, ?, ?)")
-			if err != nil {
-				fmt.Println(err)
-			}
-			defer stmt.Close()
 			validData := bodyParts[6:len(bodyParts) - 1]
+            series := make([][8]interface{}, 0, 10)
 			for _, item := range validData {
 				targetAndPingResult := strings.Split(item, ",")
 				pingResult := strings.Split(targetAndPingResult[1], "=")
@@ -45,41 +44,43 @@ func (h *AccessibilityToDBHandler) HandleMessage(m *nsq.Message) (err error) {
 				if pingResult[0] == "ResponseTime" {
 					responseTime, err = strconv.Atoi(pingResult[1])
 				}
-				_, err = stmt.Exec(bodyParts[0], time_index, bodyParts[2], bodyParts[3], bodyParts[4], targetAndPingResult[0], responseTime)
+                series = append(series, [8]interface{}{time_int, bodyParts[0], time_index, bodyParts[2], bodyParts[3], bodyParts[4], targetAndPingResult[0], responseTime})
 			}
-
-			tx.Commit()
+            ping_msg := influxdb.Series{
+                Name: h.ping_table_name,
+                Columns: ping_column_names,
+                Points: series,
+            }
+            err = h.db_client.Writes([]influxdb.Series{ping_msg})
 		}
 		if bodyParts[5] == "2" {
-
-			tx, err := h.db.Begin()
-			if err != nil {
-				fmt.Println(err)
-			}
-			stmt, err := tx.Prepare("INSERT INTO telnet_accessibility (date, time_index, ip, host_name, hardware_addr, target_url, status) VALUES (?, ?, ?, ?, ?, ?, ?)")
-			if err != nil {
-				fmt.Println(err)
-			}
-			defer stmt.Close()
 			validData := bodyParts[6:len(bodyParts) - 1]
+            series := make([][8]interface{}, 0, 10)
 			for _, item := range validData {
 				targetAndTelnetResult := strings.Split(item, ",")
 				status := targetAndTelnetResult[1]
 				if status == "" {
 					status = "NotOK"
 				}
-				_, err = stmt.Exec(bodyParts[0], time_index, bodyParts[2], bodyParts[3], bodyParts[4], targetAndTelnetResult[0], status)
+                series = append(series, [8]interface{}{time_int, bodyParts[0], time_index, bodyParts[2], bodyParts[3], bodyParts[4], targetAndTelnetReult[0], status})
 			}
-			tx.Commit()
+            telnet_msg := influxdb.Series{
+                Name: h.telnet_table_name,
+                Colums: telnet_column_names,
+                Points: series,
+            }
+            err = h.db_client.Write([]influxdb.Series{telnet_msg})
 		}
 		return err
 	}
 	return  nil
 }
 
-func NewAccessibilityToDBHandler(dbLink *sql.DB) (accessibilityToDBHandler *AccessibilityToDBHandler, err error) {
+func NewAccessibilityToDBHandler(client *influxdb.Client) (accessibilityToDBHandler *AccessibilityToDBHandler, err error) {
 	accessibilityToDBHandler = &AccessibilityToDBHandler {
-		db: dbLink,
+		db_client: client,
+        ping_table_name: "ping_accessibility",
+        telnet_table_name: "telnet_accessibility",
 	}
 	return accessibilityToDBHandler, err
 }

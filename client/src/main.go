@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"flag"
 	"fmt"
 	"log"
@@ -11,8 +10,8 @@ import (
 	//"strings"
 	"time"
 	"util"
-	_ "github.com/mattn/go-sqlite3"
 	"github.com/bitly/go-nsq"
+	"github.com/influxdb/influxdb-go"
 	"cpu_usage"
 	"mem_usage"
 	"net_flow"
@@ -28,94 +27,18 @@ var (
 	maxInFlight        = flag.Int("max-in-flight", 200, "max number of messages to allow in flight")
 	verbose            = flag.Bool("verbose", false, "enable verbose logging")
 	maxBackoffDuration = flag.Duration("max-backoff-duration", 120*time.Second, "the maximum backoff duration")
-	dbPath             = flag.String("dbPath", "D:\\", "the path to store db file")
+
+	influxdb_host     = flag.String("influxdb_host", "127.0.0.1:8086", "host of influxdb server")
+	influxdb_user     = flag.String("influxdb_user", "root", "influxdb username")
+	influxdb_passwd   = flag.String("influxdb_passwd", "root", "the passwd of influxdb user")
+	influxdb_database = flag.String("influxdb_database", "", "the name of target database")
+
 	termChan chan os.Signal
 )
 
 func init() {
 	flag.Var(&nsqdTCPAddrs, "nsqd-tcp-address", "nsqd TCP address (may be given multiple times)")
 	flag.Var(&lookupdHTTPAddrs, "lookupd-http-address", "lookupd HTTP address (may be given multiple times)")
-}
-
-func getDBLink(dbDriver string, dbSourceName string) (link *sql.DB, err error) {
-	/*
-	notExist := false
-	if _, e := os.Stat(dbSourceName); os.IsNotExist(e) {
-		notExist = true
-	}
-	*/
-	link, err = sql.Open(dbDriver, dbSourceName)
-	/*
-	if err != nil {
-		log.Fatal(err)
-	}
-	if notExist {
-		sql := `
-        CREATE TABLE cpu_usage (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, date TEXT, time_index INTEGER, ip TEXT, host_name TEXT, hardware_addr TEXT, usage REAL);
-        DELETE FROM cpu_usage;
-        `
-		_, err = link.Exec(sql)
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		sql = `
-		CREATE TABLE mem_usage (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, date TEXT, time_index INTEGER, ip TEXT, host_name TEXT, hardware_addr TEXT, usage REAL);
-        DELETE FROM mem_usage;
-		`
-		_, err = link.Exec(sql)
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		sql = `
-		CREATE TABLE net_flow (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, date TEXT, time_index INTEGER, ip TEXT, host_name TEXT, hardware_addr TEXT, out_bytes INTEGER, in_bytes INTEGER, out_packets INTEGER, in_packets  INTEGER);
-        DELETE FROM net_flow;
-		`
-		_, err = link.Exec(sql)
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		sql = `
-		CREATE TABLE heartbeat (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, date TEXT, time_index INTEGER, ip TEXT, host_name TEXT, hardware_addr TEXT, alive INTEGER NOT NULL);
-        DELETE FROM heartbeat;
-		`
-		_, err = link.Exec(sql)
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		sql = `
-		CREATE TABLE register (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, date TEXT, time_index INTEGER, ip TEXT, host_name TEXT, hardware_addr TEXT UNIQUE, agent_version TEXT, machine_role TEXT, status INTEGER);
-        DELETE FROM register;
-		`
-		_, err = link.Exec(sql)
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		sql = `
-		CREATE TABLE ping_accessibility (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, date TEXT, time_index INTEGER, ip TEXT, host_name TEXT, hardware_addr TEXT, target_ip TEXT, response_time INTEGER);
-        DELETE FROM ping_accessibility;
-		`
-		_, err = link.Exec(sql)
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		sql = `
-		CREATE TABLE telnet_accessibility (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, date TEXT, time_index INTEGER, ip TEXT, host_name TEXT, hardware_addr TEXT, target_url TEXT, status TEXT);
-        DELETE FROM telnet_accessibility;
-		`
-		_, err = link.Exec(sql)
-		if err != nil {
-			fmt.Println(err)
-		}
-	}
-	*/
-
-	return
 }
 
 func runCpuUsageClient(cuh *cpu_usage.CPUUsageHandler) (cuTodb *nsq.Reader, err error) {
@@ -335,149 +258,118 @@ func main() {
 	termChan = make(chan os.Signal, 1)
 	signal.Notify(termChan, syscall.SIGINT, syscall.SIGTERM)
 
-
-	//date := time.Now().Format("2006-01-02")
-	/*
-	if !strings.HasSuffix(*dbPath, "/") {
-		*dbPath = *dbPath + "/"
+	config := influxdb.ClientConfig {
+		Host: *influxdb_host,
+		Username: *influxdb_user,
+		Password: *influxdb_passwd,
+		Database: *influxdb_database
 	}
-	*/
+
+	client, err := influxdb.NewClient(&config)
+
 	// 初始化各种指标的处理类
-	cpu_usage_db_link, err := getDBLink("sqlite3", *dbPath + "cpu_usage_sqlite.db")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	cpuUsageHandler, err := cpu_usage.NewCPUUsageHandler(cpu_usage_db_link)
+	cpuUsageHandler, err := cpu_usage.NewCPUUsageHandler(client)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	mem_usage_db_link, err := getDBLink("sqlite3", *dbPath + "mem_usage_sqlite.db")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	memUsageHandler, err := mem_usage.NewMemUsageHandler(mem_usage_db_link)
-	if err != nil {
-		fmt.Println(err)
-	}
+    memUsageHandler, err := mem_usage.NewMemUsageHandler(client)
+    if err != nil {
+        fmt.Println(err)
+    }
 
-	net_flow_db_link, err := getDBLink("sqlite3", *dbPath + "net_flow_sqlite.db")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	netFlowHandler, err := net_flow.NewNetFlowHandler(net_flow_db_link)
-	if err != nil {
-		fmt.Println(err)
-	}
+    netFlowHandler, err := net_flow.NewNetFlowHandler(client)
+    if err != nil {
+        fmt.Println(err)
+    }
 
-	heartbeat_db_link, err := getDBLink("sqlite3", *dbPath + "heartbeat_sqlite.db")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	heartBeatHandler, err := heartbeat.NewHeartBeatHandler(heartbeat_db_link)
-	if err != nil {
-		fmt.Println(err)
-	}
+    heartBeatHandler, err := heartbeat.NewHeartBeatHandler(client)
+    if err != nil {
+        fmt.Println(err)
+    }
 
-	accessibility_db_link, err := getDBLink("sqlite3", *dbPath + "accessibility_sqlite.db")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	accessibilityToDBHandler, err := accessibility.NewAccessibilityToDBHandler(accessibility_db_link)
-	if err != nil {
-		fmt.Println(err)
-	}
+    accessibilityToDBHandler, err := accessibility.NewAccessibilityToDBHandler(client)
+    if err != nil {
+        fmt.Println(err)
+    }
+    // 可达性异常检测处理类，无需读写DB
+    accessibilityCheckHandler, err := accessibility.NewAccessibilityCheckHandler()
+    if err != nil {
+        fmt.Println(err)
+    }
 
+    registerToDBHandler, err := register.NewRegisterToDBHandler(client)
+    if err != nil {
+        fmt.Println(err)
+    }
 
-	// 可达性异常检测处理类，无需读写DB
-	accessibilityCheckHandler, err := accessibility.NewAccessibilityCheckHandler()
-	if err != nil {
-		fmt.Println(err)
-	}
+    /*
+    心跳数据定期检测，根据检测的结果修改register数据表中机器（正常运行、不正常运行两类）的当前状态
+    检测条件：3分钟内是否收到心跳数据
+    */
+    //heartBeatHandler.CheckPeriodically(register_db_link)
 
-	register_db_link, err := getDBLink("sqlite3", *dbPath + "register_sqlite.db")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	registerToDBHandler, err := register.NewRegisterToDBHandler(register_db_link)
-	if err != nil {
-		fmt.Println(err)
-	}
+    // 注册各种指标的处理类，各自连接到NSQ的某个channel
+    cuTodb, err := runCpuUsageClient(cpuUsageHandler)
+    if err != nil {
+        fmt.Println(err)
+    }
 
-	/*
-	心跳数据定期检测，根据检测的结果修改register数据表中机器（正常运行、不正常运行两类）的当前状态
-	检测条件：3分钟内是否收到心跳数据
-	*/
-	heartBeatHandler.CheckPeriodically(register_db_link)
+    muTodb, err := runMemUsageClient(memUsageHandler)
+    if err != nil {
+        fmt.Println(err)
+    }
 
-	// 注册各种指标的处理类，各自连接到NSQ的某个channel
-	cuTodb, err := runCpuUsageClient(cpuUsageHandler)
-	if err != nil {
-		fmt.Println(err)
-	}
+    nfTodb, err := runNetFlowClient(netFlowHandler)
+    if err != nil {
+        fmt.Println(err)
+    }
 
-	muTodb, err := runMemUsageClient(memUsageHandler)
-	if err != nil {
-		fmt.Println(err)
-	}
+    hbTodb, err := runHeartBeatClient(heartBeatHandler)
+    if err != nil {
+        fmt.Println(err)
+    }
 
-	nfTodb, err := runNetFlowClient(netFlowHandler)
-	if err != nil {
-		fmt.Println(err)
-	}
+    aTodb, err := runAccessibilityToDBClient(accessibilityToDBHandler)
+    if err != nil {
+        fmt.Println(err)
+    }
 
-	hbTodb, err := runHeartBeatClient(heartBeatHandler)
-	if err != nil {
-		fmt.Println(err)
-	}
+    aCheck, err := runAccessibilityCheckClient(accessibilityCheckHandler)
+    if err != nil {
+        fmt.Println(err)
+    }
 
+    rTodb, err := runRegisterToDBClient(registerToDBHandler)
+    if err != nil {
+        fmt.Println(err)
+    }
 
-	aTodb, err := runAccessibilityToDBClient(accessibilityToDBHandler)
-	if err != nil {
-		fmt.Println(err)
-	}
+    for {
+        select {
+            case <-muTodb.ExitChan:
+                return
+            case <-cuTodb.ExitChan:
+                return
+            case <-nfTodb.ExitChan:
+                return
+            case <-hbTodb.ExitChan:
+                return
+            case <-aTodb.ExitChan:
+                return
+            case <-aCheck.ExitChan:
+                return
+            case <-rTodb.ExitChan:
+                return
 
-	aCheck, err := runAccessibilityCheckClient(accessibilityCheckHandler)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	rTodb, err := runRegisterToDBClient(registerToDBHandler)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	for {
-		select {
-		case <-muTodb.ExitChan:
-			return
-		case <-cuTodb.ExitChan:
-			return
-		case <-nfTodb.ExitChan:
-			return
-		case <-hbTodb.ExitChan:
-			return
-		case <-aTodb.ExitChan:
-			return
-		case <-aCheck.ExitChan:
-			return
-		case <-rTodb.ExitChan:
-			return
-
-		case <-termChan:
-			cuTodb.Stop()
-			muTodb.Stop()
-			nfTodb.Stop()
-			hbTodb.Stop()
-			aTodb.Stop()
-			aCheck.Stop()
-			rTodb.Stop()
-		}
-	}
+            case <-termChan:
+                cuTodb.Stop()
+                muTodb.Stop()
+                nfTodb.Stop()
+                hbTodb.Stop()
+                aTodb.Stop()
+                aCheck.Stop()
+                rTodb.Stop()
+        }
+    }
 }
