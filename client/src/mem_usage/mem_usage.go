@@ -19,7 +19,6 @@ func (h *MemUsageHandler) HandleMessage(m *nsq.Message) (err error) {
 	bodyParts := strings.Split(string(m.Body), "\r\n")
 	if len(bodyParts) == 6 {
 		time_index, err := strconv.Atoi(bodyParts[1])
-        time_index, err := strconv.Atoi(bodyParts[1])
         db, err := h.db.GetLink(bodyParts[0], bodyParts[4], "mem_usage")
         if err != nil {
             return err

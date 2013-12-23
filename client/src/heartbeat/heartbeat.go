@@ -19,16 +19,13 @@ func (h *HeartBeatHandler) HandleMessage(m *nsq.Message) (err error) {
 	/*
 	实现队列消息处理功能
 	*/
-
 	bodyParts := strings.Split(string(m.Body), "\r\n")
-	time_index, err := strconv.Atoi(bodyParts[1])
-	db, err := h.db.GetLink(bodyParts[0], bodyParts[4], "heartbeat")
-	if err != nil {
-		return err
-	}
-
 	if len(bodyParts) == 6 {
 		time_index, err := strconv.Atoi(bodyParts[1])
+		db, err := h.db.GetLink(bodyParts[0], bodyParts[4], "heartbeat")
+		if err != nil {
+			return err
+		}
 		sql := `
         INSERT INTO heartbeat (date, time_index, ip, host_name, hardware_addr, alive) VALUES (?, ?, ?, ?, ?, ?);
         `
