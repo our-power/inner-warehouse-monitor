@@ -55,7 +55,7 @@ type mockTimer struct {
 }
 
 func (t *mockTimer) between(start time.Time, end time.Time) time.Duration {
-	return time.Duration(t.t) * time.Millisecond
+	return time.Duration(t.t)*time.Millisecond
 }
 
 func TestEpsilonGreedy(t *testing.T) {

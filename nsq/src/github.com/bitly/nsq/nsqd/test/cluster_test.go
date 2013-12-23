@@ -34,7 +34,7 @@ func TestNsqdToLookupd(t *testing.T) {
 	}
 
 	// allow some time for nsqd to push info to nsqlookupd
-	time.Sleep(350 * time.Millisecond)
+	time.Sleep(350*time.Millisecond)
 
 	data, err := util.ApiRequest("http://127.0.0.1:4161/debug")
 	if err != nil {
@@ -89,7 +89,7 @@ func TestNsqdToLookupd(t *testing.T) {
 	}
 
 	// allow some time for nsqd to push info to nsqlookupd
-	time.Sleep(350 * time.Millisecond)
+	time.Sleep(350*time.Millisecond)
 
 	data, err = util.ApiRequest("http://127.0.0.1:4161/lookup?topic=" + topicName)
 	if err != nil {

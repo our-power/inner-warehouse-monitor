@@ -82,7 +82,7 @@ func init() {
 // Driver struct.
 type SQLiteDriver struct {
 	Extensions  []string
-	ConnectHook func(*SQLiteConn) error
+	ConnectHook func (*SQLiteConn) error
 }
 
 // Conn struct.
@@ -237,9 +237,9 @@ func (d *SQLiteDriver) Open(dsn string) (driver.Conn, error) {
 	name := C.CString(dsn)
 	defer C.free(unsafe.Pointer(name))
 	rv := C._sqlite3_open_v2(name, &db,
-		C.SQLITE_OPEN_FULLMUTEX|
-			C.SQLITE_OPEN_READWRITE|
-			C.SQLITE_OPEN_CREATE,
+				C.SQLITE_OPEN_FULLMUTEX |
+						C.SQLITE_OPEN_READWRITE |
+					C.SQLITE_OPEN_CREATE,
 		nil)
 	if rv != 0 {
 		return nil, ErrNo(rv)
@@ -495,10 +495,10 @@ func (rc *SQLiteRows) Next(dest []driver.Value) error {
 			n := int(C.sqlite3_column_bytes(rc.s.s, C.int(i)))
 			switch dest[i].(type) {
 			case sql.RawBytes:
-				dest[i] = (*[1 << 30]byte)(unsafe.Pointer(p))[0:n]
+				dest[i] = (*[1<<30]byte)(unsafe.Pointer(p))[0:n]
 			default:
 				slice := make([]byte, n)
-				copy(slice[:], (*[1 << 30]byte)(unsafe.Pointer(p))[0:n])
+				copy(slice[:], (*[1<<30]byte)(unsafe.Pointer(p))[0:n])
 				dest[i] = slice
 			}
 		case C.SQLITE_NULL:

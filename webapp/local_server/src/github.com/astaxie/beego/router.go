@@ -282,8 +282,8 @@ func (p *ControllerRegistor) UrlFor(endpoint string, values ...string) string {
 			}
 		}
 	}
-	controllName := strings.Join(paths[:len(paths)-1], ".")
-	methodName := paths[len(paths)-1]
+	controllName := strings.Join(paths[:len(paths) - 1], ".")
+	methodName := paths[len(paths) - 1]
 	for _, route := range p.fixrouters {
 		if route.controllerType.Name() == controllName {
 			var finded bool
@@ -362,12 +362,12 @@ func (p *ControllerRegistor) UrlFor(endpoint string, values ...string) string {
 	}
 	if p.enableAuto {
 		for cName, methodList := range p.autoRouter {
-			if strings.ToLower(strings.TrimSuffix(paths[len(paths)-2], "Controller")) == cName {
+			if strings.ToLower(strings.TrimSuffix(paths[len(paths) - 2], "Controller")) == cName {
 				if _, ok := methodList[methodName]; ok {
 					if len(values) > 0 {
-						return "/" + strings.TrimSuffix(paths[len(paths)-2], "Controller") + "/" + methodName + "?" + urlv.Encode()
+						return "/" + strings.TrimSuffix(paths[len(paths) - 2], "Controller") + "/" + methodName + "?" + urlv.Encode()
 					} else {
-						return "/" + strings.TrimSuffix(paths[len(paths)-2], "Controller") + "/" + methodName
+						return "/" + strings.TrimSuffix(paths[len(paths) - 2], "Controller") + "/" + methodName
 					}
 				}
 			}
@@ -509,9 +509,9 @@ func (p *ControllerRegistor) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 		}
 		// pattern /admin   url /admin 200  /admin/ 404
 		// pattern /admin/  url /admin 301  /admin/ 200
-		if requestPath[n-1] != '/' && len(route.pattern) == n+1 &&
+		if requestPath[n - 1] != '/' && len(route.pattern) == n + 1 &&
 			route.pattern[n] == '/' && route.pattern[:n] == requestPath {
-			http.Redirect(w, r, requestPath+"/", 301)
+			http.Redirect(w, r, requestPath + "/", 301)
 			goto Admin
 		}
 	}
@@ -586,7 +586,7 @@ func (p *ControllerRegistor) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 			method = vc.MethodByName("XsrfToken")
 			method.Call(in)
 			if r.Method == "POST" || r.Method == "DELETE" || r.Method == "PUT" ||
-				(r.Method == "POST" && (r.Form.Get("_method") == "delete" || r.Form.Get("_method") == "put")) {
+					(r.Method == "POST" && (r.Form.Get("_method") == "delete" || r.Form.Get("_method") == "put")) {
 				method = vc.MethodByName("CheckXsrfCookie")
 				method.Call(in)
 			}
@@ -733,28 +733,28 @@ func (p *ControllerRegistor) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 	if p.enableAuto {
 		if !findrouter {
 			lastindex := strings.LastIndex(requestPath, "/")
-			lastsub := requestPath[lastindex+1:]
+			lastsub := requestPath[lastindex + 1:]
 			if subindex := strings.LastIndex(lastsub, "."); subindex != -1 {
-				context.Input.Param[":ext"] = lastsub[subindex+1:]
-				r.URL.Query().Add(":ext", lastsub[subindex+1:])
+				context.Input.Param[":ext"] = lastsub[subindex + 1:]
+				r.URL.Query().Add(":ext", lastsub[subindex + 1:])
 				r.URL.RawQuery = r.URL.Query().Encode()
-				requestPath = requestPath[:len(requestPath)-len(lastsub[subindex:])]
+				requestPath = requestPath[:len(requestPath) - len(lastsub[subindex:])]
 			}
 			for cName, methodmap := range p.autoRouter {
 
-				if strings.ToLower(requestPath) == "/"+cName {
-					http.Redirect(w, r, requestPath+"/", 301)
+				if strings.ToLower(requestPath) == "/" + cName {
+					http.Redirect(w, r, requestPath + "/", 301)
 					goto Admin
 				}
 
-				if strings.ToLower(requestPath) == "/"+cName+"/" {
+				if strings.ToLower(requestPath) == "/" + cName + "/" {
 					requestPath = requestPath + "index"
 				}
-				if strings.HasPrefix(strings.ToLower(requestPath), "/"+cName+"/") {
+				if strings.HasPrefix(strings.ToLower(requestPath), "/" + cName + "/") {
 					for mName, controllerType := range methodmap {
-						if strings.ToLower(requestPath) == "/"+cName+"/"+strings.ToLower(mName) ||
-							(strings.HasPrefix(strings.ToLower(requestPath), "/"+cName+"/"+strings.ToLower(mName)) &&
-								requestPath[len("/"+cName+"/"+strings.ToLower(mName)):len("/"+cName+"/"+strings.ToLower(mName))+1] == "/") {
+						if strings.ToLower(requestPath) == "/" + cName + "/" + strings.ToLower(mName) ||
+								(strings.HasPrefix(strings.ToLower(requestPath), "/" + cName + "/" + strings.ToLower(mName)) &&
+									requestPath[len("/" + cName + "/" + strings.ToLower(mName)):len("/" + cName + "/" + strings.ToLower(mName)) + 1] == "/") {
 							if r.Method == "POST" {
 								r.ParseMultipartForm(MaxMemory)
 							}
@@ -774,7 +774,7 @@ func (p *ControllerRegistor) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 								}
 							}
 							//parse params
-							otherurl := requestPath[len("/"+cName+"/"+strings.ToLower(mName)):]
+							otherurl := requestPath[len("/" + cName + "/" + strings.ToLower(mName)):]
 							if len(otherurl) > 1 {
 								plist := strings.Split(otherurl, "/")
 								for k, v := range plist[1:] {
@@ -802,7 +802,7 @@ func (p *ControllerRegistor) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 								method = vc.MethodByName("XsrfToken")
 								method.Call(in)
 								if r.Method == "POST" || r.Method == "DELETE" || r.Method == "PUT" ||
-									(r.Method == "POST" && (r.Form.Get("_method") == "delete" || r.Form.Get("_method") == "put")) {
+										(r.Method == "POST" && (r.Form.Get("_method") == "delete" || r.Form.Get("_method") == "put")) {
 									method = vc.MethodByName("CheckXsrfCookie")
 									method.Call(in)
 								}

@@ -33,24 +33,24 @@ var doc = `
 func main() {
 	fmt.Println(doc)
 
-	v,_ := x2j.ValuesFromTagPath(doc,"books")
-	fmt.Println("path: books; len(v):",len(v))
-	fmt.Printf("%+v\n\n",v)
+	v, _ := x2j.ValuesFromTagPath(doc, "books")
+	fmt.Println("path: books; len(v):", len(v))
+	fmt.Printf("%+v\n\n", v)
 
-	v,_ = x2j.ValuesFromTagPath(doc,"books.book")
-	fmt.Println("path: books.book; len(v):",len(v))
-	fmt.Printf("%+v\n\n",v)
+	v, _ = x2j.ValuesFromTagPath(doc, "books.book")
+	fmt.Println("path: books.book; len(v):", len(v))
+	fmt.Printf("%+v\n\n", v)
 
-	v,_ = x2j.ValuesFromTagPath(doc,"books.*")
-	fmt.Println("path: books.*; len(v):",len(v))
-	fmt.Printf("%+v\n\n",v)
+	v, _ = x2j.ValuesFromTagPath(doc, "books.*")
+	fmt.Println("path: books.*; len(v):", len(v))
+	fmt.Printf("%+v\n\n", v)
 
-	v,_ = x2j.ValuesFromTagPath(doc,"books.*.title")
-	fmt.Println("path: books.*.title len(v):",len(v))
-	fmt.Printf("%+v\n\n",v)
+	v, _ = x2j.ValuesFromTagPath(doc, "books.*.title")
+	fmt.Println("path: books.*.title len(v):", len(v))
+	fmt.Printf("%+v\n\n", v)
 
-	v,_ = x2j.ValuesFromTagPath(doc,"books.*.*")
-	fmt.Println("path: books.*.*; len(v):",len(v))
-	fmt.Printf("%+v\n\n",v)
+	v, _ = x2j.ValuesFromTagPath(doc, "books.*.*")
+	fmt.Println("path: books.*.*; len(v):", len(v))
+	fmt.Printf("%+v\n\n", v)
 }
 

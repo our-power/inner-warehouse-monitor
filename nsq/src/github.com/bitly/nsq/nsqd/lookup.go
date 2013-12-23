@@ -23,43 +23,43 @@ func (n *NSQd) lookupLoop() {
 	for _, host := range n.lookupdTCPAddrs {
 		log.Printf("LOOKUP: adding peer %s", host)
 		lookupPeer := NewLookupPeer(host, func(lp *LookupPeer) {
-			ci := make(map[string]interface{})
-			ci["version"] = util.BINARY_VERSION
-			ci["tcp_port"] = n.tcpAddr.Port
-			ci["http_port"] = n.httpAddr.Port
-			ci["address"] = hostname //TODO: drop for 1.0
-			ci["hostname"] = hostname
-			ci["broadcast_address"] = n.options.broadcastAddress
+				ci := make(map[string]interface{})
+				ci["version"] = util.BINARY_VERSION
+				ci["tcp_port"] = n.tcpAddr.Port
+				ci["http_port"] = n.httpAddr.Port
+				ci["address"] = hostname //TODO: drop for 1.0
+				ci["hostname"] = hostname
+				ci["broadcast_address"] = n.options.broadcastAddress
 
-			cmd, err := nsq.Identify(ci)
-			if err != nil {
-				lp.Close()
-				return
-			}
-			resp, err := lp.Command(cmd)
-			if err != nil {
-				log.Printf("LOOKUPD(%s): ERROR %s - %s", lp, cmd, err.Error())
-			} else if bytes.Equal(resp, []byte("E_INVALID")) {
-				log.Printf("LOOKUPD(%s): lookupd returned %s", lp, resp)
-			} else {
-				err = json.Unmarshal(resp, &lp.Info)
+				cmd, err := nsq.Identify(ci)
 				if err != nil {
-					log.Printf("LOOKUPD(%s): ERROR parsing response - %v", lp, resp)
-				} else {
-					log.Printf("LOOKUPD(%s): peer info %+v", lp, lp.Info)
+					lp.Close()
+					return
 				}
-			}
+				resp, err := lp.Command(cmd)
+				if err != nil {
+					log.Printf("LOOKUPD(%s): ERROR %s - %s", lp, cmd, err.Error())
+				} else if bytes.Equal(resp, []byte("E_INVALID")) {
+					log.Printf("LOOKUPD(%s): lookupd returned %s", lp, resp)
+				} else {
+					err = json.Unmarshal(resp, &lp.Info)
+					if err != nil {
+						log.Printf("LOOKUPD(%s): ERROR parsing response - %v", lp, resp)
+					} else {
+						log.Printf("LOOKUPD(%s): peer info %+v", lp, lp.Info)
+					}
+				}
 
-			go func() {
-				syncTopicChan <- lp
-			}()
-		})
+				go func() {
+					syncTopicChan <- lp
+				}()
+			})
 		lookupPeer.Command(nil) // start the connection
 		n.lookupPeers = append(n.lookupPeers, lookupPeer)
 	}
 
 	// for announcements, lookupd determines the host automatically
-	ticker := time.Tick(15 * time.Second)
+	ticker := time.Tick(15*time.Second)
 	for {
 		select {
 		case <-ticker:

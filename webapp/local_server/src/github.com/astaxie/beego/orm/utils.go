@@ -148,7 +148,7 @@ func ToInt64(value interface{}) (d int64) {
 }
 
 func snakeString(s string) string {
-	data := make([]byte, 0, len(s)*2)
+	data := make([]byte,0, len(s)*2)
 	j := false
 	num := len(s)
 	for i := 0; i < num; i++ {
@@ -165,7 +165,7 @@ func snakeString(s string) string {
 }
 
 func camelString(s string) string {
-	data := make([]byte, 0, len(s))
+	data := make([]byte,0, len(s))
 	j := false
 	k := false
 	num := len(s) - 1
@@ -179,7 +179,7 @@ func camelString(s string) string {
 			j = false
 			k = true
 		}
-		if k && d == '_' && num > i && s[i+1] >= 'a' && s[i+1] <= 'z' {
+		if k && d == '_' && num > i && s[i + 1] >= 'a' && s[i + 1] <= 'z' {
 			j = true
 			continue
 		}

@@ -292,10 +292,10 @@ func (s *httpServer) nodesHandler(w http.ResponseWriter, req *http.Request) {
 
 func (s *httpServer) infoHandler(w http.ResponseWriter, req *http.Request) {
 	util.ApiResponse(w, 200, "OK", struct {
-		Version string `json:"version"`
-	}{
-		Version: util.BINARY_VERSION,
-	})
+			Version string `json:"version"`
+		}{
+			Version: util.BINARY_VERSION,
+		})
 }
 
 func (s *httpServer) debugHandler(w http.ResponseWriter, req *http.Request) {

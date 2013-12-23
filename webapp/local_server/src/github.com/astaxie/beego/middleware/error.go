@@ -186,13 +186,13 @@ func NotFound(rw http.ResponseWriter, r *http.Request) {
 	data := make(map[string]interface{})
 	data["Title"] = "Page Not Found"
 	data["Content"] = template.HTML("<br>The Page You have requested flown the coop." +
-		"<br>Perhaps you are here because:" +
-		"<br><br><ul>" +
-		"<br>The page has moved" +
-		"<br>The page no longer exists" +
-		"<br>You were looking for your puppy and got lost" +
-		"<br>You like 404 pages" +
-		"</ul>")
+			"<br>Perhaps you are here because:" +
+			"<br><br><ul>" +
+			"<br>The page has moved" +
+			"<br>The page no longer exists" +
+			"<br>You were looking for your puppy and got lost" +
+			"<br>You like 404 pages" +
+			"</ul>")
 	data["BeegoVersion"] = VERSION
 	rw.WriteHeader(http.StatusNotFound)
 	t.Execute(rw, data)
@@ -204,11 +204,11 @@ func Unauthorized(rw http.ResponseWriter, r *http.Request) {
 	data := make(map[string]interface{})
 	data["Title"] = "Unauthorized"
 	data["Content"] = template.HTML("<br>The Page You have requested can't authorized." +
-		"<br>Perhaps you are here because:" +
-		"<br><br><ul>" +
-		"<br>Check the credentials that you supplied" +
-		"<br>Check the address for errors" +
-		"</ul>")
+			"<br>Perhaps you are here because:" +
+			"<br><br><ul>" +
+			"<br>Check the credentials that you supplied" +
+			"<br>Check the address for errors" +
+			"</ul>")
 	data["BeegoVersion"] = VERSION
 	rw.WriteHeader(http.StatusUnauthorized)
 	t.Execute(rw, data)
@@ -220,12 +220,12 @@ func Forbidden(rw http.ResponseWriter, r *http.Request) {
 	data := make(map[string]interface{})
 	data["Title"] = "Forbidden"
 	data["Content"] = template.HTML("<br>The Page You have requested forbidden." +
-		"<br>Perhaps you are here because:" +
-		"<br><br><ul>" +
-		"<br>Your address may be blocked" +
-		"<br>The site may be disabled" +
-		"<br>You need to log in" +
-		"</ul>")
+			"<br>Perhaps you are here because:" +
+			"<br><br><ul>" +
+			"<br>Your address may be blocked" +
+			"<br>The site may be disabled" +
+			"<br>You need to log in" +
+			"</ul>")
 	data["BeegoVersion"] = VERSION
 	rw.WriteHeader(http.StatusForbidden)
 	t.Execute(rw, data)
@@ -237,11 +237,11 @@ func ServiceUnavailable(rw http.ResponseWriter, r *http.Request) {
 	data := make(map[string]interface{})
 	data["Title"] = "Service Unavailable"
 	data["Content"] = template.HTML("<br>The Page You have requested unavailable." +
-		"<br>Perhaps you are here because:" +
-		"<br><br><ul>" +
-		"<br><br>The page is overloaded" +
-		"<br>Please try again later." +
-		"</ul>")
+			"<br>Perhaps you are here because:" +
+			"<br><br><ul>" +
+			"<br><br>The page is overloaded" +
+			"<br>Please try again later." +
+			"</ul>")
 	data["BeegoVersion"] = VERSION
 	rw.WriteHeader(http.StatusServiceUnavailable)
 	t.Execute(rw, data)
@@ -253,10 +253,10 @@ func InternalServerError(rw http.ResponseWriter, r *http.Request) {
 	data := make(map[string]interface{})
 	data["Title"] = "Internal Server Error"
 	data["Content"] = template.HTML("<br>The Page You have requested has down now." +
-		"<br><br><ul>" +
-		"<br>simply try again later" +
-		"<br>you should report the fault to the website administrator" +
-		"</ul>")
+			"<br><br><ul>" +
+			"<br>simply try again later" +
+			"<br>you should report the fault to the website administrator" +
+			"</ul>")
 	data["BeegoVersion"] = VERSION
 	rw.WriteHeader(http.StatusInternalServerError)
 	t.Execute(rw, data)

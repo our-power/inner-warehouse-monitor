@@ -54,7 +54,7 @@ type nsqConn struct {
 }
 
 func newNSQConn(rdyChan chan *nsqConn, addr string,
-	readTimeout time.Duration, writeTimeout time.Duration) (*nsqConn, error) {
+readTimeout time.Duration, writeTimeout time.Duration) (*nsqConn, error) {
 	conn, err := net.DialTimeout("tcp", addr, time.Second)
 	if err != nil {
 		return nil, err
@@ -62,17 +62,13 @@ func newNSQConn(rdyChan chan *nsqConn, addr string,
 
 	nc := &nsqConn{
 		Conn: conn,
-
 		addr: addr,
-
 		r: bufio.NewReader(conn),
 		w: conn,
-
 		readTimeout:      readTimeout,
 		writeTimeout:     writeTimeout,
 		maxRdyCount:      2500,
 		lastMsgTimestamp: time.Now().UnixNano(),
-
 		finishedMessages: make(chan *FinishedMessage),
 		cmdChan:          make(chan *Command),
 		rdyChan:          rdyChan,

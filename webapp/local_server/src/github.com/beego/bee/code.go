@@ -53,12 +53,10 @@ var predeclared = map[string]int{
 	"uint8":      predeclaredType,
 	"uint":       predeclaredType,
 	"uintptr":    predeclaredType,
-
 	"true":  predeclaredConstant,
 	"false": predeclaredConstant,
 	"iota":  predeclaredConstant,
 	"nil":   predeclaredConstant,
-
 	"append":  predeclaredFunction,
 	"cap":     predeclaredFunction,
 	"close":   predeclaredFunction,
@@ -202,13 +200,13 @@ loop:
 			annotation.Pos = int16(p)
 			annotation.End = int16(e)
 			if len(annotations) > 0 && annotation.Kind == ExportLinkAnnotation {
-				prev := annotations[len(annotations)-1]
+				prev := annotations[len(annotations) - 1]
 				if prev.Kind == PackageLinkAnnotation &&
 					prev.ImportPath == annotation.ImportPath &&
-					prev.End+1 == annotation.Pos {
+						prev.End + 1 == annotation.Pos {
 					// merge with previous
 					annotation.Pos = prev.Pos
-					annotations[len(annotations)-1] = annotation
+					annotations[len(annotations) - 1] = annotation
 					continue loop
 				}
 			}
@@ -221,9 +219,9 @@ loop:
 type AnnotationKind int16
 
 type Annotation struct {
-	Pos, End   int16
-	Kind       AnnotationKind
-	ImportPath string
+	Pos,  End   int16
+	Kind        AnnotationKind
+	ImportPath  string
 }
 
 type Code struct {

@@ -18,12 +18,12 @@ import (
 
 var (
 	fileRegister   map[string]bool
-	readerRegister map[string]func() io.Reader
+	readerRegister map[string]func () io.Reader
 )
 
 func init() {
 	fileRegister = make(map[string]bool)
-	readerRegister = make(map[string]func() io.Reader)
+	readerRegister = make(map[string]func () io.Reader)
 }
 
 // RegisterLocalFile adds the given file to the file whitelist,
@@ -61,7 +61,7 @@ func DeregisterLocalFile(filePath string) {
 //  if err != nil {
 //  ...
 //
-func RegisterReaderHandler(name string, handler func() io.Reader) {
+func RegisterReaderHandler(name string, handler func () io.Reader) {
 	readerRegister[name] = handler
 }
 
@@ -73,7 +73,7 @@ func DeregisterReaderHandler(name string) {
 
 func (mc *mysqlConn) handleInFileRequest(name string) (err error) {
 	var rdr io.Reader
-	data := make([]byte, 4+mc.maxWriteSize)
+	data := make([]byte, 4 + mc.maxWriteSize)
 
 	if strings.HasPrefix(name, "Reader::") { // io.Reader
 		name = name[8:]
@@ -115,10 +115,10 @@ func (mc *mysqlConn) handleInFileRequest(name string) (err error) {
 			n, err = rdr.Read(data[4:])
 			if n > 0 {
 				data[0] = byte(n)
-				data[1] = byte(n >> 8)
-				data[2] = byte(n >> 16)
+				data[1] = byte(n>>8)
+				data[2] = byte(n>>16)
 				data[3] = mc.sequence
-				ioErr = mc.writePacket(data[:4+n])
+				ioErr = mc.writePacket(data[:4 + n])
 			}
 		}
 		if err == io.EOF {

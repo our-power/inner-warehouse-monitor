@@ -95,7 +95,7 @@ func getCaller(skip int) string {
 			if cur == line {
 				flag = ">>"
 			}
-			code := fmt.Sprintf(" %s %5d:   %s", flag, cur, strings.Replace(string(lines[o+i]), "\t", "    ", -1))
+			code := fmt.Sprintf(" %s %5d:   %s", flag, cur, strings.Replace(string(lines[o + i]), "\t", "    ", -1))
 			if code != "" {
 				codes = append(codes, code)
 			}
@@ -103,7 +103,7 @@ func getCaller(skip int) string {
 	}
 	funName := fun.Name()
 	if i := strings.LastIndex(funName, "."); i > -1 {
-		funName = funName[i+1:]
+		funName = funName[i + 1:]
 	}
 	return fmt.Sprintf("%s:%d: \n%s", fn, line, strings.Join(codes, "\n"))
 }
@@ -112,7 +112,7 @@ func throwFail(t *testing.T, err error, args ...interface{}) {
 	if err != nil {
 		con := fmt.Sprintf("\t\nError: %s\n%s\n", err.Error(), getCaller(2))
 		if len(args) > 0 {
-			parts := make([]string, 0, len(args))
+			parts := make([]string,0, len(args))
 			for _, arg := range args {
 				parts = append(parts, fmt.Sprintf("%v", arg))
 			}
@@ -127,7 +127,7 @@ func throwFailNow(t *testing.T, err error, args ...interface{}) {
 	if err != nil {
 		con := fmt.Sprintf("\t\nError: %s\n%s\n", err.Error(), getCaller(2))
 		if len(args) > 0 {
-			parts := make([]string, 0, len(args))
+			parts := make([]string,0, len(args))
 			for _, arg := range args {
 				parts = append(parts, fmt.Sprintf("%v", arg))
 			}
@@ -873,7 +873,7 @@ func TestReverseQuery(t *testing.T) {
 
 	posts = []*Post{}
 	num, err = dORM.QueryTable("post").Filter("Tags__Tag__Name", "golang").
-		Filter("User__UserName", "slene").RelatedSel().All(&posts)
+	Filter("User__UserName", "slene").RelatedSel().All(&posts)
 	throwFailNow(t, err)
 	throwFailNow(t, AssertIs(num, 1))
 	throwFailNow(t, AssertIs(posts[0].User == nil, false))
@@ -887,14 +887,14 @@ func TestReverseQuery(t *testing.T) {
 
 	tags = []*Tag{}
 	num, err = dORM.QueryTable("tag").Filter("Posts__Post__Title", "Introduction").
-		Filter("BestPost__User__UserName", "astaxie").All(&tags)
+	Filter("BestPost__User__UserName", "astaxie").All(&tags)
 	throwFailNow(t, err)
 	throwFailNow(t, AssertIs(num, 1))
 	throwFailNow(t, AssertIs(tags[0].Name, "golang"))
 
 	tags = []*Tag{}
 	num, err = dORM.QueryTable("tag").Filter("Posts__Post__Title", "Introduction").
-		Filter("BestPost__User__UserName", "astaxie").RelatedSel().All(&tags)
+	Filter("BestPost__User__UserName", "astaxie").RelatedSel().All(&tags)
 	throwFailNow(t, err)
 	throwFailNow(t, AssertIs(num, 1))
 	throwFailNow(t, AssertIs(tags[0].Name, "golang"))
@@ -1535,14 +1535,14 @@ func TestRawPrepare(t *testing.T) {
 
 			id, err := r.LastInsertId()
 			throwFail(t, err)
-			throwFail(t, AssertIs(id, tid+1))
+			throwFail(t, AssertIs(id, tid + 1))
 
 			r, err = pre.Exec("name3")
 			throwFail(t, err)
 
 			id, err = r.LastInsertId()
 			throwFail(t, err)
-			throwFail(t, AssertIs(id, tid+2))
+			throwFail(t, AssertIs(id, tid + 2))
 
 			err = pre.Close()
 			throwFail(t, err)

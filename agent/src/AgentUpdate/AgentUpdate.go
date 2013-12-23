@@ -33,7 +33,7 @@ func checkList() []string {
 	resp, err := utils.ReadRemote("GET", urlString, "", hostString, netClient)
 	if err != nil {
 		logger.Println(err.Error())
-	    return list
+		return list
 	}
 	if string(resp) == "" {
 		return list
@@ -50,22 +50,22 @@ func downloadAndReplaceFile(filename string, version string) bool {
 	theFile := "../" + filename
 	if _, err := os.Stat(theFile); err == nil {
 		// If local file exists.
-	    err = os.Rename(theFile, theFile + "." + strconv.FormatInt(time.Now().Unix(), 10))
+		err = os.Rename(theFile, theFile + "." + strconv.FormatInt(time.Now().Unix(), 10))
 		if err != nil {
-		    logger.Println(err.Error())
-		    return false
+			logger.Println(err.Error())
+			return false
 		}
 	}
 	urlString := settings.UpdateServer[0]["url"] + "?action=get_file&v=" + version + "&name=" + url.QueryEscape(filename)
 	hostHeader := settings.UpdateServer[0]["host"]
-    resp, err := utils.ReadRemote("GET", urlString, "", hostHeader, netClient)
+	resp, err := utils.ReadRemote("GET", urlString, "", hostHeader, netClient)
 	if err != nil {
-	    logger.Println(err.Error())
-	    return false
+		logger.Println(err.Error())
+		return false
 	}
 	if len(resp) != 0 {
 		// empty response means no such file exists, we should do nothing.
-		f, err := os.OpenFile(theFile, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0666)
+		f, err := os.OpenFile(theFile, os.O_CREATE | os.O_WRONLY | os.O_TRUNC, 0666)
 		defer f.Close()
 		if err != nil {
 			logger.Println(err.Error())
@@ -92,12 +92,12 @@ func setDoneFlag() {
 	Then download these files.
 */
 func stopAndUpdate() {
-	c := time.Tick(time.Duration(settings.Update) * time.Second)
+	c := time.Tick(time.Duration(settings.Update)*time.Second)
 	for _ = range c {
 		if stop {
 			return
 		}
-		if files :=checkList(); len(files) > 1 {
+		if files := checkList(); len(files) > 1 {
 			allDone := true
 			// len(files) > 1 means "version + file list" or none
 			// make a rpc call to daemon, let daemon kill the agent process
@@ -118,7 +118,7 @@ func stopAndUpdate() {
 				if !succ {
 					logger.Println("update failed for:", filename)
 				}
-				time.Sleep(time.Second * 3)
+				time.Sleep(time.Second*3)
 			}
 			if allDone {
 				logger.Println("Complete updating:", files)
@@ -139,14 +139,14 @@ func main() {
 	logger = utils.InitLogger("../log/update.log")
 	cc := make(chan os.Signal, 1)
 	signal.Notify(cc, os.Interrupt, os.Kill)
-	go func(){
-	    for _ = range cc {
-	    	stop = true
-	    	time.Sleep(time.Second)
-	        logger.Println("Updater stopped")
-	        done <- true
-	        os.Exit(0)
-	    }
+	go func() {
+		for _ = range cc {
+			stop = true
+			time.Sleep(time.Second)
+			logger.Println("Updater stopped")
+			done <- true
+			os.Exit(0)
+		}
 	}()
 	// dial to the daemon, and create a rpc client
 	conn, err := net.Dial("tcp", "127.0.0.1:8773")
@@ -162,5 +162,5 @@ func main() {
 		os.Exit(1)
 	}
 	stopAndUpdate()
-	<- done
+	<-done
 }

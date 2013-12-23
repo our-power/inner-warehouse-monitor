@@ -90,9 +90,9 @@ func (db *DB) q(sql string) string {
 		qrx := regexp.MustCompile(`\?`)
 		n := 0
 		return qrx.ReplaceAllStringFunc(sql, func(string) string {
-			n++
-			return "$" + strconv.Itoa(n)
-		})
+				n++
+				return "$" + strconv.Itoa(n)
+			})
 	}
 	return sql
 }
@@ -318,7 +318,7 @@ func BenchmarkQuery(b *testing.B) {
 		var i int
 		var f float64
 		var s string
-//		var t time.Time
+		//		var t time.Time
 		if err := db.QueryRow("select null, 1, 1.1, 'foo'").Scan(&n, &i, &f, &s); err != nil {
 			panic(err)
 		}
@@ -331,7 +331,7 @@ func BenchmarkParams(b *testing.B) {
 		var i int
 		var f float64
 		var s string
-//		var t time.Time
+		//		var t time.Time
 		if err := db.QueryRow("select ?, ?, ?, ?", nil, 1, 1.1, "foo").Scan(&n, &i, &f, &s); err != nil {
 			panic(err)
 		}
@@ -350,7 +350,7 @@ func BenchmarkStmt(b *testing.B) {
 		var i int
 		var f float64
 		var s string
-//		var t time.Time
+		//		var t time.Time
 		if err := st.QueryRow(nil, 1, 1.1, "foo").Scan(&n, &i, &f, &s); err != nil {
 			panic(err)
 		}

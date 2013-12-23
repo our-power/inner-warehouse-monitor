@@ -35,16 +35,16 @@ var _ Driver = new(driver)
 var (
 	dataBaseCache = &_dbCache{cache: make(map[string]*alias)}
 	drivers       = map[string]DriverType{
-		"mysql":    DR_MySQL,
-		"postgres": DR_Postgres,
-		"sqlite3":  DR_Sqlite,
-	}
-	dbBasers = map[DriverType]dbBaser{
-		DR_MySQL:    newdbBaseMysql(),
-		DR_Sqlite:   newdbBaseSqlite(),
-		DR_Oracle:   newdbBaseMysql(),
-		DR_Postgres: newdbBasePostgres(),
-	}
+	"mysql":    DR_MySQL,
+	"postgres": DR_Postgres,
+	"sqlite3":  DR_Sqlite,
+}
+	dbBasers      = map[DriverType]dbBaser{
+	DR_MySQL:    newdbBaseMysql(),
+	DR_Sqlite:   newdbBaseSqlite(),
+	DR_Oracle:   newdbBaseMysql(),
+	DR_Postgres: newdbBasePostgres(),
+}
 )
 
 type _dbCache struct {

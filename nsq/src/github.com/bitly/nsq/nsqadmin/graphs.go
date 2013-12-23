@@ -41,7 +41,7 @@ type Topic struct {
 type Topics []*Topic
 
 func TopicsFromStrings(s []string) Topics {
-	t := make(Topics, 0, len(s))
+	t := make(Topics,0, len(s))
 	for _, ss := range s {
 		tt := &Topic{ss}
 		t = append(t, tt)
@@ -141,7 +141,7 @@ func NewGraphOptions(rw http.ResponseWriter, req *http.Request, r *util.ReqParam
 			Value:    selectedTimeString,
 			Path:     "/",
 			Domain:   host,
-			Expires:  time.Now().Add(time.Duration(720) * time.Hour),
+			Expires:  time.Now().Add(time.Duration(720)*time.Hour),
 			HttpOnly: true,
 		}
 		http.SetCookie(rw, cookie)
@@ -175,7 +175,7 @@ func (g *GraphOptions) Prefix(host string, metricType string) string {
 	prefix := ""
 	statsdHostKey := util.StatsdHostKey(host)
 	prefixWithHost := strings.Replace(g.StatsdPrefix, "%s", statsdHostKey, -1)
-	if prefixWithHost[len(prefixWithHost)-1] != '.' {
+	if prefixWithHost[len(prefixWithHost) - 1] != '.' {
 		prefixWithHost += "."
 	}
 	if g.UseStatsdPrefix && metricType == "counter" {
@@ -261,7 +261,6 @@ func metricType(key string) string {
 		"gc_pause_*":      "gauge",
 		"gc_runs":         "counter",
 		"heap_objects":    "gauge",
-
 		"e2e_processing_latency": "gauge",
 	}[key]
 }
@@ -294,7 +293,7 @@ func parseRateResponse(body []byte) ([]byte, error) {
 	if rate < 0 {
 		rateStr = "N/A"
 	} else {
-		rateDivisor := *statsdInterval / time.Second
+		rateDivisor := *statsdInterval/time.Second
 		rateStr = fmt.Sprintf("%.2f", rate/float64(rateDivisor))
 	}
 	return json.Marshal(map[string]string{"datapoint": rateStr})

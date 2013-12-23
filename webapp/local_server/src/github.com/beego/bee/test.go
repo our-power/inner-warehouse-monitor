@@ -84,7 +84,7 @@ func testApp(cmd *Command, args []string) {
 
 func runTest() {
 	ColorLog("[INFO] Start testing...\n")
-	time.Sleep(time.Second * 1)
+	time.Sleep(time.Second*1)
 	crupwd, _ := os.Getwd()
 	testDir := path.Join(crupwd, "tests")
 	if pathExists(testDir) {

@@ -15,8 +15,8 @@ type ProducerTopic struct {
 
 type ProducerTopics []ProducerTopic
 
-func (pt ProducerTopics) Len() int           { return len(pt) }
-func (pt ProducerTopics) Swap(i, j int)      { pt[i], pt[j] = pt[j], pt[i] }
+func (pt ProducerTopics) Len() int { return len(pt) }
+func (pt ProducerTopics) Swap(i, j int) { pt[i], pt[j] = pt[j], pt[i] }
 func (pt ProducerTopics) Less(i, j int) bool { return pt[i].Topic < pt[j].Topic }
 
 type Producer struct {
@@ -179,14 +179,14 @@ type ProducersByHost struct {
 	ProducerList
 }
 
-func (c ChannelStatsList) Len() int      { return len(c) }
+func (c ChannelStatsList) Len() int { return len(c) }
 func (c ChannelStatsList) Swap(i, j int) { c[i], c[j] = c[j], c[i] }
-func (c ClientInfoList) Len() int        { return len(c) }
-func (c ClientInfoList) Swap(i, j int)   { c[i], c[j] = c[j], c[i] }
-func (t TopicStatsList) Len() int        { return len(t) }
-func (t TopicStatsList) Swap(i, j int)   { t[i], t[j] = t[j], t[i] }
-func (t ProducerList) Len() int          { return len(t) }
-func (t ProducerList) Swap(i, j int)     { t[i], t[j] = t[j], t[i] }
+func (c ClientInfoList) Len() int { return len(c) }
+func (c ClientInfoList) Swap(i, j int) { c[i], c[j] = c[j], c[i] }
+func (t TopicStatsList) Len() int { return len(t) }
+func (t TopicStatsList) Swap(i, j int) { t[i], t[j] = t[j], t[i] }
+func (t ProducerList) Len() int { return len(t) }
+func (t ProducerList) Swap(i, j int) { t[i], t[j] = t[j], t[i] }
 
 func (c ChannelStatsByHost) Less(i, j int) bool {
 	return c.ChannelStatsList[i].HostAddress < c.ChannelStatsList[j].HostAddress

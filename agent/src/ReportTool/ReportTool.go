@@ -14,7 +14,7 @@ var settings utils.Settings
 var netClient *http.Client
 
 var (
-	topic = flag.String("topic", "", "The topic you want to send a message.")
+	topic   = flag.String("topic", "", "The topic you want to send a message.")
 	message = flag.String("message", "", "Message body.")
 )
 
@@ -45,7 +45,7 @@ func prepareOutput(topic string, output string, interval int) (request string, c
 	}
 	h, m, s := time.Now().Clock()
 	if interval != 0 {
-		timeIdx = (3600*h + 60*m + s) / interval
+		timeIdx = (3600*h + 60*m + s)/interval
 	}
 	line := ""
 	lines := strings.Split(output, "\n")

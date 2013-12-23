@@ -43,11 +43,11 @@ func NewScript(keyCount int, src string) *Script {
 func (s *Script) args(spec string, keysAndArgs []interface{}) []interface{} {
 	var args []interface{}
 	if s.keyCount < 0 {
-		args = make([]interface{}, 1+len(keysAndArgs))
+		args = make([]interface{}, 1 + len(keysAndArgs))
 		args[0] = spec
 		copy(args[1:], keysAndArgs)
 	} else {
-		args = make([]interface{}, 2+len(keysAndArgs))
+		args = make([]interface{}, 2 + len(keysAndArgs))
 		args[0] = spec
 		args[1] = s.keyCount
 		copy(args[2:], keysAndArgs)

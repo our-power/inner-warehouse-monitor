@@ -113,7 +113,7 @@ func (input *BeegoInput) Refer() string {
 
 func (input *BeegoInput) SubDomains() string {
 	parts := strings.Split(input.Host(), ".")
-	return strings.Join(parts[len(parts)-2:], ".")
+	return strings.Join(parts[len(parts) - 2:], ".")
 }
 
 func (input *BeegoInput) Port() int {

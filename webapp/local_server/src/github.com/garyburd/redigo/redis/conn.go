@@ -118,13 +118,13 @@ func (c *conn) Err() error {
 }
 
 func (c *conn) writeLen(prefix byte, n int) error {
-	c.lenScratch[len(c.lenScratch)-1] = '\n'
-	c.lenScratch[len(c.lenScratch)-2] = '\r'
+	c.lenScratch[len(c.lenScratch) - 1] = '\n'
+	c.lenScratch[len(c.lenScratch) - 2] = '\r'
 	i := len(c.lenScratch) - 3
 	for {
 		c.lenScratch[i] = byte('0' + n%10)
 		i -= 1
-		n = n / 10
+		n = n/10
 		if n == 0 {
 			break
 		}
@@ -157,7 +157,7 @@ func (c *conn) writeFloat64(n float64) error {
 }
 
 func (c *conn) writeCommand(cmd string, args []interface{}) (err error) {
-	c.writeLen('*', 1+len(args))
+	c.writeLen('*', 1 + len(args))
 	err = c.writeString(cmd)
 	for _, arg := range args {
 		if err != nil {

@@ -1,4 +1,4 @@
-package main 
+package main
 
 import (
 	"os"
@@ -10,13 +10,14 @@ import (
 )
 
 type Daemon int
+
 var PIDs map[string] *os.Process
 
 /*
 	Only those who start processes have the permission to kill them.
 	As a work around, we listen to rpc request and kill the required process.
 */
-func (Daemon) Kill (pName, reply *string) error {
+func (Daemon) Kill(pName, reply *string) error {
 	*reply = "success"
 	err := PIDs[*pName].Kill()
 	if err != nil {
@@ -46,13 +47,13 @@ func daemon(programName string) {
 		cmd := exec.Command(toExec)
 		err := cmd.Start()
 		if err != nil {
-			time.Sleep(time.Second * 5)
+			time.Sleep(time.Second*5)
 			continue
 		}
 		// Only by storing these *os.Process objects started just now could we kill them later. FindProcess is useless.
 		PIDs[programName] = cmd.Process
 		err = cmd.Wait()
-		time.Sleep(time.Second * 100)
+		time.Sleep(time.Second*100)
 	}
 }
 
@@ -64,5 +65,5 @@ func main() {
 	go accept()
 	go daemon(mainProgram)
 	go daemon(updateProgram)
-	<- done
+	<-done
 }

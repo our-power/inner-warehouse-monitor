@@ -81,7 +81,7 @@ func init() {
 	SessionHashKey = "beegoserversessionkey"
 	SessionCookieLifeTime = 3600
 	UseFcgi = false
-	MaxMemory = 1 << 26 //64MB
+	MaxMemory = 1<<26 //64MB
 	EnableGzip = false
 	StaticDir["/static"] = "static"
 	AppConfigPath = path.Join(AppPath, "conf", "app.conf")
@@ -298,9 +298,9 @@ func ParseConfig() (err error) {
 			sds := strings.Fields(sd)
 			for _, v := range sds {
 				if url2fsmap := strings.SplitN(v, ":", 2); len(url2fsmap) == 2 {
-					StaticDir["/"+url2fsmap[0]] = url2fsmap[1]
+					StaticDir["/" + url2fsmap[0]] = url2fsmap[1]
 				} else {
-					StaticDir["/"+url2fsmap[0]] = url2fsmap[0]
+					StaticDir["/" + url2fsmap[0]] = url2fsmap[0]
 				}
 			}
 		}
@@ -311,9 +311,9 @@ func ParseConfig() (err error) {
 			sds := strings.Fields(sd)
 			for _, v := range sds {
 				if url2fsmap := strings.SplitN(v, ":", 2); len(url2fsmap) == 2 {
-					StaticDir["/"+url2fsmap[0]] = url2fsmap[1]
+					StaticDir["/" + url2fsmap[0]] = url2fsmap[1]
 				} else {
-					StaticDir["/"+url2fsmap[0]] = url2fsmap[0]
+					StaticDir["/" + url2fsmap[0]] = url2fsmap[0]
 				}
 			}
 		}

@@ -104,9 +104,9 @@ func bootStrap() {
 				case RelManyToMany:
 					if fi.relThrough != "" {
 						msg := fmt.Sprintf("field `%s` wrong rel_through value `%s`", fi.fullName, fi.relThrough)
-						if i := strings.LastIndex(fi.relThrough, "."); i != -1 && len(fi.relThrough) > (i+1) {
+						if i := strings.LastIndex(fi.relThrough, "."); i != -1 && len(fi.relThrough) > (i + 1) {
 							pn := fi.relThrough[:i]
-							mn := fi.relThrough[i+1:]
+							mn := fi.relThrough[i + 1:]
 							tn := snakeString(mn)
 							rmi, ok := modelCache.get(tn)
 							if ok == false || pn != rmi.pkg {

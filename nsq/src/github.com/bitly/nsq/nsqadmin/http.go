@@ -815,8 +815,8 @@ func graphiteDataHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	var queryFunc func(string) string
-	var formatJsonResponseFunc func([]byte) ([]byte, error)
+	var queryFunc func (string) string
+	var formatJsonResponseFunc func ([]byte) ([]byte, error)
 
 	switch metric {
 	case "rate":

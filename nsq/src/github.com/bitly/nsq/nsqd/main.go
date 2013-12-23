@@ -88,7 +88,7 @@ func main() {
 	if *workerId == 0 {
 		h := md5.New()
 		io.WriteString(h, hostname)
-		*workerId = int64(crc32.ChecksumIEEE(h.Sum(nil)) % 1024)
+		*workerId = int64(crc32.ChecksumIEEE(h.Sum(nil))%1024)
 	}
 
 	tcpAddr, err := net.ResolveTCPAddr("tcp", *tcpAddress)
@@ -151,7 +151,7 @@ func main() {
 		options.statsdInterval = flagToDuration(*statsdInterval, time.Second, "--statsd-interval")
 		statsdHostKey := util.StatsdHostKey(net.JoinHostPort(*broadcastAddress, strconv.Itoa(httpAddr.Port)))
 		prefixWithHost := strings.Replace(*statsdPrefix, "%s", statsdHostKey, -1)
-		if prefixWithHost[len(prefixWithHost)-1] != '.' {
+		if prefixWithHost[len(prefixWithHost) - 1] != '.' {
 			prefixWithHost += "."
 		}
 		options.statsdPrefix = prefixWithHost
@@ -181,7 +181,7 @@ func flagToDuration(val string, mult time.Duration, flag string) time.Duration {
 		if err != nil {
 			log.Fatalf("ERROR: failed to Atoi %s=%s - %s", flag, val, err.Error())
 		}
-		return time.Duration(intVal) * mult
+		return time.Duration(intVal)*mult
 	}
 
 	duration, err := time.ParseDuration(val)

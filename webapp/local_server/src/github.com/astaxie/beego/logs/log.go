@@ -14,7 +14,7 @@ const (
 	LevelCritical
 )
 
-type loggerType func() LoggerInterface
+type loggerType func () LoggerInterface
 
 type LoggerInterface interface {
 	Init(config string) error
@@ -111,32 +111,32 @@ func (bl *BeeLogger) StartLogger() {
 }
 
 func (bl *BeeLogger) Trace(format string, v ...interface{}) {
-	msg := fmt.Sprintf("[T] "+format, v...)
+	msg := fmt.Sprintf("[T] " + format, v...)
 	bl.writerMsg(LevelTrace, msg)
 }
 
 func (bl *BeeLogger) Debug(format string, v ...interface{}) {
-	msg := fmt.Sprintf("[D] "+format, v...)
+	msg := fmt.Sprintf("[D] " + format, v...)
 	bl.writerMsg(LevelDebug, msg)
 }
 
 func (bl *BeeLogger) Info(format string, v ...interface{}) {
-	msg := fmt.Sprintf("[I] "+format, v...)
+	msg := fmt.Sprintf("[I] " + format, v...)
 	bl.writerMsg(LevelInfo, msg)
 }
 
 func (bl *BeeLogger) Warn(format string, v ...interface{}) {
-	msg := fmt.Sprintf("[W] "+format, v...)
+	msg := fmt.Sprintf("[W] " + format, v...)
 	bl.writerMsg(LevelWarn, msg)
 }
 
 func (bl *BeeLogger) Error(format string, v ...interface{}) {
-	msg := fmt.Sprintf("[E] "+format, v...)
+	msg := fmt.Sprintf("[E] " + format, v...)
 	bl.writerMsg(LevelError, msg)
 }
 
 func (bl *BeeLogger) Critical(format string, v ...interface{}) {
-	msg := fmt.Sprintf("[C] "+format, v...)
+	msg := fmt.Sprintf("[C] " + format, v...)
 	bl.writerMsg(LevelCritical, msg)
 }
 

@@ -255,8 +255,8 @@ func compileStructSpec(t reflect.Type, depth map[string]int, index []int, ss *st
 				}
 				for _, s := range p[1:] {
 					switch s {
-					//case "omitempty":
-					//  fs.omitempty = true
+						//case "omitempty":
+						//  fs.omitempty = true
 					default:
 						panic(errors.New("redigo: unknown field flag " + s + " for type " + t.Name()))
 					}
@@ -264,7 +264,7 @@ func compileStructSpec(t reflect.Type, depth map[string]int, index []int, ss *st
 			}
 			d, found := depth[fs.name]
 			if !found {
-				d = 1 << 30
+				d = 1<<30
 			}
 			switch {
 			case len(index) == d:
@@ -279,7 +279,7 @@ func compileStructSpec(t reflect.Type, depth map[string]int, index []int, ss *st
 				}
 				ss.l = ss.l[:j]
 			case len(index) < d:
-				fs.index = make([]int, len(index)+1)
+				fs.index = make([]int, len(index) + 1)
 				copy(fs.index, index)
 				fs.index[len(index)] = i
 				depth[fs.name] = len(index)
@@ -362,7 +362,7 @@ func ScanStruct(src []interface{}, dest interface{}) error {
 		}
 		f := d.FieldByIndex(fs.index)
 		var err error
-		switch s := src[i+1].(type) {
+		switch s := src[i + 1].(type) {
 		case nil:
 			// ignore
 		case []byte:
@@ -440,7 +440,7 @@ func ScanSlice(src []interface{}, dest interface{}, fieldNames ...string) error 
 		return errors.New("redigo: ScanSlice no struct fields")
 	}
 
-	n := len(src) / len(fss)
+	n := len(src)/len(fss)
 	if n*len(fss) != len(src) {
 		return errors.New("redigo: ScanSlice length not a multiple of struct field count")
 	}
@@ -455,7 +455,7 @@ func ScanSlice(src []interface{}, dest interface{}, fieldNames ...string) error 
 			d = d.Elem()
 		}
 		for j, fs := range fss {
-			s := src[i*len(fss)+j]
+			s := src[i*len(fss) + j]
 			if s == nil {
 				continue
 			}

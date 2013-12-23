@@ -15,6 +15,7 @@ type Common_fields struct {
 }
 */
 
+/*
 type Cpu_usage struct {
 	Id int
 	Date string
@@ -57,19 +58,21 @@ type Heart_beat struct {
 	Hardware_addr string
 	Alive int
 }
+*/
 
 type Register struct {
-	Id int
-	Date string
-	Time_index int
-	Ip string
-	Host_name string
+	Id            int
+	Date          string
+	Time_index    int
+	Ip            string
+	Host_name     string
 	Hardware_addr string
 	Agent_version string
-	Machine_role string
-	Status int
+	Machine_role  string
+	Status        int
 }
 
+/*
 type Ping_accessibility struct {
 	Id int
 	Date string
@@ -91,8 +94,9 @@ type Telnet_accessibility struct {
 	Target_url string
 	Status string
 }
-
+*/
 
 func InitModels() {
-	orm.RegisterModel(new(Cpu_usage), new(Mem_usage), new(Net_flow), new(Heart_beat), new(Register), new(Ping_accessibility), new(Telnet_accessibility))
+	//orm.RegisterModel(new(Cpu_usage), new(Mem_usage), new(Net_flow), new(Heart_beat), new(Register), new(Ping_accessibility), new(Telnet_accessibility))
+	orm.RegisterModel(new(Register))
 }

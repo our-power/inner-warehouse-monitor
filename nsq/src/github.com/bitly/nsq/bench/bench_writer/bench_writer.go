@@ -44,9 +44,9 @@ func main() {
 	duration := end.Sub(start)
 	log.Printf("duration: %s - %.03fmb/s - %.03fops/s - %.03fus/op",
 		duration,
-		float64(*num*200)/duration.Seconds()/1024/1024,
-		float64(*num)/duration.Seconds(),
-		float64(duration/time.Microsecond)/float64(*num))
+					float64(*num*200)/duration.Seconds()/1024/1024,
+			float64(*num)/duration.Seconds(),
+			float64(duration/time.Microsecond)/float64(*num))
 }
 
 func pubWorker(n int, tcpAddr string, batchSize int, batch [][]byte, topic string) {
@@ -57,7 +57,7 @@ func pubWorker(n int, tcpAddr string, batchSize int, batch [][]byte, topic strin
 	conn.Write(nsq.MagicV2)
 	rw := bufio.NewReadWriter(bufio.NewReader(conn), bufio.NewWriter(conn))
 
-	num := n / runtime.GOMAXPROCS(0) / batchSize
+	num := n/runtime.GOMAXPROCS(0)/batchSize
 	for i := 0; i < num; i += 1 {
 		cmd, _ := nsq.MultiPublish(topic, batch)
 		err := cmd.Write(rw)

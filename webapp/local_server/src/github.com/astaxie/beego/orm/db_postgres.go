@@ -82,7 +82,7 @@ func (d *dbBasePostgres) ReplaceMarks(query *string) {
 	if num == 0 {
 		return
 	}
-	data := make([]byte, 0, len(q)+num)
+	data := make([]byte,0, len(q) + num)
 	num = 1
 	for i := 0; i < len(q); i++ {
 		c := q[i]

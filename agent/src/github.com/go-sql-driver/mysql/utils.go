@@ -82,13 +82,13 @@ var (
 )
 
 func init() {
-	errLog = log.New(os.Stderr, "[MySQL] ", log.Ldate|log.Ltime|log.Lshortfile)
+	errLog = log.New(os.Stderr, "[MySQL] ", log.Ldate | log.Ltime | log.Lshortfile)
 
 	dsnPattern = regexp.MustCompile(
-		`^(?:(?P<user>.*?)(?::(?P<passwd>.*))?@)?` + // [user[:password]@]
-			`(?:(?P<net>[^\(]*)(?:\((?P<addr>[^\)]*)\))?)?` + // [net[(addr)]]
-			`\/(?P<dbname>.*?)` + // /dbname
-			`(?:\?(?P<params>[^\?]*))?$`) // [?param1=value1&paramN=valueN]
+				`^(?:(?P<user>.*?)(?::(?P<passwd>.*))?@)?` + // [user[:password]@]
+						`(?:(?P<net>[^\(]*)(?:\((?P<addr>[^\)]*)\))?)?` + // [net[(addr)]]
+					`\/(?P<dbname>.*?)` + // /dbname
+				`(?:\?(?P<params>[^\?]*))?$`) // [?param1=value1&paramN=valueN]
 }
 
 // Data Source Name Parser
@@ -204,31 +204,31 @@ func parseBinaryDateTime(num uint64, data []byte, loc *time.Location) (driver.Va
 	case 4:
 		return time.Date(
 			int(binary.LittleEndian.Uint16(data[:2])), // year
-			time.Month(data[2]),                       // month
-			int(data[3]),                              // day
+			time.Month(data[2]), // month
+			int(data[3]), // day
 			0, 0, 0, 0,
 			loc,
 		), nil
 	case 7:
 		return time.Date(
 			int(binary.LittleEndian.Uint16(data[:2])), // year
-			time.Month(data[2]),                       // month
-			int(data[3]),                              // day
-			int(data[4]),                              // hour
-			int(data[5]),                              // minutes
-			int(data[6]),                              // seconds
+			time.Month(data[2]), // month
+			int(data[3]), // day
+			int(data[4]), // hour
+			int(data[5]), // minutes
+			int(data[6]), // seconds
 			0,
 			loc,
 		), nil
 	case 11:
 		return time.Date(
 			int(binary.LittleEndian.Uint16(data[:2])), // year
-			time.Month(data[2]),                       // month
-			int(data[3]),                              // day
-			int(data[4]),                              // hour
-			int(data[5]),                              // minutes
-			int(data[6]),                              // seconds
-			int(binary.LittleEndian.Uint32(data[7:11]))*1000, // nanoseconds
+			time.Month(data[2]), // month
+			int(data[3]), // day
+			int(data[4]), // hour
+			int(data[5]), // minutes
+			int(data[6]), // seconds
+				int(binary.LittleEndian.Uint32(data[7:11]))*1000, // nanoseconds
 			loc,
 		), nil
 	}
@@ -303,13 +303,13 @@ func readBool(value string) bool {
 func uint64ToBytes(n uint64) []byte {
 	return []byte{
 		byte(n),
-		byte(n >> 8),
-		byte(n >> 16),
-		byte(n >> 24),
-		byte(n >> 32),
-		byte(n >> 40),
-		byte(n >> 48),
-		byte(n >> 56),
+		byte(n>>8),
+		byte(n>>16),
+		byte(n>>24),
+		byte(n>>32),
+		byte(n>>40),
+		byte(n>>48),
+		byte(n>>56),
 	}
 }
 
@@ -324,8 +324,8 @@ func uint64ToString(n uint64) []byte {
 	var q uint64
 	for n >= 10 {
 		i--
-		q = n / 10
-		a[i] = uint8(n-q*10) + 0x30
+		q = n/10
+		a[i] = uint8(n - q*10) + 0x30
 		n = q
 	}
 
@@ -356,7 +356,7 @@ func readLengthEnodedString(b []byte) ([]byte, bool, int, error) {
 
 	// Check data length
 	if len(b) >= n {
-		return b[n-int(num) : n], false, n, nil
+		return b[n - int(num) : n], false, n, nil
 	}
 	return nil, false, n, io.EOF
 }
@@ -380,25 +380,25 @@ func skipLengthEnodedString(b []byte) (int, error) {
 func readLengthEncodedInteger(b []byte) (num uint64, isNull bool, n int) {
 	switch b[0] {
 
-	// 251: NULL
+		// 251: NULL
 	case 0xfb:
 		n = 1
 		isNull = true
 		return
 
-	// 252: value of following 2
+		// 252: value of following 2
 	case 0xfc:
 		num = uint64(b[1]) | uint64(b[2])<<8
 		n = 3
 		return
 
-	// 253: value of following 3
+		// 253: value of following 3
 	case 0xfd:
 		num = uint64(b[1]) | uint64(b[2])<<8 | uint64(b[3])<<16
 		n = 4
 		return
 
-	// 254: value of following 8
+		// 254: value of following 8
 	case 0xfe:
 		num = uint64(b[1]) | uint64(b[2])<<8 | uint64(b[3])<<16 |
 			uint64(b[4])<<24 | uint64(b[5])<<32 | uint64(b[6])<<40 |
@@ -419,10 +419,10 @@ func lengthEncodedIntegerToBytes(n uint64) []byte {
 		return []byte{byte(n)}
 
 	case n <= 0xffff:
-		return []byte{0xfc, byte(n), byte(n >> 8)}
+		return []byte{0xfc, byte(n), byte(n>>8)}
 
 	case n <= 0xffffff:
-		return []byte{0xfd, byte(n), byte(n >> 8), byte(n >> 16)}
+		return []byte{0xfd, byte(n), byte(n>>8), byte(n>>16)}
 	}
 	return nil
 }

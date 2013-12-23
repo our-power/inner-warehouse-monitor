@@ -35,8 +35,8 @@ type Packet struct {
 
 type Uint64Slice []uint64
 
-func (s Uint64Slice) Len() int           { return len(s) }
-func (s Uint64Slice) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
+func (s Uint64Slice) Len() int { return len(s) }
+func (s Uint64Slice) Swap(i, j int) { s[i], s[j] = s[j], s[i] }
 func (s Uint64Slice) Less(i, j int) bool { return s[i] < s[j] }
 
 type Percentiles []*Percentile
@@ -82,7 +82,7 @@ var (
 )
 
 func monitor() {
-	ticker := time.NewTicker(time.Duration(*flushInterval) * time.Second)
+	ticker := time.NewTicker(time.Duration(*flushInterval)*time.Second)
 	for {
 		select {
 		case sig := <-signalchan:
@@ -106,7 +106,7 @@ func monitor() {
 				if !ok || v < 0 {
 					counters[s.Bucket] = 0
 				}
-				counters[s.Bucket] += int64(float64(s.Value.(int64)) * float64(1/s.Sampling))
+				counters[s.Bucket] += int64(float64(s.Value.(int64))*float64(1/s.Sampling))
 			}
 		}
 	}
@@ -199,7 +199,7 @@ func processTimers(buffer *bytes.Buffer, now int64, pctls Percentiles) int64 {
 
 			sort.Sort(t)
 			min := t[0]
-			max := t[len(t)-1]
+			max := t[len(t) - 1]
 			maxAtThreshold := max
 			count := len(t)
 
@@ -207,7 +207,7 @@ func processTimers(buffer *bytes.Buffer, now int64, pctls Percentiles) int64 {
 			for _, value := range t {
 				sum += value
 			}
-			mean := float64(sum) / float64(len(t))
+			mean := float64(sum)/float64(len(t))
 
 			for _, pct := range pctls {
 
@@ -220,7 +220,7 @@ func processTimers(buffer *bytes.Buffer, now int64, pctls Percentiles) int64 {
 					}
 					// poor man's math.Round(x):
 					// math.Floor(x + 0.5)
-					indexOfPerc := int(math.Floor(((abs / 100.0) * float64(count)) + 0.5))
+					indexOfPerc := int(math.Floor(((abs/100.0)*float64(count)) + 0.5))
 					if pct.float >= 0 {
 						indexOfPerc -= 1  // index offset=0
 					}
@@ -332,7 +332,7 @@ func main() {
 
 	signalchan = make(chan os.Signal, 1)
 	signal.Notify(signalchan, syscall.SIGTERM)
-	*persistCountKeys = -1 * (*persistCountKeys)
+	*persistCountKeys = -1*(*persistCountKeys)
 
 	go udpListener()
 	monitor()

@@ -244,25 +244,25 @@ var scanSliceTests = []struct {
 		[]interface{}{[]byte("a1"), []byte("b1"), []byte("a2"), []byte("b2")},
 		nil,
 		true,
-		[]struct{ A, B string }{{"a1", "b1"}, {"a2", "b2"}},
+		[]struct{ A,  B string }{{"a1", "b1"}, {"a2", "b2"}},
 	},
 	{
 		[]interface{}{[]byte("a1"), []byte("b1")},
 		nil,
 		false,
-		[]struct{ A, B, C string }{{"a1", "b1", ""}},
+		[]struct{ A,  B,  C string }{{"a1", "b1", ""}},
 	},
 	{
 		[]interface{}{[]byte("a1"), []byte("b1"), []byte("a2"), []byte("b2")},
 		nil,
 		true,
-		[]*struct{ A, B string }{{"a1", "b1"}, {"a2", "b2"}},
+		[]*struct{ A,  B string }{{"a1", "b1"}, {"a2", "b2"}},
 	},
 	{
 		[]interface{}{[]byte("a1"), []byte("b1"), []byte("a2"), []byte("b2")},
 		[]string{"A", "B"},
 		true,
-		[]struct{ A, C, B string }{{"a1", "", "b1"}, {"a2", "", "b2"}},
+		[]struct{ A,  C,  B string }{{"a1", "", "b1"}, {"a2", "", "b2"}},
 	},
 	{
 		[]interface{}{[]byte("a1"), []byte("b1"), []byte("a2"), []byte("b2")},
@@ -375,35 +375,37 @@ func ExampleArgs() {
 	p1.Author = "Gary"
 	p1.Body = "Hello"
 
-	if _, err := c.Do("HMSET", redis.Args{}.Add("id1").AddFlat(&p1)...); err != nil {
-		panic(err)
-	}
+	if _, err := c.Do("HMSET", redis.Args{}
 
-	m := map[string]string{
-		"title":  "Example2",
-		"author": "Steve",
-		"body":   "Map",
-	}
+.Add("id1").AddFlat(&p1)...); err != nil {
+panic(err)
+}
 
-	if _, err := c.Do("HMSET", redis.Args{}.Add("id2").AddFlat(m)...); err != nil {
-		panic(err)
-	}
+m := map[string]string{
+"title":  "Example2",
+"author": "Steve",
+"body":   "Map",
+}
 
-	for _, id := range []string{"id1", "id2"} {
+if _, err := c.Do("HMSET", redis.Args{}.Add("id2").AddFlat(m)...); err != nil {
+panic(err)
+}
 
-		v, err := redis.Values(c.Do("HGETALL", id))
-		if err != nil {
-			panic(err)
-		}
+for _, id := range []string{"id1", "id2"} {
 
-		if err := redis.ScanStruct(v, &p2); err != nil {
-			panic(err)
-		}
+v, err := redis.Values(c.Do("HGETALL", id))
+if err != nil {
+panic(err)
+}
 
-		fmt.Printf("%+v\n", p2)
-	}
+if err := redis.ScanStruct(v, &p2); err != nil {
+panic(err)
+}
 
-	// Output:
-	// {Title:Example Author:Gary Body:Hello}
-	// {Title:Example2 Author:Steve Body:Map}
+fmt.Printf("%+v\n", p2)
+}
+
+// Output:
+// {Title:Example Author:Gary Body:Hello}
+// {Title:Example2 Author:Steve Body:Map}
 }

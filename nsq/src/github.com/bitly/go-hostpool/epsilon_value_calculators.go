@@ -18,7 +18,9 @@ type EpsilonValueCalculator interface {
 }
 
 type LinearEpsilonValueCalculator struct{}
-type LogEpsilonValueCalculator struct{ LinearEpsilonValueCalculator }
+type LogEpsilonValueCalculator struct{
+
+LinearEpsilonValueCalculator }
 type PolynomialEpsilonValueCalculator struct {
 	LinearEpsilonValueCalculator
 	Exp float64 // the exponent to which we will raise the value to reweight
@@ -27,7 +29,7 @@ type PolynomialEpsilonValueCalculator struct {
 // -------- Methods -----------------------
 
 func (c *LinearEpsilonValueCalculator) CalcValueFromAvgResponseTime(v float64) float64 {
-	return 1.0 / v
+	return 1.0/v
 }
 
 func (c *LogEpsilonValueCalculator) CalcValueFromAvgResponseTime(v float64) float64 {

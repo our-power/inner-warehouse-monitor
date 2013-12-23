@@ -78,7 +78,7 @@ func (o *orm) Insert(md interface{}) (int64, error) {
 	}
 	if id > 0 {
 		if mi.fields.pk.auto {
-			if mi.fields.pk.fieldType&IsPostiveIntegerField > 0 {
+			if mi.fields.pk.fieldType & IsPostiveIntegerField > 0 {
 				ind.Field(mi.fields.pk.fieldIndex).SetUint(uint64(id))
 			} else {
 				ind.Field(mi.fields.pk.fieldIndex).SetInt(id)
@@ -105,7 +105,7 @@ func (o *orm) Delete(md interface{}) (int64, error) {
 	}
 	if num > 0 {
 		if mi.fields.pk.auto {
-			if mi.fields.pk.fieldType&IsPostiveIntegerField > 0 {
+			if mi.fields.pk.fieldType & IsPostiveIntegerField > 0 {
 				ind.Field(mi.fields.pk.fieldIndex).SetUint(0)
 			} else {
 				ind.Field(mi.fields.pk.fieldIndex).SetInt(0)
@@ -238,7 +238,7 @@ func (o *orm) getReverseQs(md interface{}, mi *modelInfo, fi *fieldInfo) *queryS
 
 	if fi.fieldType == RelReverseMany && fi.reverseFieldInfo.mi.isThrough {
 		q = newQuerySet(o, fi.relModelInfo).(*querySet)
-		q.cond = NewCondition().And(fi.reverseFieldInfoM2M.column+ExprSep+fi.reverseFieldInfo.column, md)
+		q.cond = NewCondition().And(fi.reverseFieldInfoM2M.column + ExprSep + fi.reverseFieldInfo.column, md)
 	} else {
 		q = newQuerySet(o, fi.reverseFieldInfo.mi).(*querySet)
 		q.cond = NewCondition().And(fi.reverseFieldInfo.column, md)
@@ -258,7 +258,7 @@ func (o *orm) getRelQs(md interface{}, mi *modelInfo, fi *fieldInfo) *querySet {
 	q.cond = NewCondition()
 
 	if fi.fieldType == RelManyToMany {
-		q.cond = q.cond.And(fi.reverseFieldInfoM2M.column+ExprSep+fi.reverseFieldInfo.column, md)
+		q.cond = q.cond.And(fi.reverseFieldInfoM2M.column + ExprSep + fi.reverseFieldInfo.column, md)
 	} else {
 		q.cond = q.cond.And(fi.reverseFieldInfo.column, md)
 	}

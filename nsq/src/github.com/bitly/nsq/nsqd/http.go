@@ -83,10 +83,10 @@ func (s *httpServer) pingHandler(w http.ResponseWriter, req *http.Request) {
 
 func (s *httpServer) infoHandler(w http.ResponseWriter, req *http.Request) {
 	util.ApiResponse(w, 200, "OK", struct {
-		Version string `json:"version"`
-	}{
-		Version: util.BINARY_VERSION,
-	})
+			Version string `json:"version"`
+		}{
+			Version: util.BINARY_VERSION,
+		})
 }
 
 func (s *httpServer) getTopicFromQuery(req *http.Request) (url.Values, *Topic, error) {
@@ -211,8 +211,8 @@ func (s *httpServer) mputHandler(w http.ResponseWriter, req *http.Request) {
 				continue
 			}
 
-			if len(block) > 0 && block[len(block)-1] == '\n' {
-				block = block[:len(block)-1]
+			if len(block) > 0 && block[len(block) - 1] == '\n' {
+				block = block[:len(block) - 1]
 			}
 
 			// silently discard 0 length messages
@@ -467,8 +467,8 @@ func (s *httpServer) statsHandler(w http.ResponseWriter, req *http.Request) {
 
 	if jsonFormat {
 		util.ApiResponse(w, 200, "OK", struct {
-			Topics []TopicStats `json:"topics"`
-		}{stats})
+				Topics []TopicStats `json:"topics"`
+			}{stats})
 	} else {
 		if len(stats) == 0 {
 			io.WriteString(w, "\nNO_TOPICS\n")
@@ -476,11 +476,11 @@ func (s *httpServer) statsHandler(w http.ResponseWriter, req *http.Request) {
 		}
 		for _, t := range stats {
 			io.WriteString(w, fmt.Sprintf("\n[%-15s] depth: %-5d be-depth: %-5d msgs: %-8d e2e%%: %s\n",
-				t.TopicName,
-				t.Depth,
-				t.BackendDepth,
-				t.MessageCount,
-				t.E2eProcessingLatency))
+					t.TopicName,
+					t.Depth,
+					t.BackendDepth,
+					t.MessageCount,
+					t.E2eProcessingLatency))
 			for _, c := range t.Channels {
 				var pausedPrefix string
 				if c.Paused {
@@ -503,19 +503,19 @@ func (s *httpServer) statsHandler(w http.ResponseWriter, req *http.Request) {
 				for _, client := range c.Clients {
 					connectTime := time.Unix(client.ConnectTime, 0)
 					// truncate to the second
-					duration := time.Duration(int64(now.Sub(connectTime).Seconds())) * time.Second
+					duration := time.Duration(int64(now.Sub(connectTime).Seconds()))*time.Second
 					_, port, _ := net.SplitHostPort(client.RemoteAddress)
 					io.WriteString(w, fmt.Sprintf("        [%s %-21s] state: %d inflt: %-4d rdy: %-4d fin: %-8d re-q: %-8d msgs: %-8d connected: %s\n",
-						client.Version,
-						fmt.Sprintf("%s:%s", client.Name, port),
-						client.State,
-						client.InFlightCount,
-						client.ReadyCount,
-						client.FinishCount,
-						client.RequeueCount,
-						client.MessageCount,
-						duration,
-					))
+							client.Version,
+							fmt.Sprintf("%s:%s", client.Name, port),
+							client.State,
+							client.InFlightCount,
+							client.ReadyCount,
+							client.FinishCount,
+							client.RequeueCount,
+							client.MessageCount,
+							duration,
+						))
 				}
 			}
 		}

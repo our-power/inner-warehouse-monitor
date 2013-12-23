@@ -123,7 +123,7 @@ func MultiPublish(topic string, bodies [][]byte) (*Command, error) {
 	for _, b := range bodies {
 		bodySize += len(b) + 4
 	}
-	body := make([]byte, 0, bodySize)
+	body := make([]byte,0, bodySize)
 	buf := bytes.NewBuffer(body)
 
 	err := binary.Write(buf, binary.BigEndian, &num)

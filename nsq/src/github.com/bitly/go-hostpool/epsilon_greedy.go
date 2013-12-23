@@ -72,7 +72,7 @@ func (p *epsilonGreedyHostPool) SetEpsilon(newEpsilon float32) {
 }
 
 func (p *epsilonGreedyHostPool) epsilonGreedyDecay() {
-	durationPerBucket := p.decayDuration / epsilonBuckets
+	durationPerBucket := p.decayDuration/epsilonBuckets
 	ticker := time.Tick(durationPerBucket)
 	for {
 		<-ticker
@@ -83,7 +83,7 @@ func (p *epsilonGreedyHostPool) performEpsilonGreedyDecay() {
 	p.Lock()
 	for _, h := range p.hostList {
 		h.epsilonIndex += 1
-		h.epsilonIndex = h.epsilonIndex % epsilonBuckets
+		h.epsilonIndex = h.epsilonIndex%epsilonBuckets
 		h.epsilonCounts[h.epsilonIndex] = 0
 		h.epsilonValues[h.epsilonIndex] = 0
 	}
@@ -106,7 +106,7 @@ func (p *epsilonGreedyHostPool) getEpsilonGreedy() string {
 
 	// this is our exploration phase
 	if rand.Float32() < p.epsilon {
-		p.epsilon = p.epsilon * epsilonDecay
+		p.epsilon = p.epsilon*epsilonDecay
 		if p.epsilon < minEpsilon {
 			p.epsilon = minEpsilon
 		}
@@ -132,7 +132,7 @@ func (p *epsilonGreedyHostPool) getEpsilonGreedy() string {
 	if len(possibleHosts) != 0 {
 		// now normalize to the 0..1 range to get a percentage
 		for _, h := range possibleHosts {
-			h.epsilonPercentage = h.epsilonValue / sumValues
+			h.epsilonPercentage = h.epsilonValue/sumValues
 		}
 
 		// do a weighted random choice among hosts
@@ -178,7 +178,7 @@ func (p *epsilonGreedyHostPool) markSuccess(hostR HostPoolResponse) {
 		log.Fatalf("host %s not in HostPool %v", host, p.Hosts())
 	}
 	h.epsilonCounts[h.epsilonIndex]++
-	h.epsilonValues[h.epsilonIndex] += int64(duration.Seconds() * 1000)
+	h.epsilonValues[h.epsilonIndex] += int64(duration.Seconds()*1000)
 }
 
 // --- timer: this just exists for testing

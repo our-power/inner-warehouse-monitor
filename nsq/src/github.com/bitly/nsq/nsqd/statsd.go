@@ -135,7 +135,7 @@ func (n *NSQd) statsdLoop() {
 				statsd.Gauge("mem.gc_pause_usec_99", int64(percentile(99.0, gcPauses, len(gcPauses))/1000))
 				statsd.Gauge("mem.gc_pause_usec_95", int64(percentile(95.0, gcPauses, len(gcPauses))/1000))
 				statsd.Gauge("mem.next_gc_bytes", int64(memStats.NextGC))
-				statsd.Incr("mem.gc_runs", int64(memStats.NumGC-lastMemStats.NumGC))
+				statsd.Incr("mem.gc_runs", int64(memStats.NumGC - lastMemStats.NumGC))
 
 				lastMemStats = memStats
 			}
@@ -149,7 +149,7 @@ exit:
 }
 
 func percentile(perc float64, arr []uint64, length int) uint64 {
-	indexOfPerc := int(math.Ceil(((perc / 100.0) * float64(length)) + 0.5))
+	indexOfPerc := int(math.Ceil(((perc/100.0)*float64(length)) + 0.5))
 	if indexOfPerc >= length {
 		indexOfPerc = length - 1
 	}

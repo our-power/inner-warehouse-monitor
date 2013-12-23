@@ -129,10 +129,10 @@ func Restart(l net.Listener) error {
 		os.NewFile(fd, string(v.FieldByName("sysfile").String())))
 
 	p, err := os.StartProcess(argv0, os.Args, &os.ProcAttr{
-		Dir:   wd,
-		Env:   append(os.Environ(), fmt.Sprintf("%s=%d", FDKey, fd)),
-		Files: allFiles,
-	})
+			Dir:   wd,
+			Env:   append(os.Environ(), fmt.Sprintf("%s=%d", FDKey, fd)),
+			Files: allFiles,
+		})
 	if nil != err {
 		return err
 	}

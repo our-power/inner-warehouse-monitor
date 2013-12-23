@@ -104,31 +104,32 @@ func (ph *PublishHandler) responder() {
 			}
 		}
 
-		requeueDelay := int(60 * time.Second * time.Duration(msg.Attempts) / time.Millisecond)
+		requeueDelay := int(60*time.Second*time.Duration(msg.Attempts)/time.Millisecond)
 		respChan <- &nsq.FinishedMessage{msg.Id, requeueDelay, success}
 
-		if *statusEvery > 0 {
-			duration := time.Now().Sub(startTime)
-			ph.reqs = append(ph.reqs, duration)
-		}
-
-		if *statusEvery > 0 && len(ph.reqs) >= *statusEvery {
-			var total time.Duration
-			for _, v := range ph.reqs {
-				total += v
-			}
-			avgMs := (total.Seconds() * 1000) / float64(len(ph.reqs))
-
-			sort.Sort(ph.reqs)
-			p95Ms := percentile(95.0, ph.reqs, len(ph.reqs)).Seconds() * 1000
-			p99Ms := percentile(99.0, ph.reqs, len(ph.reqs)).Seconds() * 1000
-
-			log.Printf("handler(%d): finished %d requests - 99th: %.02fms - 95th: %.02fms - avg: %.02fms",
-				ph.id, *statusEvery, p99Ms, p95Ms, avgMs)
-
-			ph.reqs = ph.reqs[:0]
-		}
+	if *statusEvery > 0 {
+		duration := time.Now().Sub(startTime)
+		ph.reqs = append(ph.reqs, duration)
 	}
+
+	if *statusEvery > 0 && len(ph.reqs) >= *statusEvery {
+		var total time.Duration
+		for _, v := range ph.reqs {
+			total += v
+		}
+		avgMs := (total.Seconds()*1000)/float64(len(ph.reqs))
+
+		sort.Sort(ph.reqs)
+		p95Ms := percentile(95.0, ph.reqs, len(ph.reqs)).Seconds()*1000
+		p99Ms := percentile(99.0, ph.reqs, len(ph.reqs)).Seconds()*1000
+
+		log.Printf("handler(%d): finished %d requests - 99th: %.02fms - 95th: %.02fms - avg: %.02fms",
+			ph.id, *statusEvery, p99Ms, p95Ms, avgMs)
+
+		ph.reqs = ph.reqs[:0]
+	}
+}
+
 }
 
 func (ph *PublishHandler) HandleMessage(m *nsq.Message, respChan chan *nsq.FinishedMessage) {
@@ -138,7 +139,7 @@ func (ph *PublishHandler) HandleMessage(m *nsq.Message, respChan chan *nsq.Finis
 
 	switch ph.mode {
 	case ModeRoundRobin:
-		idx := ph.counter % uint64(len(ph.addresses))
+		idx := ph.counter%uint64(len(ph.addresses))
 		writer := ph.writers[ph.addresses[idx]]
 		err = writer.PublishAsync(*destTopic, m.Body, ph.respChan, m, respChan, startTime)
 		ph.counter++
@@ -152,13 +153,14 @@ func (ph *PublishHandler) HandleMessage(m *nsq.Message, respChan chan *nsq.Finis
 	}
 
 	if err != nil {
-		requeueDelay := int(60 * time.Second * time.Duration(m.Attempts) / time.Millisecond)
+		requeueDelay := int(60*time.Second*time.Duration(m.Attempts)/time.Millisecond)
 		respChan <- &nsq.FinishedMessage{m.Id, requeueDelay, false}
-	}
+}
+
 }
 
 func percentile(perc float64, arr []time.Duration, length int) time.Duration {
-	indexOfPerc := int(math.Ceil(((perc / 100.0) * float64(length)) + 0.5))
+	indexOfPerc := int(math.Ceil(((perc/100.0)*float64(length)) + 0.5))
 	if indexOfPerc >= length {
 		indexOfPerc = length - 1
 	}
@@ -238,7 +240,7 @@ func main() {
 	writers := make(map[string]*nsq.Writer)
 	for _, addr := range destNsqdTCPAddrs {
 		writer := nsq.NewWriter(addr)
-		writer.HeartbeatInterval = nsq.DefaultClientTimeout / 2
+		writer.HeartbeatInterval = nsq.DefaultClientTimeout/2
 		writers[addr] = writer
 	}
 
@@ -248,7 +250,7 @@ func main() {
 			addresses: destNsqdTCPAddrs,
 			writers:   writers,
 			mode:      selectedMode,
-			reqs:      make(Durations, 0, *statusEvery),
+			reqs:      make(Durations,0, *statusEvery),
 			id:        i,
 			hostPool:  hostpool.New(destNsqdTCPAddrs),
 			respChan:  respChan,

@@ -27,7 +27,7 @@ const (
 type clientFlag uint32
 
 const (
-	clientLongPassword clientFlag = 1 << iota
+	clientLongPassword clientFlag = 1<<iota
 	clientFoundRows
 	clientLongFlag
 	clientConnectWithDB
@@ -113,7 +113,7 @@ const (
 type fieldFlag uint16
 
 const (
-	flagNotNULL fieldFlag = 1 << iota
+	flagNotNULL fieldFlag = 1<<iota
 	flagPriKey
 	flagUniqueKey
 	flagMultipleKey

@@ -287,7 +287,7 @@ func (d *DiskQueue) writeOne(data []byte) error {
 
 	if d.writeFile == nil {
 		curFileName := d.fileName(d.writeFileNum)
-		d.writeFile, err = os.OpenFile(curFileName, os.O_RDWR|os.O_CREATE, 0600)
+		d.writeFile, err = os.OpenFile(curFileName, os.O_RDWR | os.O_CREATE, 0600)
 		if err != nil {
 			return err
 		}
@@ -404,7 +404,7 @@ func (d *DiskQueue) persistMetaData() error {
 	tmpFileName := fileName + ".tmp"
 
 	// write to tmp file
-	f, err = os.OpenFile(tmpFileName, os.O_RDWR|os.O_CREATE, 0600)
+	f, err = os.OpenFile(tmpFileName, os.O_RDWR | os.O_CREATE, 0600)
 	if err != nil {
 		return err
 	}
@@ -564,8 +564,8 @@ func (d *DiskQueue) ioLoop() {
 		}
 
 		select {
-		// the Go channel spec dictates that nil channel operations (read or write)
-		// in a select are skipped, we set r to d.readChan only when there is data to read
+			// the Go channel spec dictates that nil channel operations (read or write)
+			// in a select are skipped, we set r to d.readChan only when there is data to read
 		case r <- dataRead:
 			d.moveForward()
 		case <-d.emptyChan:

@@ -59,7 +59,7 @@ func (s *Stream) insert(in *Element) {
 	if e != nil {
 		e.Count++
 	} else {
-		if len(s.mon) < s.k+1 {
+		if len(s.mon) < s.k + 1 {
 			e = &Element{in.Value, in.Count}
 			s.mon[in.Value] = e
 		} else {

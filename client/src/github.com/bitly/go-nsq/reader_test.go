@@ -118,7 +118,7 @@ func readerTest(t *testing.T, deflate bool, snappy bool, tlsv1 bool) {
 	// so that the test can simulate reaching max requeues and a call to LogFailedMessage
 	q.DefaultRequeueDelay = 0
 	// so that the test wont timeout from backing off
-	q.SetMaxBackoffDuration(time.Millisecond * 50)
+	q.SetMaxBackoffDuration(time.Millisecond*50)
 
 	if deflate {
 		q.Deflate = true

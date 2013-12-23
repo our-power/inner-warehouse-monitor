@@ -15,8 +15,8 @@ func Commafy(i interface{}) string {
 		n = int64(i.(int32))
 	}
 	if n > 1000 {
-		r := n % 1000
-		n = n / 1000
+		r := n%1000
+		n = n/1000
 		return fmt.Sprintf("%s,%03d", Commafy(n), r)
 	}
 	return fmt.Sprintf("%d", n)
@@ -27,7 +27,7 @@ func FloatToPercent(i float64) string {
 }
 
 func PercSuffix(i float64) string {
-	switch int(i*100) % 10 {
+	switch int(i*100)%10 {
 	case 1:
 		return "st"
 	case 2:

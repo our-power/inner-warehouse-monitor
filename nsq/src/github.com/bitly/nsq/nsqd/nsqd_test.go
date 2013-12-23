@@ -75,7 +75,7 @@ func TestStartup(t *testing.T) {
 	log.Printf("read %d msgs", iterations/2)
 	for i := 0; i < iterations/2; i++ {
 		msg := <-channel1.clientMsgChan
-		log.Printf("read message %d", i+1)
+		log.Printf("read message %d", i + 1)
 		assert.Equal(t, msg.Body, body)
 	}
 
@@ -83,7 +83,7 @@ func TestStartup(t *testing.T) {
 		if channel1.Depth() == int64(iterations/2) {
 			break
 		}
-		time.Sleep(50 * time.Millisecond)
+		time.Sleep(50*time.Millisecond)
 	}
 
 	// make sure metadata shows the topic
@@ -123,13 +123,13 @@ func TestStartup(t *testing.T) {
 		if channel1.Depth() == int64(iterations/2) {
 			break
 		}
-		time.Sleep(50 * time.Millisecond)
+		time.Sleep(50*time.Millisecond)
 	}
 
 	// read the other half of the messages
 	for i := 0; i < iterations/2; i++ {
 		msg := <-channel1.clientMsgChan
-		log.Printf("read message %d", i+1)
+		log.Printf("read message %d", i + 1)
 		assert.Equal(t, msg.Body, body)
 	}
 
@@ -175,7 +175,7 @@ func TestEphemeralChannel(t *testing.T) {
 	log.Printf("pulling from channel")
 	ephemeralChannel.RemoveClient(client.ID)
 
-	time.Sleep(50 * time.Millisecond)
+	time.Sleep(50*time.Millisecond)
 
 	assert.Equal(t, len(topic.channelMap), 0)
 	exitChan <- 1

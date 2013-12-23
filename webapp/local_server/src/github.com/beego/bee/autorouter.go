@@ -63,7 +63,7 @@ func getControllerInfo(path string) (map[string][]string, error) {
 		return nil, err
 	}
 
-	files := make([]*source, 0, len(fis))
+	files := make([]*source,0, len(fis))
 	for _, fi := range fis {
 		// Only load go files.
 		if strings.HasSuffix(fi.Name(), ".go") {
@@ -80,9 +80,9 @@ func getControllerInfo(path string) (map[string][]string, error) {
 
 			f.Close()
 			files = append(files, &source{
-				name: path + "/" + fi.Name(),
-				data: p,
-			})
+					name: path + "/" + fi.Name(),
+					data: p,
+				})
 		}
 	}
 
@@ -112,12 +112,12 @@ type source struct {
 	data []byte
 }
 
-func (s *source) Name() string       { return s.name }
-func (s *source) Size() int64        { return int64(len(s.data)) }
-func (s *source) Mode() os.FileMode  { return 0 }
+func (s *source) Name() string { return s.name }
+func (s *source) Size() int64 { return int64(len(s.data)) }
+func (s *source) Mode() os.FileMode { return 0 }
 func (s *source) ModTime() time.Time { return time.Time{} }
-func (s *source) IsDir() bool        { return false }
-func (s *source) Sys() interface{}   { return nil }
+func (s *source) IsDir() bool { return false }
+func (s *source) Sys() interface{} { return nil }
 
 // A routerWalker holds the state used when building the documentation.
 type routerWalker struct {
@@ -211,8 +211,8 @@ func (w *routerWalker) funcs(fdocs []*doc.Func) []*Func {
 	var result []*Func
 	for _, d := range fdocs {
 		result = append(result, &Func{
-			Name: d.Name,
-		})
+				Name: d.Name,
+			})
 	}
 	return result
 }
@@ -221,10 +221,10 @@ func (w *routerWalker) types(tdocs []*doc.Type) []*Type {
 	var result []*Type
 	for _, d := range tdocs {
 		result = append(result, &Type{
-			Decl:    w.printDecl(d.Decl),
-			Name:    d.Name,
-			Methods: w.funcs(d.Methods),
-		})
+				Decl:    w.printDecl(d.Decl),
+				Name:    d.Name,
+				Methods: w.funcs(d.Methods),
+			})
 	}
 	return result
 }
@@ -239,7 +239,7 @@ func (w *routerWalker) readDir(dir string) ([]os.FileInfo, error) {
 	if dir != w.pdoc.ImportPath {
 		panic("unexpected")
 	}
-	fis := make([]os.FileInfo, 0, len(w.srcs))
+	fis := make([]os.FileInfo,0, len(w.srcs))
 	for _, src := range w.srcs {
 		fis = append(fis, src)
 	}
@@ -247,8 +247,8 @@ func (w *routerWalker) readDir(dir string) ([]os.FileInfo, error) {
 }
 
 func (w *routerWalker) openFile(path string) (io.ReadCloser, error) {
-	if strings.HasPrefix(path, w.pdoc.ImportPath+"/") {
-		if src, ok := w.srcs[path[len(w.pdoc.ImportPath)+1:]]; ok {
+	if strings.HasPrefix(path, w.pdoc.ImportPath + "/") {
+		if src, ok := w.srcs[path[len(w.pdoc.ImportPath) + 1:]]; ok {
 			return ioutil.NopCloser(bytes.NewReader(src.data)), nil
 		}
 	}
@@ -260,7 +260,7 @@ func simpleImporter(imports map[string]*ast.Object, path string) (*ast.Object, e
 	if pkg == nil {
 		// Guess the package name without importing it. Start with the last
 		// element of the path.
-		name := path[strings.LastIndex(path, "/")+1:]
+		name := path[strings.LastIndex(path, "/") + 1:]
 
 		// Trim commonly used prefixes and suffixes containing illegal name
 		// runes.

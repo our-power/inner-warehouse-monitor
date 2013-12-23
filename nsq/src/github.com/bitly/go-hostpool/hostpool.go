@@ -59,18 +59,22 @@ type standardHostPool struct {
 // ------ constants -------------------
 
 const epsilonBuckets = 120
-const epsilonDecay = 0.90 // decay the exploration rate
-const minEpsilon = 0.01   // explore one percent of the time
+const epsilonDecay = 0.90
+
+// decay the exploration rate
+const minEpsilon = 0.01
+
+// explore one percent of the time
 const initialEpsilon = 0.3
-const defaultDecayDuration = time.Duration(5) * time.Minute
+const defaultDecayDuration = time.Duration(5)*time.Minute
 
 // Construct a basic HostPool using the hostnames provided
 func New(hosts []string) HostPool {
 	p := &standardHostPool{
 		hosts:             make(map[string]*hostEntry, len(hosts)),
 		hostList:          make([]*hostEntry, len(hosts)),
-		initialRetryDelay: time.Duration(30) * time.Second,
-		maxRetryInterval:  time.Duration(900) * time.Second,
+		initialRetryDelay: time.Duration(30)*time.Second,
+		maxRetryInterval:  time.Duration(900)*time.Second,
 	}
 
 	for i, h := range hosts {
@@ -120,7 +124,7 @@ func (p *standardHostPool) getRoundRobin() string {
 	hostCount := len(p.hostList)
 	for i := range p.hostList {
 		// iterate via sequenece from where we last iterated
-		currentIndex := (i + p.nextHostIndex) % hostCount
+		currentIndex := (i + p.nextHostIndex)%hostCount
 
 		h := p.hostList[currentIndex]
 		if !h.dead {

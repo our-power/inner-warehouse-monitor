@@ -139,7 +139,7 @@ func (this *FileCache) Put(key string, val interface{}, timeout int64) error {
 	var item FileCacheItem
 	item.Data = val
 	if timeout == FileCacheEmbedExpiry {
-		item.Expired = time.Now().Unix() + (86400 * 365 * 10) //10年
+		item.Expired = time.Now().Unix() + (86400*365*10) //10年
 	} else {
 		item.Expired = time.Now().Unix() + timeout
 	}
@@ -177,7 +177,7 @@ func (this *FileCache) Incr(key string) error {
 func (this *FileCache) Decr(key string) error {
 	data := this.Get(key)
 	var decr int
-	if reflect.TypeOf(data).Name() != "int" || data.(int)-1 <= 0 {
+	if reflect.TypeOf(data).Name() != "int" || data.(int) - 1 <= 0 {
 		decr = 0
 	} else {
 		decr = data.(int) - 1
@@ -210,7 +210,7 @@ func exists(path string) (bool, error) {
 }
 
 func File_get_contents(filename string) ([]byte, error) { //文件不存在时自动创建
-	f, err := os.OpenFile(filename, os.O_RDWR|os.O_CREATE, os.ModePerm)
+	f, err := os.OpenFile(filename, os.O_RDWR | os.O_CREATE, os.ModePerm)
 	if err != nil {
 		return []byte(""), err
 	}
@@ -228,7 +228,7 @@ func File_get_contents(filename string) ([]byte, error) { //文件不存在时�
 }
 
 func File_put_contents(filename string, content []byte) error {
-	fp, err := os.OpenFile(filename, os.O_RDWR|os.O_CREATE, os.ModePerm)
+	fp, err := os.OpenFile(filename, os.O_RDWR | os.O_CREATE, os.ModePerm)
 	if err != nil {
 		return err
 	}

@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	filepder      = &FileProvider{}
+	filepder = &FileProvider{}
 	gcmaxlifetime int64
 )
 
@@ -111,7 +111,7 @@ func (fp *FileProvider) SessionRead(sid string) (SessionStore, error) {
 		}
 	}
 	f.Close()
-	f, err = os.OpenFile(path.Join(fp.savePath, string(sid[0]), string(sid[1]), sid), os.O_WRONLY|os.O_CREATE, 0777)
+	f, err = os.OpenFile(path.Join(fp.savePath, string(sid[0]), string(sid[1]), sid), os.O_WRONLY | os.O_CREATE, 0777)
 	ss := &FileSessionStore{f: f, sid: sid, values: kv}
 	return ss, nil
 }
@@ -138,8 +138,8 @@ func (fp *FileProvider) SessionGC() {
 func (fp *FileProvider) SessionAll() int {
 	a := &activeSession{}
 	err := filepath.Walk(fp.savePath, func(path string, f os.FileInfo, err error) error {
-		return a.visit(path, f, err)
-	})
+			return a.visit(path, f, err)
+		})
 	if err != nil {
 		fmt.Printf("filepath.Walk() returned %v\n", err)
 		return 0
@@ -191,7 +191,7 @@ func (fp *FileProvider) SessionRegenerate(oldsid, sid string) (SessionStore, err
 		}
 	}
 
-	newf, err = os.OpenFile(path.Join(fp.savePath, string(sid[0]), string(sid[1]), sid), os.O_WRONLY|os.O_CREATE, 0777)
+	newf, err = os.OpenFile(path.Join(fp.savePath, string(sid[0]), string(sid[1]), sid), os.O_WRONLY | os.O_CREATE, 0777)
 	ss := &FileSessionStore{f: newf, sid: sid, values: kv}
 	return ss, nil
 }

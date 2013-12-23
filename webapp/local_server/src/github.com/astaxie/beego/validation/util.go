@@ -19,15 +19,15 @@ var (
 
 	// doesn't belong to validation functions
 	unFuncs = map[string]bool{
-		"Clear":     true,
-		"HasErrors": true,
-		"ErrorMap":  true,
-		"Error":     true,
-		"apply":     true,
-		"Check":     true,
-		"Valid":     true,
-		"NoMatch":   true,
-	}
+	"Clear":     true,
+	"HasErrors": true,
+	"ErrorMap":  true,
+	"Error":     true,
+	"apply":     true,
+	"Check":     true,
+	"Valid":     true,
+	"NoMatch":   true,
+}
 )
 
 func init() {
@@ -116,12 +116,12 @@ func getRegFuncs(tag, key string) (vfs []ValidFunc, str string, err error) {
 		err = fmt.Errorf("invalid Match function")
 		return
 	}
-	reg, err := regexp.Compile(tag[index+len("Match(/") : end])
+	reg, err := regexp.Compile(tag[index + len("Match(/") : end])
 	if err != nil {
 		return
 	}
 	vfs = []ValidFunc{ValidFunc{"Match", []interface{}{reg, key + ".Match"}}}
-	str = strings.TrimSpace(tag[:index]) + strings.TrimSpace(tag[end+len("/)"):])
+	str = strings.TrimSpace(tag[:index]) + strings.TrimSpace(tag[end + len("/)"):])
 	return
 }
 
@@ -160,14 +160,14 @@ func parseFunc(vfunc, key string) (v ValidFunc, err error) {
 		return
 	}
 
-	params := strings.Split(vfunc[start+1:end], ",")
+	params := strings.Split(vfunc[start + 1:end], ",")
 	// the num of param must be equal
 	if num != len(params) {
 		err = fmt.Errorf("%s require %d parameters", name, num)
 		return
 	}
 
-	tParams, err := trim(name, key+"."+name, params)
+	tParams, err := trim(name, key + "." + name, params)
 	if err != nil {
 		return
 	}
@@ -187,7 +187,7 @@ func numIn(name string) (num int, err error) {
 }
 
 func trim(name, key string, s []string) (ts []interface{}, err error) {
-	ts = make([]interface{}, len(s), len(s)+1)
+	ts = make([]interface{},len(s), len(s) + 1)
 	fn, ok := funcs[name]
 	if !ok {
 		err = fmt.Errorf("doesn't exsits %s valid function", name)
@@ -196,7 +196,7 @@ func trim(name, key string, s []string) (ts []interface{}, err error) {
 	for i := 0; i < len(s); i++ {
 		var param interface{}
 		// skip *Validation and obj params
-		if param, err = magic(fn.Type().In(i+2), strings.TrimSpace(s[i])); err != nil {
+		if param, err = magic(fn.Type().In(i + 2), strings.TrimSpace(s[i])); err != nil {
 			return
 		}
 		ts[i] = param

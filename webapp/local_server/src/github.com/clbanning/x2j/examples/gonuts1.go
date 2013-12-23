@@ -1,6 +1,6 @@
 // https://groups.google.com/forum/#!searchin/golang-nuts/idnet$20netid/golang-nuts/guM3ZHHqSF0/K1pBpMqQSSwJ
 // http://play.golang.org/p/BFFDxphKYK
- 
+
 package main
 
 import (
@@ -32,28 +32,28 @@ var doc2 = `
 `
 
 func main() {
-	var docs = []string{doc1,doc2}
+	var docs = []string{doc1, doc2}
 
-	for n,doc := range docs {
-		fmt.Println("\nTestValuesFromTagPath2(), iteration:",n,"\n",doc)
+	for n, doc := range docs {
+		fmt.Println("\nTestValuesFromTagPath2(), iteration:", n, "\n", doc)
 
-		m,_ := x2j.DocToMap(doc)
-		fmt.Println("map:",x2j.WriteMap(m))
+		m, _ := x2j.DocToMap(doc)
+		fmt.Println("map:", x2j.WriteMap(m))
 
-		v,_ := x2j.ValuesFromTagPath(doc,"data.*")
-		fmt.Println("\npath == data.*: len(v):",len(v))
-		for key,val := range v {
-			fmt.Println(key,":",val)
+		v, _ := x2j.ValuesFromTagPath(doc, "data.*")
+		fmt.Println("\npath == data.*: len(v):", len(v))
+		for key, val := range v {
+			fmt.Println(key, ":", val)
 		}
 		mm := v[0]
-		for key,val := range mm.(map[string]interface{}) {
-			fmt.Println(key,":",val)
+		for key, val := range mm.(map[string]interface{}) {
+			fmt.Println(key, ":", val)
 		}
 
-		v,_ = x2j.ValuesFromTagPath(doc,"data.*.*")
-		fmt.Println("\npath == data.*.*: len(v):",len(v))
-		for key,val := range v {
-			fmt.Println(key,":",val)
+		v, _ = x2j.ValuesFromTagPath(doc, "data.*.*")
+		fmt.Println("\npath == data.*.*: len(v):", len(v))
+		for key, val := range v {
+			fmt.Println(key, ":", val)
 		}
 	}
 }

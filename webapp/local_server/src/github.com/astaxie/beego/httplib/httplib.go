@@ -22,7 +22,7 @@ func Get(url string) *BeegoHttpRequest {
 	req.Method = "GET"
 	req.Header = http.Header{}
 	req.Header.Set("User-Agent", defaultUserAgent)
-	return &BeegoHttpRequest{url, &req, map[string]string{}, false, 60 * time.Second, 60 * time.Second}
+	return &BeegoHttpRequest{url, &req, map[string]string{}, false, 60*time.Second, 60*time.Second}
 }
 
 func Post(url string) *BeegoHttpRequest {
@@ -30,7 +30,7 @@ func Post(url string) *BeegoHttpRequest {
 	req.Method = "POST"
 	req.Header = http.Header{}
 	req.Header.Set("User-Agent", defaultUserAgent)
-	return &BeegoHttpRequest{url, &req, map[string]string{}, false, 60 * time.Second, 60 * time.Second}
+	return &BeegoHttpRequest{url, &req, map[string]string{}, false, 60*time.Second, 60*time.Second}
 }
 
 func Put(url string) *BeegoHttpRequest {
@@ -38,7 +38,7 @@ func Put(url string) *BeegoHttpRequest {
 	req.Method = "PUT"
 	req.Header = http.Header{}
 	req.Header.Set("User-Agent", defaultUserAgent)
-	return &BeegoHttpRequest{url, &req, map[string]string{}, false, 60 * time.Second, 60 * time.Second}
+	return &BeegoHttpRequest{url, &req, map[string]string{}, false, 60*time.Second, 60*time.Second}
 }
 
 func Delete(url string) *BeegoHttpRequest {
@@ -46,7 +46,7 @@ func Delete(url string) *BeegoHttpRequest {
 	req.Method = "DELETE"
 	req.Header = http.Header{}
 	req.Header.Set("User-Agent", defaultUserAgent)
-	return &BeegoHttpRequest{url, &req, map[string]string{}, false, 60 * time.Second, 60 * time.Second}
+	return &BeegoHttpRequest{url, &req, map[string]string{}, false, 60*time.Second, 60*time.Second}
 }
 
 func Head(url string) *BeegoHttpRequest {
@@ -54,7 +54,7 @@ func Head(url string) *BeegoHttpRequest {
 	req.Method = "HEAD"
 	req.Header = http.Header{}
 	req.Header.Set("User-Agent", defaultUserAgent)
-	return &BeegoHttpRequest{url, &req, map[string]string{}, false, 60 * time.Second, 60 * time.Second}
+	return &BeegoHttpRequest{url, &req, map[string]string{}, false, 60*time.Second, 60*time.Second}
 }
 
 type BeegoHttpRequest struct {
@@ -112,7 +112,7 @@ func (b *BeegoHttpRequest) getResponse() (*http.Response, error) {
 			buf.WriteByte('&')
 		}
 		paramBody = buf.String()
-		paramBody = paramBody[0 : len(paramBody)-1]
+		paramBody = paramBody[0 : len(paramBody) - 1]
 	}
 	if b.req.Method == "GET" && len(paramBody) > 0 {
 		if strings.Index(b.url, "?") != -1 {
@@ -230,7 +230,7 @@ func (b *BeegoHttpRequest) Response() (*http.Response, error) {
 	return b.getResponse()
 }
 
-func TimeoutDialer(cTimeout time.Duration, rwTimeout time.Duration) func(net, addr string) (c net.Conn, err error) {
+func TimeoutDialer(cTimeout time.Duration, rwTimeout time.Duration) func (net, addr string) (c net.Conn, err error) {
 	return func(netw, addr string) (net.Conn, error) {
 		conn, err := net.DialTimeout(netw, addr, cTimeout)
 		if err != nil {

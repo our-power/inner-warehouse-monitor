@@ -58,17 +58,17 @@ func (e *FileEvent) IsCreate() bool { return (e.mask & sys_FS_CREATE) == sys_FS_
 
 // IsDelete reports whether the FileEvent was triggerd by a delete
 func (e *FileEvent) IsDelete() bool {
-	return ((e.mask&sys_FS_DELETE) == sys_FS_DELETE || (e.mask&sys_FS_DELETE_SELF) == sys_FS_DELETE_SELF)
+	return ((e.mask & sys_FS_DELETE) == sys_FS_DELETE || (e.mask & sys_FS_DELETE_SELF) == sys_FS_DELETE_SELF)
 }
 
 // IsModify reports whether the FileEvent was triggerd by a file modification or attribute change
 func (e *FileEvent) IsModify() bool {
-	return ((e.mask&sys_FS_MODIFY) == sys_FS_MODIFY || (e.mask&sys_FS_ATTRIB) == sys_FS_ATTRIB)
+	return ((e.mask & sys_FS_MODIFY) == sys_FS_MODIFY || (e.mask & sys_FS_ATTRIB) == sys_FS_ATTRIB)
 }
 
 // IsRename reports whether the FileEvent was triggerd by a change name
 func (e *FileEvent) IsRename() bool {
-	return ((e.mask&sys_FS_MOVE) == sys_FS_MOVE || (e.mask&sys_FS_MOVE_SELF) == sys_FS_MOVE_SELF || (e.mask&sys_FS_MOVED_FROM) == sys_FS_MOVED_FROM || (e.mask&sys_FS_MOVED_TO) == sys_FS_MOVED_TO)
+	return ((e.mask & sys_FS_MOVE) == sys_FS_MOVE || (e.mask & sys_FS_MOVE_SELF) == sys_FS_MOVE_SELF || (e.mask & sys_FS_MOVED_FROM) == sys_FS_MOVED_FROM || (e.mask & sys_FS_MOVED_TO) == sys_FS_MOVED_TO)
 }
 
 const (
@@ -77,7 +77,7 @@ const (
 )
 
 const (
-	provisional uint64 = 1 << (32 + iota)
+	provisional uint64 = 1<<(32 + iota)
 )
 
 type input struct {
@@ -119,7 +119,7 @@ type Watcher struct {
 	Event         chan *FileEvent   // Events are returned on this channel
 	Error         chan error        // Errors are sent on this channel
 	isClosed      bool              // Set to true when Close() is first called
-	quit          chan chan<- error
+	quit          chan chan <- error
 	cookie        uint32
 }
 
@@ -137,7 +137,7 @@ func NewWatcher() (*Watcher, error) {
 		Event:         make(chan *FileEvent, 50),
 		internalEvent: make(chan *FileEvent),
 		Error:         make(chan error),
-		quit:          make(chan chan<- error, 1),
+		quit:          make(chan chan <- error, 1),
 	}
 	go w.readEvents()
 	go w.purgeEvents()
@@ -212,7 +212,7 @@ func getDir(pathname string) (dir string, err error) {
 	if e != nil {
 		return "", os.NewSyscallError("GetFileAttributes", e)
 	}
-	if attr&syscall.FILE_ATTRIBUTE_DIRECTORY != 0 {
+	if attr & syscall.FILE_ATTRIBUTE_DIRECTORY != 0 {
 		dir = pathname
 	} else {
 		dir, _ = filepath.Split(pathname)
@@ -224,9 +224,9 @@ func getDir(pathname string) (dir string, err error) {
 func getIno(path string) (ino *inode, err error) {
 	h, e := syscall.CreateFile(syscall.StringToUTF16Ptr(path),
 		syscall.FILE_LIST_DIRECTORY,
-		syscall.FILE_SHARE_READ|syscall.FILE_SHARE_WRITE|syscall.FILE_SHARE_DELETE,
+				syscall.FILE_SHARE_READ | syscall.FILE_SHARE_WRITE | syscall.FILE_SHARE_DELETE,
 		nil, syscall.OPEN_EXISTING,
-		syscall.FILE_FLAG_BACKUP_SEMANTICS|syscall.FILE_FLAG_OVERLAPPED, 0)
+			syscall.FILE_FLAG_BACKUP_SEMANTICS | syscall.FILE_FLAG_OVERLAPPED, 0)
 	if e != nil {
 		return nil, os.NewSyscallError("CreateFile", e)
 	}
@@ -267,7 +267,7 @@ func (w *Watcher) addWatch(pathname string, flags uint64) error {
 	if err != nil {
 		return err
 	}
-	if flags&sys_FS_ONLYDIR != 0 && pathname != dir {
+	if flags & sys_FS_ONLYDIR != 0 && pathname != dir {
 		return nil
 	}
 	ino, err := getIno(dir)
@@ -327,11 +327,11 @@ func (w *Watcher) remWatch(pathname string) error {
 		return fmt.Errorf("can't remove non-existent watch for: %s", pathname)
 	}
 	if pathname == dir {
-		w.sendEvent(watch.path, watch.mask&sys_FS_IGNORED)
+		w.sendEvent(watch.path, watch.mask & sys_FS_IGNORED)
 		watch.mask = 0
 	} else {
 		name := filepath.Base(pathname)
-		w.sendEvent(watch.path+"\\"+name, watch.names[name]&sys_FS_IGNORED)
+		w.sendEvent(watch.path + "\\" + name, watch.names[name] & sys_FS_IGNORED)
 		delete(watch.names, name)
 	}
 	return w.startRead(watch)
@@ -340,14 +340,14 @@ func (w *Watcher) remWatch(pathname string) error {
 // Must run within the I/O thread.
 func (w *Watcher) deleteWatch(watch *watch) {
 	for name, mask := range watch.names {
-		if mask&provisional == 0 {
-			w.sendEvent(watch.path+"\\"+name, mask&sys_FS_IGNORED)
+		if mask & provisional == 0 {
+			w.sendEvent(watch.path + "\\" + name, mask & sys_FS_IGNORED)
 		}
 		delete(watch.names, name)
 	}
 	if watch.mask != 0 {
-		if watch.mask&provisional == 0 {
-			w.sendEvent(watch.path, watch.mask&sys_FS_IGNORED)
+		if watch.mask & provisional == 0 {
+			w.sendEvent(watch.path, watch.mask & sys_FS_IGNORED)
 		}
 		watch.mask = 0
 	}
@@ -376,10 +376,10 @@ func (w *Watcher) startRead(watch *watch) error {
 		uint32(unsafe.Sizeof(watch.buf)), false, mask, nil, &watch.ov, 0)
 	if e != nil {
 		err := os.NewSyscallError("ReadDirectoryChanges", e)
-		if e == syscall.ERROR_ACCESS_DENIED && watch.mask&provisional == 0 {
+		if e == syscall.ERROR_ACCESS_DENIED && watch.mask & provisional == 0 {
 			// Watched directory was probably removed
-			if w.sendEvent(watch.path, watch.mask&sys_FS_DELETE_SELF) {
-				if watch.mask&sys_FS_ONESHOT != 0 {
+			if w.sendEvent(watch.path, watch.mask & sys_FS_DELETE_SELF) {
+				if watch.mask & sys_FS_ONESHOT != 0 {
 					watch.mask = 0
 				}
 			}
@@ -453,7 +453,7 @@ func (w *Watcher) readEvents() {
 			}
 		case syscall.ERROR_ACCESS_DENIED:
 			// Watched directory was probably removed
-			w.sendEvent(watch.path, watch.mask&sys_FS_DELETE_SELF)
+			w.sendEvent(watch.path, watch.mask & sys_FS_DELETE_SELF)
 			w.deleteWatch(watch)
 			w.startRead(watch)
 			continue
@@ -497,8 +497,8 @@ func (w *Watcher) readEvents() {
 			}
 
 			sendNameEvent := func() {
-				if w.sendEvent(fullname, watch.names[name]&mask) {
-					if watch.names[name]&sys_FS_ONESHOT != 0 {
+				if w.sendEvent(fullname, watch.names[name] & mask) {
+					if watch.names[name] & sys_FS_ONESHOT != 0 {
 						delete(watch.names, name)
 					}
 				}
@@ -507,11 +507,11 @@ func (w *Watcher) readEvents() {
 				sendNameEvent()
 			}
 			if raw.Action == syscall.FILE_ACTION_REMOVED {
-				w.sendEvent(fullname, watch.names[name]&sys_FS_IGNORED)
+				w.sendEvent(fullname, watch.names[name] & sys_FS_IGNORED)
 				delete(watch.names, name)
 			}
-			if w.sendEvent(fullname, watch.mask&toFSnotifyFlags(raw.Action)) {
-				if watch.mask&sys_FS_ONESHOT != 0 {
+			if w.sendEvent(fullname, watch.mask & toFSnotifyFlags(raw.Action)) {
+				if watch.mask & sys_FS_ONESHOT != 0 {
 					watch.mask = 0
 				}
 			}
@@ -544,8 +544,8 @@ func (w *Watcher) sendEvent(name string, mask uint64) bool {
 		return false
 	}
 	event := &FileEvent{mask: uint32(mask), Name: name}
-	if mask&sys_FS_MOVE != 0 {
-		if mask&sys_FS_MOVED_FROM != 0 {
+	if mask & sys_FS_MOVE != 0 {
+		if mask & sys_FS_MOVED_FROM != 0 {
 			w.cookie++
 		}
 		event.cookie = w.cookie
@@ -560,16 +560,16 @@ func (w *Watcher) sendEvent(name string, mask uint64) bool {
 
 func toWindowsFlags(mask uint64) uint32 {
 	var m uint32
-	if mask&sys_FS_ACCESS != 0 {
+	if mask & sys_FS_ACCESS != 0 {
 		m |= syscall.FILE_NOTIFY_CHANGE_LAST_ACCESS
 	}
-	if mask&sys_FS_MODIFY != 0 {
+	if mask & sys_FS_MODIFY != 0 {
 		m |= syscall.FILE_NOTIFY_CHANGE_LAST_WRITE
 	}
-	if mask&sys_FS_ATTRIB != 0 {
+	if mask & sys_FS_ATTRIB != 0 {
 		m |= syscall.FILE_NOTIFY_CHANGE_ATTRIBUTES
 	}
-	if mask&(sys_FS_MOVE|sys_FS_CREATE|sys_FS_DELETE) != 0 {
+	if mask & (sys_FS_MOVE | sys_FS_CREATE | sys_FS_DELETE) != 0 {
 		m |= syscall.FILE_NOTIFY_CHANGE_FILE_NAME | syscall.FILE_NOTIFY_CHANGE_DIR_NAME
 	}
 	return m

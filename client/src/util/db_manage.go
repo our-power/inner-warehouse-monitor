@@ -11,7 +11,7 @@ import (
 )
 
 type DbLink struct {
-	Today string
+	Today    string
 	Changing bool
 	Links map[string]*sql.DB
 }
@@ -53,7 +53,7 @@ func (link *DbLink) GetLink(date string, hardware_addr string, indicator string)
 		}
 		createTable(indicator, newLink)
 		go func() {
-			c := time.Tick(5 * time.Minute)
+			c := time.Tick(5*time.Minute)
 			for _ = range c {
 				for k, v := range link.Links {
 					// 如果缓存中有非Today的日期，表示已经过期，可以执行延时关闭

@@ -24,19 +24,19 @@ func (w *Watcher) purgeEvents() {
 		fsnFlags := w.fsnFlags[ev.Name]
 		w.fsnmut.Unlock()
 
-		if (fsnFlags&FSN_CREATE == FSN_CREATE) && ev.IsCreate() {
+		if (fsnFlags & FSN_CREATE == FSN_CREATE) && ev.IsCreate() {
 			sendEvent = true
 		}
 
-		if (fsnFlags&FSN_MODIFY == FSN_MODIFY) && ev.IsModify() {
+		if (fsnFlags & FSN_MODIFY == FSN_MODIFY) && ev.IsModify() {
 			sendEvent = true
 		}
 
-		if (fsnFlags&FSN_DELETE == FSN_DELETE) && ev.IsDelete() {
+		if (fsnFlags & FSN_DELETE == FSN_DELETE) && ev.IsDelete() {
 			sendEvent = true
 		}
 
-		if (fsnFlags&FSN_RENAME == FSN_RENAME) && ev.IsRename() {
+		if (fsnFlags & FSN_RENAME == FSN_RENAME) && ev.IsRename() {
 			sendEvent = true
 		}
 

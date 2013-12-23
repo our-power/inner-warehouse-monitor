@@ -13,7 +13,7 @@ func TestRegistrationDB(t *testing.T) {
 	log.SetOutput(ioutil.Discard)
 	defer log.SetOutput(os.Stdout)
 
-	sec30 := 30 * time.Second
+	sec30 := 30*time.Second
 	beginningOfTime := time.Unix(1348797047, 0)
 	pi1 := &PeerInfo{"1", "remote_addr:1", "addr", "host", "b_addr", 1, 2, "v1", beginningOfTime}
 	pi2 := &PeerInfo{"2", "remote_addr:2", "addr", "host", "b_addr", 2, 3, "v1", beginningOfTime}
@@ -55,13 +55,13 @@ func TestRegistrationDB(t *testing.T) {
 	assert.Equal(t, len(p.FilterByActive(sec30, sec30)), 1)
 
 	// tombstoning
-	fewSecAgo := time.Now().Add(-5 * time.Second)
+	fewSecAgo := time.Now().Add(-5*time.Second)
 	p1.peerInfo.lastUpdate = fewSecAgo
 	p2.peerInfo.lastUpdate = fewSecAgo
 	assert.Equal(t, len(p.FilterByActive(sec30, sec30)), 2)
 	p1.Tombstone()
 	assert.Equal(t, len(p.FilterByActive(sec30, sec30)), 1)
-	time.Sleep(10 * time.Millisecond)
+	time.Sleep(10*time.Millisecond)
 	assert.Equal(t, len(p.FilterByActive(sec30, 5*time.Millisecond)), 2)
 	// make sure we can still retrieve p1 from another registration see #148
 	assert.Equal(t, len(db.FindProducers("t", "*", "").FilterByActive(sec30, sec30)), 1)

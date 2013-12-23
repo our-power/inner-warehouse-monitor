@@ -187,7 +187,7 @@ func downloadTestdata(basename string) (errRet error) {
 	}()
 	resp, err := http.Get(baseURL + basename)
 	if err != nil {
-		return fmt.Errorf("failed to download %s: %s", baseURL+basename, err)
+		return fmt.Errorf("failed to download %s: %s", baseURL + basename, err)
 	}
 	defer resp.Body.Close()
 	_, err = io.Copy(f, resp.Body)
@@ -223,16 +223,16 @@ func benchFile(b *testing.B, n int, decode bool) {
 }
 
 // Naming convention is kept similar to what snappy's C++ implementation uses.
-func Benchmark_UFlat0(b *testing.B)  { benchFile(b, 0, true) }
-func Benchmark_UFlat1(b *testing.B)  { benchFile(b, 1, true) }
-func Benchmark_UFlat2(b *testing.B)  { benchFile(b, 2, true) }
-func Benchmark_UFlat3(b *testing.B)  { benchFile(b, 3, true) }
-func Benchmark_UFlat4(b *testing.B)  { benchFile(b, 4, true) }
-func Benchmark_UFlat5(b *testing.B)  { benchFile(b, 5, true) }
-func Benchmark_UFlat6(b *testing.B)  { benchFile(b, 6, true) }
-func Benchmark_UFlat7(b *testing.B)  { benchFile(b, 7, true) }
-func Benchmark_UFlat8(b *testing.B)  { benchFile(b, 8, true) }
-func Benchmark_UFlat9(b *testing.B)  { benchFile(b, 9, true) }
+func Benchmark_UFlat0(b *testing.B) { benchFile(b, 0, true) }
+func Benchmark_UFlat1(b *testing.B) { benchFile(b, 1, true) }
+func Benchmark_UFlat2(b *testing.B) { benchFile(b, 2, true) }
+func Benchmark_UFlat3(b *testing.B) { benchFile(b, 3, true) }
+func Benchmark_UFlat4(b *testing.B) { benchFile(b, 4, true) }
+func Benchmark_UFlat5(b *testing.B) { benchFile(b, 5, true) }
+func Benchmark_UFlat6(b *testing.B) { benchFile(b, 6, true) }
+func Benchmark_UFlat7(b *testing.B) { benchFile(b, 7, true) }
+func Benchmark_UFlat8(b *testing.B) { benchFile(b, 8, true) }
+func Benchmark_UFlat9(b *testing.B) { benchFile(b, 9, true) }
 func Benchmark_UFlat10(b *testing.B) { benchFile(b, 10, true) }
 func Benchmark_UFlat11(b *testing.B) { benchFile(b, 11, true) }
 func Benchmark_UFlat12(b *testing.B) { benchFile(b, 12, true) }
@@ -241,16 +241,16 @@ func Benchmark_UFlat14(b *testing.B) { benchFile(b, 14, true) }
 func Benchmark_UFlat15(b *testing.B) { benchFile(b, 15, true) }
 func Benchmark_UFlat16(b *testing.B) { benchFile(b, 16, true) }
 func Benchmark_UFlat17(b *testing.B) { benchFile(b, 17, true) }
-func Benchmark_ZFlat0(b *testing.B)  { benchFile(b, 0, false) }
-func Benchmark_ZFlat1(b *testing.B)  { benchFile(b, 1, false) }
-func Benchmark_ZFlat2(b *testing.B)  { benchFile(b, 2, false) }
-func Benchmark_ZFlat3(b *testing.B)  { benchFile(b, 3, false) }
-func Benchmark_ZFlat4(b *testing.B)  { benchFile(b, 4, false) }
-func Benchmark_ZFlat5(b *testing.B)  { benchFile(b, 5, false) }
-func Benchmark_ZFlat6(b *testing.B)  { benchFile(b, 6, false) }
-func Benchmark_ZFlat7(b *testing.B)  { benchFile(b, 7, false) }
-func Benchmark_ZFlat8(b *testing.B)  { benchFile(b, 8, false) }
-func Benchmark_ZFlat9(b *testing.B)  { benchFile(b, 9, false) }
+func Benchmark_ZFlat0(b *testing.B) { benchFile(b, 0, false) }
+func Benchmark_ZFlat1(b *testing.B) { benchFile(b, 1, false) }
+func Benchmark_ZFlat2(b *testing.B) { benchFile(b, 2, false) }
+func Benchmark_ZFlat3(b *testing.B) { benchFile(b, 3, false) }
+func Benchmark_ZFlat4(b *testing.B) { benchFile(b, 4, false) }
+func Benchmark_ZFlat5(b *testing.B) { benchFile(b, 5, false) }
+func Benchmark_ZFlat6(b *testing.B) { benchFile(b, 6, false) }
+func Benchmark_ZFlat7(b *testing.B) { benchFile(b, 7, false) }
+func Benchmark_ZFlat8(b *testing.B) { benchFile(b, 8, false) }
+func Benchmark_ZFlat9(b *testing.B) { benchFile(b, 9, false) }
 func Benchmark_ZFlat10(b *testing.B) { benchFile(b, 10, false) }
 func Benchmark_ZFlat11(b *testing.B) { benchFile(b, 11, false) }
 func Benchmark_ZFlat12(b *testing.B) { benchFile(b, 12, false) }

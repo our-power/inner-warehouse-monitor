@@ -11,13 +11,13 @@ import (
 
 const (
 	// Time allowed to write a message to the client.
-	writeWait = 10 * time.Second
+	writeWait = 10*time.Second
 
 	// Time allowed to read the next message from the client.
-	readWait = 60 * time.Second
+	readWait = 60*time.Second
 
 	// Send pings to client with this period. Must be less than readWait.
-	pingPeriod = (readWait * 9) / 10
+	pingPeriod = (readWait*9)/10
 
 	// Maximum message size allowed from client.
 	maxMessageSize = 512
@@ -165,5 +165,5 @@ func randomString(l int) string {
 }
 
 func randInt(min int, max int) int {
-	return min + rand.Intn(max-min)
+	return min + rand.Intn(max - min)
 }

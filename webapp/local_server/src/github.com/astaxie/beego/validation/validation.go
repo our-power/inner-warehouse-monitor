@@ -12,9 +12,9 @@ type ValidFormer interface {
 }
 
 type ValidationError struct {
-	Message, Key, Name, Field, Tmpl string
-	Value                           interface{}
-	LimitValue                      interface{}
+	Message,  Key,  Name,  Field,  Tmpl string
+	Value                               interface{}
+	LimitValue                          interface{}
 }
 
 // Returns the Message.
@@ -74,9 +74,9 @@ func (v *Validation) ErrorMap() map[string]*ValidationError {
 // Add an error to the validation context.
 func (v *Validation) Error(message string, args ...interface{}) *ValidationResult {
 	result := (&ValidationResult{
-		Ok:    false,
-		Error: &ValidationError{},
-	}).Message(message, args...)
+			Ok:    false,
+			Error: &ValidationError{},
+		}).Message(message, args...)
 	v.Errors = append(v.Errors, result.Error)
 	return result
 }
@@ -159,7 +159,7 @@ func (v *Validation) Tel(obj interface{}, key string) *ValidationResult {
 
 func (v *Validation) Phone(obj interface{}, key string) *ValidationResult {
 	return v.apply(Phone{Mobile{Match: Match{Regexp: mobilePattern}},
-		Tel{Match: Match{Regexp: telPattern}}, key}, obj)
+			Tel{Match: Match{Regexp: telPattern}}, key}, obj)
 }
 
 func (v *Validation) ZipCode(obj interface{}, key string) *ValidationResult {

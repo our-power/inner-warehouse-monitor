@@ -32,7 +32,7 @@ var (
 )
 
 func init() {
-	errLog = log.New(os.Stderr, "[MySQL] ", log.Ldate|log.Ltime|log.Lshortfile)
+	errLog = log.New(os.Stderr, "[MySQL] ", log.Ldate | log.Ltime | log.Lshortfile)
 	tlsConfigRegister = make(map[string]*tls.Config)
 }
 
@@ -95,7 +95,7 @@ func parseDSN(dsn string) (cfg *config, err error) {
 						// Find the first ':' in dsn[:j]
 						for k = 0; k < j; k++ {
 							if dsn[k] == ':' {
-								cfg.passwd = dsn[k+1 : j]
+								cfg.passwd = dsn[k + 1 : j]
 								break
 							}
 						}
@@ -110,30 +110,30 @@ func parseDSN(dsn string) (cfg *config, err error) {
 				for k = j + 1; k < i; k++ {
 					if dsn[k] == '(' {
 						// dsn[i-1] must be == ')' if an adress is specified
-						if dsn[i-1] != ')' {
-							if strings.ContainsRune(dsn[k+1:i], ')') {
+						if dsn[i - 1] != ')' {
+							if strings.ContainsRune(dsn[k + 1:i], ')') {
 								return nil, errInvalidDSNUnescaped
 							}
 							return nil, errInvalidDSNAddr
 						}
-						cfg.addr = dsn[k+1 : i-1]
+						cfg.addr = dsn[k + 1 : i - 1]
 						break
 					}
 				}
-				cfg.net = dsn[j+1 : k]
+				cfg.net = dsn[j + 1 : k]
 			}
 
 			// dbname[?param1=value1&...&paramN=valueN]
 			// Find the first '?' in dsn[i+1:]
 			for j = i + 1; j < len(dsn); j++ {
 				if dsn[j] == '?' {
-					if err = parseDSNParams(cfg, dsn[j+1:]); err != nil {
+					if err = parseDSNParams(cfg, dsn[j + 1:]); err != nil {
 						return
 					}
 					break
 				}
 			}
-			cfg.dbname = dsn[i+1 : j]
+			cfg.dbname = dsn[i + 1 : j]
 
 			break
 		}
@@ -177,7 +177,7 @@ func parseDSNParams(cfg *config, params string) (err error) {
 		// cfg params
 		switch value := param[1]; param[0] {
 
-		// Disable INFILE whitelist / enable all files
+			// Disable INFILE whitelist / enable all files
 		case "allowAllFiles":
 			var isBool bool
 			cfg.allowAllFiles, isBool = readBool(value)
@@ -185,7 +185,7 @@ func parseDSNParams(cfg *config, params string) (err error) {
 				return fmt.Errorf("Invalid Bool value: %s", value)
 			}
 
-		// Switch "rowsAffected" mode
+			// Switch "rowsAffected" mode
 		case "clientFoundRows":
 			var isBool bool
 			cfg.clientFoundRows, isBool = readBool(value)
@@ -193,7 +193,7 @@ func parseDSNParams(cfg *config, params string) (err error) {
 				return fmt.Errorf("Invalid Bool value: %s", value)
 			}
 
-		// Use old authentication mode (pre MySQL 4.1)
+			// Use old authentication mode (pre MySQL 4.1)
 		case "allowOldPasswords":
 			var isBool bool
 			cfg.allowOldPasswords, isBool = readBool(value)
@@ -201,7 +201,7 @@ func parseDSNParams(cfg *config, params string) (err error) {
 				return fmt.Errorf("Invalid Bool value: %s", value)
 			}
 
-		// Time Location
+			// Time Location
 		case "loc":
 			if value, err = url.QueryUnescape(value); err != nil {
 				return
@@ -211,14 +211,14 @@ func parseDSNParams(cfg *config, params string) (err error) {
 				return
 			}
 
-		// Dial Timeout
+			// Dial Timeout
 		case "timeout":
 			cfg.timeout, err = time.ParseDuration(value)
 			if err != nil {
 				return
 			}
 
-		// TLS-Encryption
+			// TLS-Encryption
 		case "tls":
 			boolValue, isBool := readBool(value)
 			if isBool {
@@ -301,7 +301,7 @@ func scramblePassword(scramble, password []byte) []byte {
 // Encrypt password using pre 4.1 (old password) method
 // https://github.com/atcurtis/mariadb/blob/master/mysys/my_rnd.c
 type myRnd struct {
-	seed1, seed2 uint32
+	seed1,  seed2 uint32
 }
 
 const myRndMaxVal = 0x3FFFFFFF
@@ -309,8 +309,8 @@ const myRndMaxVal = 0x3FFFFFFF
 // Pseudo random number generator
 func newMyRnd(seed1, seed2 uint32) *myRnd {
 	return &myRnd{
-		seed1: seed1 % myRndMaxVal,
-		seed2: seed2 % myRndMaxVal,
+		seed1: seed1%myRndMaxVal,
+		seed2: seed2%myRndMaxVal,
 	}
 }
 
@@ -318,10 +318,10 @@ func newMyRnd(seed1, seed2 uint32) *myRnd {
 // http://play.golang.org/p/QHvhd4qved
 // http://play.golang.org/p/RG0q4ElWDx
 func (r *myRnd) NextByte() byte {
-	r.seed1 = (r.seed1*3 + r.seed2) % myRndMaxVal
-	r.seed2 = (r.seed1 + r.seed2 + 33) % myRndMaxVal
+	r.seed1 = (r.seed1*3 + r.seed2)%myRndMaxVal
+	r.seed2 = (r.seed1 + r.seed2 + 33)%myRndMaxVal
 
-	return byte(uint64(r.seed1) * 31 / myRndMaxVal)
+	return byte(uint64(r.seed1)*31/myRndMaxVal)
 }
 
 // Generate binary hash from byte string using insecure pre 4.1 method
@@ -339,8 +339,8 @@ func pwHash(password []byte) (result [2]uint32) {
 		}
 
 		tmp = uint32(c)
-		result[0] ^= (((result[0] & 63) + add) * tmp) + (result[0] << 8)
-		result[1] += (result[1] << 8) ^ result[0]
+		result[0] ^= (((result[0] & 63) + add)*tmp) + (result[0]<<8)
+		result[1] += (result[1]<<8) ^ result[0]
 		add += tmp
 	}
 
@@ -362,7 +362,7 @@ func scrambleOldPassword(scramble, password []byte) []byte {
 	hashPw := pwHash(password)
 	hashSc := pwHash(scramble)
 
-	r := newMyRnd(hashPw[0]^hashSc[0], hashPw[1]^hashSc[1])
+	r := newMyRnd(hashPw[0] ^ hashSc[0], hashPw[1] ^ hashSc[1])
 
 	var out [8]byte
 	for i := range out {
@@ -469,31 +469,31 @@ func parseBinaryDateTime(num uint64, data []byte, loc *time.Location) (driver.Va
 	case 4:
 		return time.Date(
 			int(binary.LittleEndian.Uint16(data[:2])), // year
-			time.Month(data[2]),                       // month
-			int(data[3]),                              // day
+			time.Month(data[2]), // month
+			int(data[3]), // day
 			0, 0, 0, 0,
 			loc,
 		), nil
 	case 7:
 		return time.Date(
 			int(binary.LittleEndian.Uint16(data[:2])), // year
-			time.Month(data[2]),                       // month
-			int(data[3]),                              // day
-			int(data[4]),                              // hour
-			int(data[5]),                              // minutes
-			int(data[6]),                              // seconds
+			time.Month(data[2]), // month
+			int(data[3]), // day
+			int(data[4]), // hour
+			int(data[5]), // minutes
+			int(data[6]), // seconds
 			0,
 			loc,
 		), nil
 	case 11:
 		return time.Date(
 			int(binary.LittleEndian.Uint16(data[:2])), // year
-			time.Month(data[2]),                       // month
-			int(data[3]),                              // day
-			int(data[4]),                              // hour
-			int(data[5]),                              // minutes
-			int(data[6]),                              // seconds
-			int(binary.LittleEndian.Uint32(data[7:11]))*1000, // nanoseconds
+			time.Month(data[2]), // month
+			int(data[3]), // day
+			int(data[4]), // hour
+			int(data[5]), // minutes
+			int(data[6]), // seconds
+				int(binary.LittleEndian.Uint32(data[7:11]))*1000, // nanoseconds
 			loc,
 		), nil
 	}
@@ -558,13 +558,13 @@ func formatBinaryDateTime(num uint64, data []byte) (driver.Value, error) {
 func uint64ToBytes(n uint64) []byte {
 	return []byte{
 		byte(n),
-		byte(n >> 8),
-		byte(n >> 16),
-		byte(n >> 24),
-		byte(n >> 32),
-		byte(n >> 40),
-		byte(n >> 48),
-		byte(n >> 56),
+		byte(n>>8),
+		byte(n>>16),
+		byte(n>>24),
+		byte(n>>32),
+		byte(n>>40),
+		byte(n>>48),
+		byte(n>>56),
 	}
 }
 
@@ -579,8 +579,8 @@ func uint64ToString(n uint64) []byte {
 	var q uint64
 	for n >= 10 {
 		i--
-		q = n / 10
-		a[i] = uint8(n-q*10) + 0x30
+		q = n/10
+		a[i] = uint8(n - q*10) + 0x30
 		n = q
 	}
 
@@ -614,7 +614,7 @@ func readLengthEnodedString(b []byte) ([]byte, bool, int, error) {
 
 	// Check data length
 	if len(b) >= n {
-		return b[n-int(num) : n], false, n, nil
+		return b[n - int(num) : n], false, n, nil
 	}
 	return nil, false, n, io.EOF
 }
@@ -641,24 +641,24 @@ func skipLengthEnodedString(b []byte) (int, error) {
 func readLengthEncodedInteger(b []byte) (uint64, bool, int) {
 	switch b[0] {
 
-	// 251: NULL
+		// 251: NULL
 	case 0xfb:
 		return 0, true, 1
 
-	// 252: value of following 2
+		// 252: value of following 2
 	case 0xfc:
 		return uint64(b[1]) | uint64(b[2])<<8, false, 3
 
-	// 253: value of following 3
+		// 253: value of following 3
 	case 0xfd:
 		return uint64(b[1]) | uint64(b[2])<<8 | uint64(b[3])<<16, false, 4
 
-	// 254: value of following 8
+		// 254: value of following 8
 	case 0xfe:
 		return uint64(b[1]) | uint64(b[2])<<8 | uint64(b[3])<<16 |
-				uint64(b[4])<<24 | uint64(b[5])<<32 | uint64(b[6])<<40 |
-				uint64(b[7])<<48 | uint64(b[8])<<54,
-			false, 9
+			uint64(b[4])<<24 | uint64(b[5])<<32 | uint64(b[6])<<40 |
+			uint64(b[7])<<48 | uint64(b[8])<<54,
+		false, 9
 	}
 
 	// 0-250: value of first byte

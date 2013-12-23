@@ -91,33 +91,26 @@ type nsqdOptions struct {
 func NewNsqdOptions() *nsqdOptions {
 	return &nsqdOptions{
 		broadcastAddress: "",
-
 		dataPath:        os.TempDir(),
 		memQueueSize:    10000,
 		maxBytesPerFile: 104857600,
 		syncEvery:       2500,
-		syncTimeout:     2 * time.Second,
-
-		msgTimeout:     60 * time.Second,
-		maxMsgTimeout:  15 * time.Minute,
+		syncTimeout:     2*time.Second,
+		msgTimeout:     60*time.Second,
+		maxMsgTimeout:  15*time.Minute,
 		maxMessageSize: 1024768,
-		maxBodySize:    5 * 1024768,
+		maxBodySize:    5*1024768,
 		clientTimeout:  nsq.DefaultClientTimeout,
-
-		maxHeartbeatInterval:   60 * time.Second,
+		maxHeartbeatInterval:   60*time.Second,
 		maxRdyCount:            2500,
-		maxOutputBufferSize:    64 * 1024,
-		maxOutputBufferTimeout: 1 * time.Second,
-
+		maxOutputBufferSize:    64*1024,
+		maxOutputBufferTimeout: 1*time.Second,
 		statsdAddress:  "",
 		statsdPrefix:   "",
-		statsdInterval: 60 * time.Second,
-
-		e2eProcessingLatencyWindowTime: time.Duration(10 * time.Minute),
-
+		statsdInterval: 60*time.Second,
+		e2eProcessingLatencyWindowTime: time.Duration(10*time.Minute),
 		tlsCert: "",
 		tlsKey:  "",
-
 		deflateEnabled:  true,
 		maxDeflateLevel: -1,
 		snappyEnabled:   true,
@@ -277,7 +270,7 @@ func (n *NSQd) PersistMetadata() error {
 	}
 
 	tmpFileName := fileName + ".tmp"
-	f, err := os.OpenFile(tmpFileName, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+	f, err := os.OpenFile(tmpFileName, os.O_WRONLY | os.O_CREATE | os.O_TRUNC, 0600)
 	if err != nil {
 		return err
 	}

@@ -12,7 +12,7 @@ type CPUUsageHandler struct {
 	db *util.DbLink
 }
 
-func (h *CPUUsageHandler) HandleMessage(m *nsq.Message)(err error){
+func (h *CPUUsageHandler) HandleMessage(m *nsq.Message) (err error) {
 	/*
 	实现队列消息处理功能
 	*/
@@ -26,12 +26,12 @@ func (h *CPUUsageHandler) HandleMessage(m *nsq.Message)(err error){
 	sql := `
 	INSERT INTO cpu_usage (date, time_index, ip, host_name, hardware_addr, usage) VALUES (?, ?, ?, ?, ?, ?);
 	`
-	_, err = db.Exec(sql, bodyParts[0], time_index, bodyParts[2], bodyParts[3], bodyParts[4], strings.Split(bodyParts[5],",")[1])
+	_, err = db.Exec(sql, bodyParts[0], time_index, bodyParts[2], bodyParts[3], bodyParts[4], strings.Split(bodyParts[5], ",")[1])
 
 	return err
 }
 
-func NewCPUUsageHandler(dbLink *util.DbLink)(cpuUsageHandler *CPUUsageHandler, err error){
+func NewCPUUsageHandler(dbLink *util.DbLink) (cpuUsageHandler *CPUUsageHandler, err error) {
 	cpuUsageHandler = &CPUUsageHandler {
 		db: dbLink,
 	}

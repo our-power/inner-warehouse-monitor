@@ -17,7 +17,7 @@ func TestFile(t *testing.T) {
 	log.Warn("warning")
 	log.Error("error")
 	log.Critical("critical")
-	time.Sleep(time.Second * 4)
+	time.Sleep(time.Second*4)
 	f, err := os.Open("test.log")
 	if err != nil {
 		t.Fatal(err)
@@ -48,7 +48,7 @@ func TestFile2(t *testing.T) {
 	log.Warn("warning")
 	log.Error("error")
 	log.Critical("critical")
-	time.Sleep(time.Second * 4)
+	time.Sleep(time.Second*4)
 	f, err := os.Open("test2.log")
 	if err != nil {
 		t.Fatal(err)
@@ -79,7 +79,7 @@ func TestFileRotate(t *testing.T) {
 	log.Warn("warning")
 	log.Error("error")
 	log.Critical("critical")
-	time.Sleep(time.Second * 4)
+	time.Sleep(time.Second*4)
 	rotatename := "test3.log" + fmt.Sprintf(".%s.%03d", time.Now().Format("2006-01-02"), 1)
 	b, err := exists(rotatename)
 	if !b || err != nil {

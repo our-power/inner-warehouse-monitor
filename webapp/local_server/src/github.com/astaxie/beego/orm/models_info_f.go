@@ -163,7 +163,7 @@ checkType:
 			goto end
 		}
 		fieldType = f.FieldType()
-		if fieldType&IsRelField > 0 {
+		if fieldType & IsRelField > 0 {
 			err = fmt.Errorf("unsupport rel type custom field")
 			goto end
 		}
@@ -240,7 +240,7 @@ checkType:
 		}
 	}
 
-	if fieldType&IsFieldType == 0 {
+	if fieldType & IsFieldType == 0 {
 		err = fmt.Errorf("wrong field type")
 		goto end
 	}
@@ -340,12 +340,12 @@ checkType:
 		fi.decimals = int(v2)
 	default:
 		switch {
-		case fieldType&IsIntegerField > 0:
-		case fieldType&IsRelField > 0:
+		case fieldType & IsIntegerField > 0:
+		case fieldType & IsRelField > 0:
 		}
 	}
 
-	if fieldType&IsIntegerField == 0 {
+	if fieldType & IsIntegerField == 0 {
 		if fi.auto {
 			err = fmt.Errorf("non-integer type cannot set auto")
 			goto end

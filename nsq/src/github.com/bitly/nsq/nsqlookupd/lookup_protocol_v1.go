@@ -125,17 +125,18 @@ func (p *LookupProtocolV1) REGISTER(client *ClientV1, reader *bufio.Reader, para
 	if channel != "" {
 		key := Registration{"channel", topic, channel}
 		if p.context.nsqlookupd.DB.AddProducer(key, &Producer{peerInfo: client.peerInfo}) {
-			log.Printf("DB: client(%s) REGISTER category:%s key:%s subkey:%s",
-				client, "channel", topic, channel)
-		}
-	}
-	key := Registration{"topic", topic, ""}
-	if p.context.nsqlookupd.DB.AddProducer(key, &Producer{peerInfo: client.peerInfo}) {
-		log.Printf("DB: client(%s) REGISTER category:%s key:%s subkey:%s",
-			client, "topic", topic, "")
-	}
+	log.Printf("DB: client(%s) REGISTER category:%s key:%s subkey:%s",
+	client, "channel", topic, channel)
+}
 
-	return []byte("OK"), nil
+}
+key := Registration{"topic", topic, ""}
+if p.context.nsqlookupd.DB.AddProducer(key, &Producer{peerInfo: client.peerInfo}) {
+log.Printf("DB: client(%s) REGISTER category:%s key:%s subkey:%s",
+client, "topic", topic, "")
+}
+
+return []byte("OK"), nil
 }
 
 func (p *LookupProtocolV1) UNREGISTER(client *ClientV1, reader *bufio.Reader, params []string) ([]byte, error) {
@@ -225,29 +226,31 @@ func (p *LookupProtocolV1) IDENTIFY(client *ClientV1, reader *bufio.Reader, para
 		client, peerInfo.BroadcastAddress, peerInfo.TcpPort, peerInfo.HttpPort, peerInfo.Version)
 
 	client.peerInfo = &peerInfo
-	if p.context.nsqlookupd.DB.AddProducer(Registration{"client", "", ""}, &Producer{peerInfo: client.peerInfo}) {
-		log.Printf("DB: client(%s) REGISTER category:%s key:%s subkey:%s", client, "client", "", "")
-	}
+	if p.context.nsqlookupd.DB.AddProducer(Registration{"client", "", ""}
 
-	// build a response
-	data := make(map[string]interface{})
-	data["tcp_port"] = p.context.nsqlookupd.tcpAddr.Port
-	data["http_port"] = p.context.nsqlookupd.httpAddr.Port
-	data["version"] = util.BINARY_VERSION
-	hostname, err := os.Hostname()
-	if err != nil {
-		log.Fatalf("ERROR: unable to get hostname %s", err.Error())
-	}
-	data["address"] = hostname //TODO: remove for 1.0
-	data["broadcast_address"] = p.context.nsqlookupd.broadcastAddress
-	data["hostname"] = hostname
+, &Producer{peerInfo: client.peerInfo}) {
+log.Printf("DB: client(%s) REGISTER category:%s key:%s subkey:%s", client, "client", "", "")
+}
 
-	response, err := json.Marshal(data)
-	if err != nil {
-		log.Printf("ERROR: marshaling %v", data)
-		return []byte("OK"), nil
-	}
-	return response, nil
+// build a response
+data := make(map[string]interface{})
+data["tcp_port"] = p.context.nsqlookupd.tcpAddr.Port
+data["http_port"] = p.context.nsqlookupd.httpAddr.Port
+data["version"] = util.BINARY_VERSION
+hostname, err := os.Hostname()
+if err != nil {
+log.Fatalf("ERROR: unable to get hostname %s", err.Error())
+}
+data["address"] = hostname //TODO: remove for 1.0
+data["broadcast_address"] = p.context.nsqlookupd.broadcastAddress
+data["hostname"] = hostname
+
+response, err := json.Marshal(data)
+if err != nil {
+log.Printf("ERROR: marshaling %v", data)
+return []byte("OK"), nil
+}
+return response, nil
 }
 
 func (p *LookupProtocolV1) PING(client *ClientV1, params []string) ([]byte, error) {

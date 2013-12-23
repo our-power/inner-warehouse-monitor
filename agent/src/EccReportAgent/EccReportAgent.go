@@ -1,4 +1,4 @@
-package main 
+package main
 
 import (
 	"os"
@@ -24,7 +24,7 @@ var netClient *http.Client
 /* Send heartbeat signal to server */
 func heartbeat() {
 	outModules(prepareOutput("heartbeat", "alive", settings.Hb))
-	c := time.Tick(time.Duration(settings.Hb) * time.Second)
+	c := time.Tick(time.Duration(settings.Hb)*time.Second)
 	for _ = range c {
 		if stop { break }
 		outModules(prepareOutput("heartbeat", "alive", settings.Hb))
@@ -38,7 +38,7 @@ func register() {
 
 func runInModule(name string, topic string, interval string) {
 	itv, _ := strconv.Atoi(interval)
-	c := time.Tick(time.Duration(itv) * time.Second)
+	c := time.Tick(time.Duration(itv)*time.Second)
 	for _ = range c {
 		if stop { break }
 		var result string
@@ -92,7 +92,7 @@ func inModules() {
 	Return: Formatted string
 */
 func prepareOutput(topic string, output string, interval int) (request string, content string) {
-	
+
 	timeStamp := time.Now().Unix()
 	timeIdx := int(timeStamp)
 	dateNow := time.Now().Format("20060102")
@@ -102,7 +102,7 @@ func prepareOutput(topic string, output string, interval int) (request string, c
 	}
 	h, m, s := time.Now().Clock()
 	if interval != 0 {
-		timeIdx = (3600*h + 60*m + s) / interval
+		timeIdx = (3600*h + 60*m + s)/interval
 	}
 	line := ""
 	lines := strings.Split(output, "\n")
@@ -124,8 +124,8 @@ func prepareOutput(topic string, output string, interval int) (request string, c
 func runOutModule(urlString string, content string, hostHeader string) {
 	resp, err := utils.ReadRemote("POST", urlString, content, hostHeader, netClient)
 	if err != nil {
-	    logger.Println(err.Error())
-	    return
+		logger.Println(err.Error())
+		return
 	}
 	fmt.Printf("%s\n", resp)
 }
@@ -154,14 +154,14 @@ func main() {
 	// code snippet: capture Ctrl-C signal and handle it
 	cc := make(chan os.Signal, 1)
 	signal.Notify(cc, os.Interrupt, os.Kill)
-	go func(){
-	    for _ = range cc {
-	    	stop = true
-	    	time.Sleep(time.Second)
-	        logger.Println("Agent stopped")
-	        done <- true
-	        os.Exit(0)
-	    }
+	go func() {
+		for _ = range cc {
+			stop = true
+			time.Sleep(time.Second)
+			logger.Println("Agent stopped")
+			done <- true
+			os.Exit(0)
+		}
 	}()
 	logger.Println("Agent started")
 	netClient = utils.BuildClient()
@@ -176,5 +176,5 @@ func main() {
 	time.Sleep(time.Second)
 	go heartbeat()
 	go inModules()
-	<- done
+	<-done
 }

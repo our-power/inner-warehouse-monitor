@@ -160,7 +160,7 @@ func (j *Json) StringArray() ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	retArr := make([]string, 0, len(arr))
+	retArr := make([]string,0, len(arr))
 	for _, a := range arr {
 		s, ok := a.(string)
 		if !ok {

@@ -56,10 +56,10 @@ func TestDSNParser(t *testing.T) {
 
 func TestDSNParserInvalid(t *testing.T) {
 	var invalidDSNs = []string{
-		"@net(addr/",  // no closing brace
-		"@tcp(/",      // no closing brace
-		"tcp(/",       // no closing brace
-		"(/",          // no closing brace
+		"@net(addr/", // no closing brace
+		"@tcp(/", // no closing brace
+		"tcp(/", // no closing brace
+		"(/", // no closing brace
 		"net(addr)//", // unescaped
 		//"/dbname?arg=/some/unescaped/path",
 	}

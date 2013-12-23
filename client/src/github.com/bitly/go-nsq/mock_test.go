@@ -87,7 +87,7 @@ func (n *mockNSQD) handle(conn net.Conn) {
 				return
 			}
 			// trim the '\n'
-			line = line[:len(line)-1]
+			line = line[:len(line) - 1]
 			readChan <- line
 			<-readDoneChan
 		}
@@ -131,7 +131,7 @@ func (n *mockNSQD) handle(conn net.Conn) {
 			if inst.frameType == FrameTypeMessage {
 				if rdyCount == 0 {
 					log.Printf("!!! RDY == 0")
-					scriptTime = time.After(n.script[idx+1].delay)
+					scriptTime = time.After(n.script[idx + 1].delay)
 					continue
 				}
 				rdyCount--
@@ -141,7 +141,7 @@ func (n *mockNSQD) handle(conn net.Conn) {
 				log.Printf(err.Error())
 				goto exit
 			}
-			scriptTime = time.After(n.script[idx+1].delay)
+			scriptTime = time.After(n.script[idx + 1].delay)
 			idx++
 		}
 	}
@@ -198,22 +198,22 @@ func TestReaderBackoff(t *testing.T) {
 		instruction{0, FrameTypeResponse, []byte("OK")},
 		// IDENTIFY
 		instruction{0, FrameTypeResponse, []byte("OK")},
-		instruction{20 * time.Millisecond, FrameTypeMessage, msgBytesGood},
-		instruction{20 * time.Millisecond, FrameTypeMessage, msgBytesGood},
-		instruction{20 * time.Millisecond, FrameTypeMessage, msgBytesGood},
-		instruction{20 * time.Millisecond, FrameTypeMessage, msgBytesBad},
-		instruction{20 * time.Millisecond, FrameTypeMessage, msgBytesBad},
-		instruction{20 * time.Millisecond, FrameTypeMessage, msgBytesGood},
-		instruction{20 * time.Millisecond, FrameTypeMessage, msgBytesGood},
+		instruction{20*time.Millisecond, FrameTypeMessage, msgBytesGood},
+		instruction{20*time.Millisecond, FrameTypeMessage, msgBytesGood},
+		instruction{20*time.Millisecond, FrameTypeMessage, msgBytesGood},
+		instruction{20*time.Millisecond, FrameTypeMessage, msgBytesBad},
+		instruction{20*time.Millisecond, FrameTypeMessage, msgBytesBad},
+		instruction{20*time.Millisecond, FrameTypeMessage, msgBytesGood},
+		instruction{20*time.Millisecond, FrameTypeMessage, msgBytesGood},
 		// needed to exit test
-		instruction{200 * time.Millisecond, -1, []byte("exit")},
+		instruction{200*time.Millisecond, -1, []byte("exit")},
 	}
 	n := newMockNSQD(script)
 
 	topicName := "test_reader_commands" + strconv.Itoa(int(time.Now().Unix()))
 	q, _ := NewReader(topicName, "ch")
 	q.VerboseLogging = true
-	q.BackoffMultiplier = 10 * time.Millisecond
+	q.BackoffMultiplier = 10*time.Millisecond
 	q.SetMaxInFlight(5)
 	q.AddHandler(&testHandler{})
 	err := q.ConnectToNSQ(n.tcpAddr.String())
@@ -229,7 +229,7 @@ func TestReaderBackoff(t *testing.T) {
 
 	expected := []string{
 		"IDENTIFY",
-		"SUB " + topicName + " ch",
+				"SUB " + topicName + " ch",
 		"RDY 5",
 		fmt.Sprintf("FIN %s", msgIdGood),
 		fmt.Sprintf("FIN %s", msgIdGood),

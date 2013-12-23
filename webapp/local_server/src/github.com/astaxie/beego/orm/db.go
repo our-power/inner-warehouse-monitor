@@ -20,29 +20,29 @@ var (
 
 var (
 	operators = map[string]bool{
-		"exact":     true,
-		"iexact":    true,
-		"contains":  true,
-		"icontains": true,
-		// "regex":       true,
-		// "iregex":      true,
-		"gt":          true,
-		"gte":         true,
-		"lt":          true,
-		"lte":         true,
-		"startswith":  true,
-		"endswith":    true,
-		"istartswith": true,
-		"iendswith":   true,
-		"in":          true,
-		// "range":       true,
-		// "year":        true,
-		// "month":       true,
-		// "day":         true,
-		// "week_day":    true,
-		"isnull": true,
-		// "search":      true,
-	}
+	"exact":     true,
+	"iexact":    true,
+	"contains":  true,
+	"icontains": true,
+	// "regex":       true,
+	// "iregex":      true,
+	"gt":          true,
+	"gte":         true,
+	"lt":          true,
+	"lte":         true,
+	"startswith":  true,
+	"endswith":    true,
+	"istartswith": true,
+	"iendswith":   true,
+	"in":          true,
+	// "range":       true,
+	// "year":        true,
+	// "month":       true,
+	// "day":         true,
+	// "week_day":    true,
+	"isnull": true,
+	// "search":      true,
+}
 )
 
 type dbBase struct {
@@ -102,11 +102,11 @@ func (d *dbBase) collectFieldValue(mi *modelInfo, fi *fieldInfo, ind reflect.Val
 				}
 			default:
 				switch {
-				case fi.fieldType&IsPostiveIntegerField > 0:
+				case fi.fieldType & IsPostiveIntegerField > 0:
 					value = field.Uint()
-				case fi.fieldType&IsIntegerField > 0:
+				case fi.fieldType & IsIntegerField > 0:
 					value = field.Int()
-				case fi.fieldType&IsRelField > 0:
+				case fi.fieldType & IsRelField > 0:
 					if field.IsNil() {
 						value = nil
 					} else {
@@ -143,8 +143,8 @@ func (d *dbBase) collectFieldValue(mi *modelInfo, fi *fieldInfo, ind reflect.Val
 func (d *dbBase) PrepareInsert(q dbQuerier, mi *modelInfo) (stmtQuerier, string, error) {
 	Q := d.ins.TableQuote()
 
-	dbcols := make([]string, 0, len(mi.fields.dbcols))
-	marks := make([]string, 0, len(mi.fields.dbcols))
+	dbcols := make([]string,0, len(mi.fields.dbcols))
+	marks := make([]string,0, len(mi.fields.dbcols))
 	for _, fi := range mi.fields.fieldsDB {
 		if fi.auto == false {
 			dbcols = append(dbcols, fi.column)
@@ -338,7 +338,7 @@ func (d *dbBase) Delete(q dbQuerier, mi *modelInfo, ind reflect.Value, tz *time.
 
 		if num > 0 {
 			if mi.fields.pk.auto {
-				if mi.fields.pk.fieldType&IsPostiveIntegerField > 0 {
+				if mi.fields.pk.fieldType & IsPostiveIntegerField > 0 {
 					ind.Field(mi.fields.pk.fieldIndex).SetUint(0)
 				} else {
 					ind.Field(mi.fields.pk.fieldIndex).SetInt(0)
@@ -359,8 +359,8 @@ func (d *dbBase) Delete(q dbQuerier, mi *modelInfo, ind reflect.Value, tz *time.
 }
 
 func (d *dbBase) UpdateBatch(q dbQuerier, qs *querySet, mi *modelInfo, cond *Condition, params Params, tz *time.Location) (int64, error) {
-	columns := make([]string, 0, len(params))
-	values := make([]interface{}, 0, len(params))
+	columns := make([]string,0, len(params))
+	values := make([]interface{},0, len(params))
 	for col, val := range params {
 		if fi, ok := mi.fields.GetByAny(col); ok == false || fi.dbcol == false {
 			panic(fmt.Errorf("wrong field/column name `%s`", col))
@@ -393,24 +393,24 @@ func (d *dbBase) UpdateBatch(q dbQuerier, qs *querySet, mi *modelInfo, cond *Con
 		T = "T0."
 	}
 
-	cols := make([]string, 0, len(columns))
+	cols := make([]string,0, len(columns))
 
 	for i, v := range columns {
 		col := fmt.Sprintf("%s%s%s%s", T, Q, v, Q)
 		if c, ok := values[i].(colValue); ok {
 			switch c.opt {
 			case Col_Add:
-				cols = append(cols, col+" = "+col+" + ?")
+				cols = append(cols, col + " = " + col + " + ?")
 			case Col_Minus:
-				cols = append(cols, col+" = "+col+" - ?")
+				cols = append(cols, col + " = " + col + " - ?")
 			case Col_Multiply:
-				cols = append(cols, col+" = "+col+" * ?")
+				cols = append(cols, col + " = " + col + " * ?")
 			case Col_Except:
-				cols = append(cols, col+" = "+col+" / ?")
+				cols = append(cols, col + " = " + col + " / ?")
 			}
 			values[i] = c.value
 		} else {
-			cols = append(cols, col+" = ?")
+			cols = append(cols, col + " = ?")
 		}
 	}
 
@@ -575,7 +575,7 @@ func (d *dbBase) ReadBatch(q dbQuerier, qs *querySet, mi *modelInfo, cond *Condi
 	var tCols []string
 	if len(cols) > 0 {
 		hasRel := len(qs.related) > 0 || qs.relDepth > 0
-		tCols = make([]string, 0, len(cols))
+		tCols = make([]string,0, len(cols))
 		var maps map[string]bool
 		if hasRel {
 			maps = make(map[string]bool)
@@ -592,7 +592,7 @@ func (d *dbBase) ReadBatch(q dbQuerier, qs *querySet, mi *modelInfo, cond *Condi
 		}
 		if hasRel {
 			for _, fi := range mi.fields.fieldsDB {
-				if fi.fieldType&IsRelField > 0 {
+				if fi.fieldType & IsRelField > 0 {
 					if maps[fi.column] == false {
 						tCols = append(tCols, fi.column)
 					}
@@ -918,7 +918,7 @@ setValue:
 			}
 			value = t
 		}
-	case fieldType&IsIntegerField > 0:
+	case fieldType & IsIntegerField > 0:
 		if str == nil {
 			s := StrTo(ToStr(val))
 			str = &s
@@ -947,7 +947,7 @@ setValue:
 				tErr = err
 				goto end
 			}
-			if fieldType&IsPostiveIntegerField > 0 {
+			if fieldType & IsPostiveIntegerField > 0 {
 				v, _ := str.Uint64()
 				value = v
 			} else {
@@ -973,7 +973,7 @@ setValue:
 			}
 			value = v
 		}
-	case fieldType&IsRelField > 0:
+	case fieldType & IsRelField > 0:
 		fi = fi.relModelInfo.fields.pk
 		fieldType = fi.fieldType
 		goto setValue
@@ -1017,8 +1017,8 @@ setValue:
 			}
 			field.Set(reflect.ValueOf(value))
 		}
-	case fieldType&IsIntegerField > 0:
-		if fieldType&IsPostiveIntegerField > 0 {
+	case fieldType & IsIntegerField > 0:
+		if fieldType & IsPostiveIntegerField > 0 {
 			if isNative {
 				if value == nil {
 					value = uint64(0)
@@ -1040,7 +1040,7 @@ setValue:
 			}
 			field.SetFloat(value.(float64))
 		}
-	case fieldType&IsRelField > 0:
+	case fieldType & IsRelField > 0:
 		if value != nil {
 			fieldType = fi.relModelInfo.fields.pk.fieldType
 			mf := reflect.New(fi.relModelInfo.addrField.Elem().Type())
@@ -1107,8 +1107,8 @@ func (d *dbBase) ReadValues(q dbQuerier, qs *querySet, mi *modelInfo, cond *Cond
 	Q := d.ins.TableQuote()
 
 	if hasExprs {
-		cols = make([]string, 0, len(exprs))
-		infos = make([]*fieldInfo, 0, len(exprs))
+		cols = make([]string,0, len(exprs))
+		infos = make([]*fieldInfo,0, len(exprs))
 		for _, ex := range exprs {
 			index, name, fi, suc := tables.parseExprs(mi, strings.Split(ex, ExprSep))
 			if suc == false {
@@ -1118,8 +1118,8 @@ func (d *dbBase) ReadValues(q dbQuerier, qs *querySet, mi *modelInfo, cond *Cond
 			infos = append(infos, fi)
 		}
 	} else {
-		cols = make([]string, 0, len(mi.fields.dbcols))
-		infos = make([]*fieldInfo, 0, len(exprs))
+		cols = make([]string,0, len(mi.fields.dbcols))
+		infos = make([]*fieldInfo,0, len(exprs))
 		for _, fi := range mi.fields.fieldsDB {
 			cols = append(cols, fmt.Sprintf("T0.%s%s%s %s%s%s", Q, fi.column, Q, Q, fi.name, Q))
 			infos = append(infos, fi)
@@ -1182,7 +1182,7 @@ func (d *dbBase) ReadValues(q dbQuerier, qs *querySet, mi *modelInfo, cond *Cond
 			}
 			maps = append(maps, params)
 		case 2:
-			params := make(ParamsList, 0, len(cols))
+			params := make(ParamsList,0, len(cols))
 			for i, ref := range refs {
 				fi := infos[i]
 

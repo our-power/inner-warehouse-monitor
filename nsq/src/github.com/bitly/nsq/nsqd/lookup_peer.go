@@ -16,7 +16,7 @@ type LookupPeer struct {
 	addr            string
 	conn            net.Conn
 	state           int32
-	connectCallback func(*LookupPeer)
+	connectCallback func (*LookupPeer)
 	Info            PeerInfo
 }
 
@@ -32,7 +32,7 @@ type PeerInfo struct {
 // NewLookupPeer creates a new LookupPeer instance connecting to the supplied address.
 //
 // The supplied connectCallback will be called *every* time the instance connects.
-func NewLookupPeer(addr string, connectCallback func(*LookupPeer)) *LookupPeer {
+func NewLookupPeer(addr string, connectCallback func (*LookupPeer)) *LookupPeer {
 	return &LookupPeer{
 		addr:            addr,
 		state:           nsq.StateDisconnected,

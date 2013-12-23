@@ -69,7 +69,7 @@ func NewWatcher(paths []string) {
 			}
 		}
 
-		time.Sleep(500 * time.Millisecond)
+		time.Sleep(500*time.Millisecond)
 	}()
 
 	ColorLog("[INFO] Initializing watcher...\n")

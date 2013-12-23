@@ -43,7 +43,7 @@ func TestDiskQueueRoll(t *testing.T) {
 	for i := 0; i < 10; i++ {
 		err := dq.Put(msg)
 		assert.Equal(t, err, nil)
-		assert.Equal(t, dq.Depth(), int64(i+1))
+		assert.Equal(t, dq.Depth(), int64(i + 1))
 	}
 
 	assert.Equal(t, dq.(*DiskQueue).writeFileNum, int64(1))
@@ -70,7 +70,7 @@ func TestDiskQueueEmpty(t *testing.T) {
 	for i := 0; i < 100; i++ {
 		err := dq.Put(msg)
 		assert.Equal(t, err, nil)
-		assert.Equal(t, dq.Depth(), int64(i+1))
+		assert.Equal(t, dq.Depth(), int64(i + 1))
 	}
 
 	for i := 0; i < 3; i++ {
@@ -81,7 +81,7 @@ func TestDiskQueueEmpty(t *testing.T) {
 		if dq.Depth() == 97 {
 			break
 		}
-		time.Sleep(50 * time.Millisecond)
+		time.Sleep(50*time.Millisecond)
 	}
 	assert.Equal(t, dq.Depth(), int64(97))
 
@@ -101,7 +101,7 @@ func TestDiskQueueEmpty(t *testing.T) {
 	for i := 0; i < 100; i++ {
 		err := dq.Put(msg)
 		assert.Equal(t, err, nil)
-		assert.Equal(t, dq.Depth(), int64(i+1))
+		assert.Equal(t, dq.Depth(), int64(i + 1))
 	}
 
 	for i := 0; i < 100; i++ {
@@ -112,7 +112,7 @@ func TestDiskQueueEmpty(t *testing.T) {
 		if dq.Depth() == 0 {
 			break
 		}
-		time.Sleep(50 * time.Millisecond)
+		time.Sleep(50*time.Millisecond)
 	}
 
 	assert.Equal(t, dq.Depth(), int64(0))
@@ -176,7 +176,7 @@ func TestDiskQueueTorture(t *testing.T) {
 		go func() {
 			defer wg.Done()
 			for {
-				time.Sleep(100000 * time.Nanosecond)
+				time.Sleep(100000*time.Nanosecond)
 				select {
 				case <-writeExitChan:
 					return
@@ -190,7 +190,7 @@ func TestDiskQueueTorture(t *testing.T) {
 		}()
 	}
 
-	time.Sleep(1 * time.Second)
+	time.Sleep(1*time.Second)
 
 	dq.Close()
 
@@ -209,7 +209,7 @@ func TestDiskQueueTorture(t *testing.T) {
 		go func() {
 			defer wg.Done()
 			for {
-				time.Sleep(100000 * time.Nanosecond)
+				time.Sleep(100000*time.Nanosecond)
 				select {
 				case m := <-dq.ReadChan():
 					assert.Equal(t, msg, m)
@@ -226,7 +226,7 @@ func TestDiskQueueTorture(t *testing.T) {
 		if dq.Depth() == 0 {
 			break
 		}
-		time.Sleep(50 * time.Millisecond)
+		time.Sleep(50*time.Millisecond)
 	}
 
 	log.Printf("closing readExitChan")

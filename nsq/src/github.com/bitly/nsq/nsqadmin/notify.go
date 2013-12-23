@@ -28,7 +28,7 @@ func HandleAdminActions() {
 		if err != nil {
 			log.Printf("Error serializing admin action! %s", err)
 		}
-		httpclient := &http.Client{Transport: util.NewDeadlineTransport(10 * time.Second)}
+		httpclient := &http.Client{Transport: util.NewDeadlineTransport(10*time.Second)}
 		log.Printf("Posting notification to %s", *notificationHTTPEndpoint)
 		_, err = httpclient.Post(*notificationHTTPEndpoint, "application/json", bytes.NewBuffer(content))
 		if err != nil {

@@ -166,10 +166,10 @@ func TestRenderForm(t *testing.T) {
 	}
 	output = RenderForm(&u)
 	result := template.HTML(
-		`Name: <input name="username" type="text" value="test"></br>` +
-			`年龄：<input name="age" type="text" value="0"></br>` +
-			`Sex: <input name="Sex" type="text" value=""></br>` +
-			`Intro: <input name="Intro" type="textarea" value="">`)
+				`Name: <input name="username" type="text" value="test"></br>` +
+						`年龄：<input name="age" type="text" value="0"></br>` +
+					`Sex: <input name="Sex" type="text" value=""></br>` +
+				`Intro: <input name="Intro" type="textarea" value="">`)
 	if output != result {
 		t.Errorf("output should equal `%v` but got `%v`", result, output)
 	}

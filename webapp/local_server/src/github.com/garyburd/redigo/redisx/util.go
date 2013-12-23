@@ -70,7 +70,7 @@ func compileStructSpec(t reflect.Type, depth map[string]int, index []int, ss *st
 			}
 			d, found := depth[fs.name]
 			if !found {
-				d = 1 << 30
+				d = 1<<30
 			}
 			switch {
 			case len(index) == d:
@@ -85,7 +85,7 @@ func compileStructSpec(t reflect.Type, depth map[string]int, index []int, ss *st
 				}
 				ss.l = ss.l[:j]
 			case len(index) < d:
-				fs.index = make([]int, len(index)+1)
+				fs.index = make([]int, len(index) + 1)
 				copy(fs.index, index)
 				fs.index[len(index)] = i
 				depth[fs.name] = len(index)

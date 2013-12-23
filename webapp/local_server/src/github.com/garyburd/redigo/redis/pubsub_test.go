@@ -117,7 +117,7 @@ func TestPushed(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer nc.Close()
-	nc.SetReadDeadline(time.Now().Add(4 * time.Second))
+	nc.SetReadDeadline(time.Now().Add(4*time.Second))
 
 	c := redis.PubSubConn{Conn: redis.NewConn(nc, 0, 0)}
 

@@ -26,7 +26,7 @@ type fakeConn struct {
 }
 
 func (c *fakeConn) Close() error { *c.open -= 1; return nil }
-func (c *fakeConn) Err() error   { return c.err }
+func (c *fakeConn) Err() error { return c.err }
 
 func (c *fakeConn) Do(commandName string, args ...interface{}) (reply interface{}, err error) {
 	if commandName == "ERR" {
@@ -49,7 +49,7 @@ func (c *fakeConn) Receive() (reply interface{}, err error) {
 
 type dialer struct {
 	t            *testing.T
-	dialed, open int
+	dialed,  open int
 }
 
 func (d *dialer) dial() (Conn, error) {
@@ -177,7 +177,7 @@ func TestPoolTimeout(t *testing.T) {
 	d := dialer{t: t}
 	p := &Pool{
 		MaxIdle:     2,
-		IdleTimeout: 300 * time.Second,
+		IdleTimeout: 300*time.Second,
 		Dial:        d.dial,
 	}
 

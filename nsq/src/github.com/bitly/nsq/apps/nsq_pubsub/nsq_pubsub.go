@@ -48,7 +48,7 @@ func (s *StreamServer) Set(sr *StreamReader) {
 func (s *StreamServer) Del(sr *StreamReader) {
 	s.Lock()
 	defer s.Unlock()
-	n := make([]*StreamReader, len(s.clients)-1)
+	n := make([]*StreamReader, len(s.clients) - 1)
 	for _, x := range s.clients {
 		if x != sr {
 			n = append(n, x)
@@ -96,16 +96,16 @@ func StatsHandler(w http.ResponseWriter, req *http.Request) {
 	now := time.Now()
 	for _, sr := range streamServer.clients {
 		duration := now.Sub(sr.connectTime).Seconds()
-		secondsDuration := time.Duration(int64(duration)) * time.Second // turncate to the second
+		secondsDuration := time.Duration(int64(duration))*time.Second // turncate to the second
 
 		io.WriteString(w, fmt.Sprintf("[%s] [%s : %s] msgs: %-8d fin: %-8d re-q: %-8d connected: %s\n",
-			sr.conn.RemoteAddr().String(),
-			sr.topic,
-			sr.channel,
-			sr.reader.MessagesReceived,
-			sr.reader.MessagesFinished,
-			sr.reader.MessagesRequeued,
-			secondsDuration))
+				sr.conn.RemoteAddr().String(),
+				sr.topic,
+				sr.channel,
+				sr.reader.MessagesReceived,
+				sr.reader.MessagesFinished,
+				sr.reader.MessagesRequeued,
+				secondsDuration))
 	}
 }
 
@@ -186,7 +186,7 @@ func (s *StreamServer) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 }
 
 func (sr *StreamReader) HeartbeatLoop() {
-	heartbeatTicker := time.NewTicker(30 * time.Second)
+	heartbeatTicker := time.NewTicker(30*time.Second)
 	defer func() {
 		sr.conn.Close()
 		heartbeatTicker.Stop()

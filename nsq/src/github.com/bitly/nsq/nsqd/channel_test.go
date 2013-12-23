@@ -63,7 +63,7 @@ func TestInFlightWorker(t *testing.T) {
 	defer log.SetOutput(os.Stdout)
 
 	options := NewNsqdOptions()
-	options.msgTimeout = 200 * time.Millisecond
+	options.msgTimeout = 200*time.Millisecond
 	nsqd := NewNSQd(1, options)
 	defer nsqd.Exit()
 
@@ -98,14 +98,14 @@ func TestChannelEmpty(t *testing.T) {
 	topic := nsqd.GetTopic(topicName)
 	channel := topic.GetChannel("channel")
 
-	msgs := make([]*nsq.Message, 0, 25)
+	msgs := make([]*nsq.Message,0, 25)
 	for i := 0; i < 25; i++ {
 		msg := nsq.NewMessage(<-nsqd.idChan, []byte("test"))
 		channel.StartInFlightTimeout(msg, 0)
 		msgs = append(msgs, msg)
 	}
 
-	channel.RequeueMessage(0, msgs[len(msgs)-1].Id, 100*time.Millisecond)
+	channel.RequeueMessage(0, msgs[len(msgs) - 1].Id, 100*time.Millisecond)
 	assert.Equal(t, len(channel.inFlightMessages), 24)
 	assert.Equal(t, len(channel.inFlightPQ), 24)
 	assert.Equal(t, len(channel.deferredMessages), 1)

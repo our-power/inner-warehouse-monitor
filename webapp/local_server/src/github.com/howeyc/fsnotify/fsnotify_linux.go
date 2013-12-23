@@ -67,22 +67,22 @@ type FileEvent struct {
 
 // IsCreate reports whether the FileEvent was triggerd by a creation
 func (e *FileEvent) IsCreate() bool {
-	return (e.mask&sys_IN_CREATE) == sys_IN_CREATE || (e.mask&sys_IN_MOVED_TO) == sys_IN_MOVED_TO
+	return (e.mask & sys_IN_CREATE) == sys_IN_CREATE || (e.mask & sys_IN_MOVED_TO) == sys_IN_MOVED_TO
 }
 
 // IsDelete reports whether the FileEvent was triggerd by a delete
 func (e *FileEvent) IsDelete() bool {
-	return (e.mask&sys_IN_DELETE_SELF) == sys_IN_DELETE_SELF || (e.mask&sys_IN_DELETE) == sys_IN_DELETE
+	return (e.mask & sys_IN_DELETE_SELF) == sys_IN_DELETE_SELF || (e.mask & sys_IN_DELETE) == sys_IN_DELETE
 }
 
 // IsModify reports whether the FileEvent was triggerd by a file modification or attribute change
 func (e *FileEvent) IsModify() bool {
-	return ((e.mask&sys_IN_MODIFY) == sys_IN_MODIFY || (e.mask&sys_IN_ATTRIB) == sys_IN_ATTRIB)
+	return ((e.mask & sys_IN_MODIFY) == sys_IN_MODIFY || (e.mask & sys_IN_ATTRIB) == sys_IN_ATTRIB)
 }
 
 // IsRename reports whether the FileEvent was triggerd by a change name
 func (e *FileEvent) IsRename() bool {
-	return ((e.mask&sys_IN_MOVE_SELF) == sys_IN_MOVE_SELF || (e.mask&sys_IN_MOVED_FROM) == sys_IN_MOVED_FROM)
+	return ((e.mask & sys_IN_MOVE_SELF) == sys_IN_MOVE_SELF || (e.mask & sys_IN_MOVED_FROM) == sys_IN_MOVED_FROM)
 }
 
 type watch struct {
@@ -198,9 +198,9 @@ func (w *Watcher) removeWatch(path string) error {
 // received events into Event objects and sends them via the Event channel
 func (w *Watcher) readEvents() {
 	var (
-		buf   [syscall.SizeofInotifyEvent * 4096]byte // Buffer for a maximum of 4096 raw events
-		n     int                                     // Number of bytes read with read()
-		errno error                                   // Syscall errno
+		buf   [syscall.SizeofInotifyEvent*4096]byte // Buffer for a maximum of 4096 raw events
+		n     int                                   // Number of bytes read with read()
+		errno error                                 // Syscall errno
 	)
 
 	for {
@@ -214,7 +214,7 @@ func (w *Watcher) readEvents() {
 		default:
 		}
 
-			n, errno = syscall.Read(w.fd, buf[0:])
+		n, errno = syscall.Read(w.fd, buf[0:])
 
 		// If EOF is received
 		if n == 0 {
@@ -236,7 +236,7 @@ func (w *Watcher) readEvents() {
 		var offset uint32 = 0
 		// We don't know how many events we just read into the buffer
 		// While the offset points to at least one whole event...
-		for offset <= uint32(n-syscall.SizeofInotifyEvent) {
+		for offset <= uint32(n - syscall.SizeofInotifyEvent) {
 			// Point "raw" to the event in the buffer
 			raw := (*syscall.InotifyEvent)(unsafe.Pointer(&buf[offset]))
 			event := new(FileEvent)
@@ -253,7 +253,7 @@ func (w *Watcher) readEvents() {
 			watchedName := event.Name
 			if nameLen > 0 {
 				// Point "bytes" at the first byte of the filename
-				bytes := (*[syscall.PathMax]byte)(unsafe.Pointer(&buf[offset+syscall.SizeofInotifyEvent]))
+				bytes := (*[syscall.PathMax]byte)(unsafe.Pointer(&buf[offset + syscall.SizeofInotifyEvent]))
 				// The filename is padded with NUL bytes. TrimRight() gets rid of those.
 				event.Name += "/" + strings.TrimRight(string(bytes[0:nameLen]), "\000")
 			}
@@ -285,7 +285,7 @@ func (w *Watcher) readEvents() {
 // against files that do not exist.
 func (e *FileEvent) ignoreLinux() bool {
 	// Ignore anything the inotify API says to ignore
-	if e.mask&sys_IN_IGNORED == sys_IN_IGNORED {
+	if e.mask & sys_IN_IGNORED == sys_IN_IGNORED {
 		return true
 	}
 

@@ -9,11 +9,11 @@ import (
 )
 
 // We limit how far copy back-references can go, the same as the C++ code.
-const maxOffset = 1 << 15
+const maxOffset = 1<<15
 
 // emitLiteral writes a literal chunk and returns the number of bytes written.
 func emitLiteral(dst, lit []byte) int {
-	i, n := 0, uint(len(lit)-1)
+	i, n := 0, uint(len(lit) - 1)
 	switch {
 	case n < 60:
 		dst[0] = uint8(n)<<2 | tagLiteral
@@ -25,20 +25,20 @@ func emitLiteral(dst, lit []byte) int {
 	case n < 1<<16:
 		dst[0] = 61<<2 | tagLiteral
 		dst[1] = uint8(n)
-		dst[2] = uint8(n >> 8)
+		dst[2] = uint8(n>>8)
 		i = 3
 	case n < 1<<24:
 		dst[0] = 62<<2 | tagLiteral
 		dst[1] = uint8(n)
-		dst[2] = uint8(n >> 8)
-		dst[3] = uint8(n >> 16)
+		dst[2] = uint8(n>>8)
+		dst[3] = uint8(n>>16)
 		i = 4
 	case int64(n) < 1<<32:
 		dst[0] = 63<<2 | tagLiteral
 		dst[1] = uint8(n)
-		dst[2] = uint8(n >> 8)
-		dst[3] = uint8(n >> 16)
-		dst[4] = uint8(n >> 24)
+		dst[2] = uint8(n>>8)
+		dst[3] = uint8(n>>16)
+		dst[4] = uint8(n>>24)
 		i = 5
 	default:
 		panic("snappy: source buffer is too long")
@@ -55,19 +55,19 @@ func emitCopy(dst []byte, offset, length int) int {
 	for length > 0 {
 		x := length - 4
 		if 0 <= x && x < 1<<3 && offset < 1<<11 {
-			dst[i+0] = uint8(offset>>8)&0x07<<5 | uint8(x)<<2 | tagCopy1
-			dst[i+1] = uint8(offset)
+			dst[i + 0] = uint8(offset>>8) & 0x07<<5 | uint8(x)<<2 | tagCopy1
+			dst[i + 1] = uint8(offset)
 			i += 2
 			break
 		}
 
 		x = length
 		if x > 1<<6 {
-			x = 1 << 6
+			x = 1<<6
 		}
-		dst[i+0] = uint8(x-1)<<2 | tagCopy2
-		dst[i+1] = uint8(offset)
-		dst[i+2] = uint8(offset >> 8)
+		dst[i + 0] = uint8(x - 1)<<2 | tagCopy2
+		dst[i + 1] = uint8(offset)
+		dst[i + 2] = uint8(offset>>8)
 		i += 3
 		length -= x
 	}
@@ -95,8 +95,8 @@ func Encode(dst, src []byte) ([]byte, error) {
 	}
 
 	// Initialize the hash table. Its size ranges from 1<<8 to 1<<14 inclusive.
-	const maxTableSize = 1 << 14
-	shift, tableSize := uint(32-8), 1<<8
+	const maxTableSize = 1<<14
+	shift, tableSize := uint(32 - 8), 1<<8
 	for tableSize < maxTableSize && tableSize < len(src) {
 		shift--
 		tableSize *= 2
@@ -109,18 +109,18 @@ func Encode(dst, src []byte) ([]byte, error) {
 		t   int // The last position with the same hash as s.
 		lit int // The start position of any pending literal bytes.
 	)
-	for s+3 < len(src) {
+	for s + 3 < len(src) {
 		// Update the hash table.
-		b0, b1, b2, b3 := src[s], src[s+1], src[s+2], src[s+3]
+		b0, b1, b2, b3 := src[s], src[s + 1], src[s + 2], src[s + 3]
 		h := uint32(b0) | uint32(b1)<<8 | uint32(b2)<<16 | uint32(b3)<<24
 		p := &table[(h*0x1e35a7bd)>>shift]
 		// We need to to store values in [-1, inf) in table. To save
 		// some initialization time, (re)use the table's zero value
 		// and shift the values against this zero: add 1 on writes,
 		// subtract 1 on reads.
-		t, *p = *p-1, s+1
+		t, *p = *p - 1, s + 1
 		// If t is invalid or src[s:s+4] differs from src[t:t+4], accumulate a literal byte.
-		if t < 0 || s-t >= maxOffset || b0 != src[t] || b1 != src[t+1] || b2 != src[t+2] || b3 != src[t+3] {
+		if t < 0 || s - t >= maxOffset || b0 != src[t] || b1 != src[t + 1] || b2 != src[t + 2] || b3 != src[t + 3] {
 			s++
 			continue
 		}
@@ -130,13 +130,13 @@ func Encode(dst, src []byte) ([]byte, error) {
 		}
 		// Extend the match to be as long as possible.
 		s0 := s
-		s, t = s+4, t+4
+		s, t = s + 4, t + 4
 		for s < len(src) && src[s] == src[t] {
 			s++
 			t++
 		}
 		// Emit the copied bytes.
-		d += emitCopy(dst[d:], s-t, s-s0)
+		d += emitCopy(dst[d:], s - t, s - s0)
 		lit = s
 	}
 

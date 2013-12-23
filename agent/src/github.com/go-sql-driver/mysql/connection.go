@@ -48,7 +48,7 @@ type config struct {
 func (mc *mysqlConn) handleParams() (err error) {
 	for param, val := range mc.cfg.params {
 		switch param {
-		// Charset
+			// Charset
 		case "charset":
 			charsets := strings.Split(val, ",")
 			for i := range charsets {
@@ -62,28 +62,28 @@ func (mc *mysqlConn) handleParams() (err error) {
 				return
 			}
 
-		// handled elsewhere
+			// handled elsewhere
 		case "timeout", "allowAllFiles", "loc":
 			continue
 
-		// time.Time parsing
+			// time.Time parsing
 		case "parseTime":
 			mc.parseTime = readBool(val)
 
-		// Strict mode
+			// Strict mode
 		case "strict":
 			mc.strict = readBool(val)
 
-		// TLS-Encryption
+			// TLS-Encryption
 		case "tls":
 			err = errors.New("TLS-Encryption not implemented yet")
 			return
 
-		// Compression
+			// Compression
 		case "compress":
 			err = errors.New("Compression not implemented yet")
 
-		// System Vars
+			// System Vars
 		default:
 			err = mc.exec("SET " + param + "=" + val + "")
 			if err != nil {
@@ -215,7 +215,7 @@ func (mc *mysqlConn) Query(query string, args []driver.Value) (driver.Rows, erro
 // The returned byte slice is only valid until the next read
 func (mc *mysqlConn) getSystemVar(name string) (val []byte, err error) {
 	// Send command
-	err = mc.writeCommandPacketStr(comQuery, "SELECT @@"+name)
+	err = mc.writeCommandPacketStr(comQuery, "SELECT @@" + name)
 	if err == nil {
 		// Read Result
 		var resLen int

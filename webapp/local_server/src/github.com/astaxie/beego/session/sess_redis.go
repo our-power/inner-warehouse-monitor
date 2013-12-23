@@ -97,18 +97,18 @@ func (rp *RedisProvider) SessionInit(maxlifetime int64, savePath string) error {
 		rp.password = configs[2]
 	}
 	rp.poollist = redis.NewPool(func() (redis.Conn, error) {
-		c, err := redis.Dial("tcp", rp.savePath)
-		if err != nil {
-			return nil, err
-		}
-		if rp.password != "" {
-			if _, err := c.Do("AUTH", rp.password); err != nil {
-				c.Close()
+			c, err := redis.Dial("tcp", rp.savePath)
+			if err != nil {
 				return nil, err
 			}
-		}
-		return c, err
-	}, rp.poolsize)
+			if rp.password != "" {
+				if _, err := c.Do("AUTH", rp.password); err != nil {
+					c.Close()
+					return nil, err
+				}
+			}
+			return c, err
+		}, rp.poolsize)
 	return nil
 }
 

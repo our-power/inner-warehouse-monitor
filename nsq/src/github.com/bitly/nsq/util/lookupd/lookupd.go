@@ -142,9 +142,9 @@ func GetLookupdProducers(lookupdHTTPAddrs []string) ([]*Producer, error) {
 
 					for i, t := range topicList {
 						topics = append(topics, ProducerTopic{
-							Topic:      t.(string),
-							Tombstoned: tombstones[i],
-						})
+								Topic:      t.(string),
+								Tombstoned: tombstones[i],
+							})
 					}
 
 					sort.Sort(topics)
@@ -361,7 +361,6 @@ func GetNSQDStats(nsqdHTTPAddrs []string, selectedTopic string) ([]*TopicStats, 
 					MemoryDepth:  depth - backendDepth,
 					MessageCount: t.Get("message_count").MustInt64(),
 					ChannelCount: len(channels),
-
 					E2eProcessingLatency: e2eProcessingLatency,
 				}
 				topicStatsList = append(topicStatsList, topicStats)
@@ -404,7 +403,6 @@ func GetNSQDStats(nsqdHTTPAddrs []string, selectedTopic string) ([]*TopicStats, 
 						MessageCount:  c.Get("message_count").MustInt64(),
 						RequeueCount:  c.Get("requeue_count").MustInt64(),
 						TimeoutCount:  c.Get("timeout_count").MustInt64(),
-
 						E2eProcessingLatency: e2eProcessingLatency,
 						// TODO: this is sort of wrong; clients should be de-duped
 						// client A that connects to NSQD-a and NSQD-b should only be counted once. right?
@@ -423,7 +421,7 @@ func GetNSQDStats(nsqdHTTPAddrs []string, selectedTopic string) ([]*TopicStats, 
 							ClientVersion: client.Get("version").MustString(),
 							ClientIdentifier: fmt.Sprintf("%s:%s", client.Get("name").MustString(),
 								strings.Split(client.Get("remote_address").MustString(), ":")[1]),
-							ConnectedDuration: time.Duration(int64(connectedDuration)) * time.Second, // truncate to second
+							ConnectedDuration: time.Duration(int64(connectedDuration))*time.Second, // truncate to second
 							InFlightCount:     client.Get("in_flight_count").MustInt(),
 							ReadyCount:        client.Get("ready_count").MustInt(),
 							FinishCount:       client.Get("finish_count").MustInt64(),

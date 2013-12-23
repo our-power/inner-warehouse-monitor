@@ -19,14 +19,14 @@ func (b *Bin) Update(x *Bin) {
 }
 
 func (b *Bin) Mean() float64 {
-	return b.Sum / float64(b.Count)
+	return b.Sum/float64(b.Count)
 }
 
 type Bins []*Bin
 
-func (bs Bins) Len() int           { return len(bs) }
+func (bs Bins) Len() int { return len(bs) }
 func (bs Bins) Less(i, j int) bool { return bs[i].Mean() < bs[j].Mean() }
-func (bs Bins) Swap(i, j int)      { bs[i], bs[j] = bs[j], bs[i] }
+func (bs Bins) Swap(i, j int) { bs[i], bs[j] = bs[j], bs[i] }
 
 func (bs *Bins) Push(x interface{}) {
 	*bs = append(*bs, x.(*Bin))
@@ -41,7 +41,7 @@ func (bs *Bins) remove(n int) *Bin {
 		return nil
 	}
 	x := (*bs)[n]
-	*bs = append((*bs)[:n], (*bs)[n+1:]...)
+	*bs = append((*bs)[:n], (*bs)[n + 1:]...)
 	return x
 }
 
@@ -75,8 +75,8 @@ func newReservoir(maxBins int) *reservoir {
 func (r *reservoir) insert(bin *Bin) {
 	r.n += bin.Count
 	i := sort.Search(len(r.bins), func(i int) bool {
-		return r.bins[i].Mean() >= bin.Mean()
-	})
+			return r.bins[i].Mean() >= bin.Mean()
+		})
 	if i < 0 || i == r.bins.Len() {
 		// TODO(blake): Maybe use an .insert(i, bin) instead of
 		// performing the extra work of a heap.Push.
@@ -90,8 +90,8 @@ func (r *reservoir) compress() {
 	for r.bins.Len() > r.maxBins {
 		minGapIndex := -1
 		minGap := math.MaxFloat64
-		for i := 0; i < r.bins.Len()-1; i++ {
-			gap := gapWeight(r.bins[i], r.bins[i+1])
+		for i := 0; i < r.bins.Len() - 1; i++ {
+			gap := gapWeight(r.bins[i], r.bins[i + 1])
 			if minGap > gap {
 				minGap = gap
 				minGapIndex = i

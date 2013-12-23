@@ -75,7 +75,7 @@ func (o *queryM2M) Remove(mds ...interface{}) (int64, error) {
 	fi := o.fi
 	qs := o.qs.Filter(fi.reverseFieldInfo.name, o.md)
 
-	nums, err := qs.Filter(fi.reverseFieldInfoTwo.name+ExprSep+"in", mds).Delete()
+	nums, err := qs.Filter(fi.reverseFieldInfoTwo.name + ExprSep + "in", mds).Delete()
 	if err != nil {
 		return nums, err
 	}
@@ -85,7 +85,7 @@ func (o *queryM2M) Remove(mds ...interface{}) (int64, error) {
 func (o *queryM2M) Exist(md interface{}) bool {
 	fi := o.fi
 	return o.qs.Filter(fi.reverseFieldInfo.name, o.md).
-		Filter(fi.reverseFieldInfoTwo.name, md).Exist()
+	Filter(fi.reverseFieldInfoTwo.name, md).Exist()
 }
 
 func (o *queryM2M) Clear() (int64, error) {

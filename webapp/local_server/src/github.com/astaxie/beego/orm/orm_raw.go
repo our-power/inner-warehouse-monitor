@@ -317,7 +317,7 @@ func (o *rawSet) QueryRow(containers ...interface{}) error {
 		panic(fmt.Errorf("<RawSeter.QueryRow> need at least one arg"))
 	}
 
-	refs := make([]interface{}, 0, len(containers))
+	refs := make([]interface{},0, len(containers))
 	sIdxes := make([][]int, 0)
 	sInds := make([]reflect.Value, 0)
 	eTyps := make([]reflect.Type, 0)
@@ -491,7 +491,7 @@ func (o *rawSet) readValues(container interface{}) (int64, error) {
 			}
 			maps = append(maps, params)
 		case 2:
-			params := make(ParamsList, 0, len(cols))
+			params := make(ParamsList,0, len(cols))
 			for _, ref := range refs {
 				value := reflect.Indirect(reflect.ValueOf(ref)).Interface().(sql.NullString)
 				if value.Valid {

@@ -38,7 +38,6 @@ type writer struct {
 func NewWriter(w io.Writer) io.Writer {
 	return &writer{
 		writer: w,
-
 		hdr: make([]byte, 8),
 		dst: make([]byte, 4096),
 	}
@@ -48,10 +47,10 @@ func (w *writer) Write(p []byte) (int, error) {
 	total := 0
 	sz := MaxBlockSize
 	for i := 0; i < len(p); i += MaxBlockSize {
-		if i+sz > len(p) {
+		if i + sz > len(p) {
 			sz = len(p) - i
 		}
-		n, err := w.write(p[i : i+sz])
+		n, err := w.write(p[i : i + sz])
 		if err != nil {
 			return 0, err
 		}
@@ -86,15 +85,15 @@ func (w *writer) write(p []byte) (int, error) {
 
 	// 3 byte little endian length
 	w.hdr[1] = byte(length)
-	w.hdr[2] = byte(length >> 8)
-	w.hdr[3] = byte(length >> 16)
+	w.hdr[2] = byte(length>>8)
+	w.hdr[3] = byte(length>>16)
 
 	// 4 byte little endian CRC32 checksum
 	checksum := maskChecksum(crc32.Checksum(p, crcTable))
 	w.hdr[4] = byte(checksum)
-	w.hdr[5] = byte(checksum >> 8)
-	w.hdr[6] = byte(checksum >> 16)
-	w.hdr[7] = byte(checksum >> 24)
+	w.hdr[5] = byte(checksum>>8)
+	w.hdr[6] = byte(checksum>>16)
+	w.hdr[7] = byte(checksum>>24)
 
 	_, err = w.writer.Write(w.hdr)
 	if err != nil {
@@ -110,5 +109,5 @@ func (w *writer) write(p []byte) (int, error) {
 }
 
 func maskChecksum(c uint32) uint32 {
-	return ((c >> 15) | (c << 17)) + 0xa282ead8
+	return ((c>>15) | (c<<17)) + 0xa282ead8
 }

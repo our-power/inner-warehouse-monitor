@@ -39,9 +39,7 @@ type reader struct {
 func NewReader(r io.Reader, verifyChecksum bool) io.Reader {
 	return &reader{
 		reader: r,
-
 		verifyChecksum: verifyChecksum,
-
 		hdr: make([]byte, 4),
 		src: make([]byte, 4096),
 		dst: make([]byte, 4096),
@@ -133,5 +131,5 @@ func (r *reader) readBlock() ([]byte, error) {
 
 func unmaskChecksum(c uint32) uint32 {
 	x := c - 0xa282ead8
-	return ((x >> 17) | (x << 15))
+	return ((x>>17) | (x<<15))
 }

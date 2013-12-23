@@ -23,9 +23,9 @@ func (a *FloatArray) Set(param string) error {
 	return nil
 }
 
-func (a FloatArray) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a FloatArray) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 func (a FloatArray) Less(i, j int) bool { return a[i] > a[j] }
-func (a FloatArray) Len() int           { return len(a) }
+func (a FloatArray) Len() int { return len(a) }
 
 func (a *FloatArray) String() string {
 	s := ""

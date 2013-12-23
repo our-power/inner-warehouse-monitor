@@ -21,8 +21,8 @@ type NSQLookupd struct {
 
 func NewNSQLookupd() *NSQLookupd {
 	return &NSQLookupd{
-		inactiveProducerTimeout: 300 * time.Second,
-		tombstoneLifetime:       45 * time.Second,
+		inactiveProducerTimeout: 300*time.Second,
+		tombstoneLifetime:       45*time.Second,
 		DB:                      NewRegistrationDB(),
 	}
 }

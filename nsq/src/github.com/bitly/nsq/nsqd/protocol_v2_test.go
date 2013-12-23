@@ -136,7 +136,7 @@ func TestBasicV2(t *testing.T) {
 	defer log.SetOutput(os.Stdout)
 
 	options := NewNsqdOptions()
-	options.clientTimeout = 60 * time.Second
+	options.clientTimeout = 60*time.Second
 	tcpAddr, _, nsqd := mustStartNSQd(options)
 	defer nsqd.Exit()
 
@@ -171,7 +171,7 @@ func TestMultipleConsumerV2(t *testing.T) {
 	msgChan := make(chan *nsq.Message)
 
 	options := NewNsqdOptions()
-	options.clientTimeout = 60 * time.Second
+	options.clientTimeout = 60*time.Second
 	tcpAddr, _, nsqd := mustStartNSQd(options)
 	defer nsqd.Exit()
 
@@ -187,7 +187,7 @@ func TestMultipleConsumerV2(t *testing.T) {
 		assert.Equal(t, err, nil)
 
 		identify(t, conn)
-		sub(t, conn, topicName, "ch"+i)
+		sub(t, conn, topicName, "ch" + i)
 
 		err = nsq.Ready(1).Write(conn)
 		assert.Equal(t, err, nil)
@@ -217,7 +217,7 @@ func TestClientTimeout(t *testing.T) {
 	topicName := "test_client_timeout_v2" + strconv.Itoa(int(time.Now().Unix()))
 
 	options := NewNsqdOptions()
-	options.clientTimeout = 50 * time.Millisecond
+	options.clientTimeout = 50*time.Millisecond
 	tcpAddr, _, nsqd := mustStartNSQd(options)
 	defer nsqd.Exit()
 
@@ -227,11 +227,11 @@ func TestClientTimeout(t *testing.T) {
 	identify(t, conn)
 	sub(t, conn, topicName, "ch")
 
-	time.Sleep(50 * time.Millisecond)
+	time.Sleep(50*time.Millisecond)
 
 	// depending on timing there may be 1 or 2 hearbeats sent
 	// just read until we get an error
-	timer := time.After(100 * time.Millisecond)
+	timer := time.After(100*time.Millisecond)
 	for {
 		select {
 		case <-timer:
@@ -253,7 +253,7 @@ func TestClientHeartbeat(t *testing.T) {
 	topicName := "test_hb_v2" + strconv.Itoa(int(time.Now().Unix()))
 
 	options := NewNsqdOptions()
-	options.clientTimeout = 200 * time.Millisecond
+	options.clientTimeout = 200*time.Millisecond
 	tcpAddr, _, nsqd := mustStartNSQd(options)
 	defer nsqd.Exit()
 
@@ -270,13 +270,13 @@ func TestClientHeartbeat(t *testing.T) {
 	_, data, _ := nsq.UnpackResponse(resp)
 	assert.Equal(t, data, []byte("_heartbeat_"))
 
-	time.Sleep(20 * time.Millisecond)
+	time.Sleep(20*time.Millisecond)
 
 	err = nsq.Nop().Write(conn)
 	assert.Equal(t, err, nil)
 
 	// wait long enough that would have timed out (had we not sent the above cmd)
-	time.Sleep(100 * time.Millisecond)
+	time.Sleep(100*time.Millisecond)
 
 	err = nsq.Nop().Write(conn)
 	assert.Equal(t, err, nil)
@@ -289,7 +289,7 @@ func TestClientHeartbeatDisableSUB(t *testing.T) {
 	topicName := "test_hb_v2" + strconv.Itoa(int(time.Now().Unix()))
 
 	options := NewNsqdOptions()
-	options.clientTimeout = 200 * time.Millisecond
+	options.clientTimeout = 200*time.Millisecond
 	tcpAddr, _, nsqd := mustStartNSQd(options)
 	defer nsqd.Exit()
 
@@ -305,7 +305,7 @@ func TestClientHeartbeatDisable(t *testing.T) {
 	defer log.SetOutput(os.Stdout)
 
 	options := NewNsqdOptions()
-	options.clientTimeout = 100 * time.Millisecond
+	options.clientTimeout = 100*time.Millisecond
 	tcpAddr, _, nsqd := mustStartNSQd(options)
 	defer nsqd.Exit()
 
@@ -314,7 +314,7 @@ func TestClientHeartbeatDisable(t *testing.T) {
 
 	identifyHeartbeatInterval(t, conn, -1, nsq.FrameTypeResponse, "OK")
 
-	time.Sleep(150 * time.Millisecond)
+	time.Sleep(150*time.Millisecond)
 
 	err = nsq.Nop().Write(conn)
 	assert.Equal(t, err, nil)
@@ -325,14 +325,14 @@ func TestMaxHeartbeatIntervalValid(t *testing.T) {
 	defer log.SetOutput(os.Stdout)
 
 	options := NewNsqdOptions()
-	options.maxHeartbeatInterval = 300 * time.Second
+	options.maxHeartbeatInterval = 300*time.Second
 	tcpAddr, _, nsqd := mustStartNSQd(options)
 	defer nsqd.Exit()
 
 	conn, err := mustConnectNSQd(tcpAddr)
 	assert.Equal(t, err, nil)
 
-	hbi := int(options.maxHeartbeatInterval / time.Millisecond)
+	hbi := int(options.maxHeartbeatInterval/time.Millisecond)
 	identifyHeartbeatInterval(t, conn, hbi, nsq.FrameTypeResponse, "OK")
 }
 
@@ -341,7 +341,7 @@ func TestMaxHeartbeatIntervalInvalid(t *testing.T) {
 	defer log.SetOutput(os.Stdout)
 
 	options := NewNsqdOptions()
-	options.maxHeartbeatInterval = 300 * time.Second
+	options.maxHeartbeatInterval = 300*time.Second
 	tcpAddr, _, nsqd := mustStartNSQd(options)
 	defer nsqd.Exit()
 
@@ -388,20 +388,20 @@ func TestPausing(t *testing.T) {
 	assert.Equal(t, err, nil)
 
 	// sleep to allow the RDY state to take effect
-	time.Sleep(50 * time.Millisecond)
+	time.Sleep(50*time.Millisecond)
 
 	// pause the channel... the client shouldn't receive any more messages
 	channel.Pause()
 
 	// sleep to allow the paused state to take effect
-	time.Sleep(50 * time.Millisecond)
+	time.Sleep(50*time.Millisecond)
 
 	msg = nsq.NewMessage(<-nsqd.idChan, []byte("test body2"))
 	topic.PutMessage(msg)
 
 	// allow the client to possibly get a message, the test would hang indefinitely
 	// if pausing was not working on the internal clientMsgChan read
-	time.Sleep(50 * time.Millisecond)
+	time.Sleep(50*time.Millisecond)
 	msg = <-channel.clientMsgChan
 	assert.Equal(t, msg.Body, []byte("test body2"))
 
@@ -552,7 +552,7 @@ func TestTouch(t *testing.T) {
 
 	*verbose = true
 	options := NewNsqdOptions()
-	options.msgTimeout = 50 * time.Millisecond
+	options.msgTimeout = 50*time.Millisecond
 	tcpAddr, _, nsqd := mustStartNSQd(options)
 	defer nsqd.Exit()
 
@@ -579,12 +579,12 @@ func TestTouch(t *testing.T) {
 	assert.Equal(t, frameType, nsq.FrameTypeMessage)
 	assert.Equal(t, msgOut.Id, msg.Id)
 
-	time.Sleep(25 * time.Millisecond)
+	time.Sleep(25*time.Millisecond)
 
 	err = nsq.Touch(msg.Id).Write(conn)
 	assert.Equal(t, err, nil)
 
-	time.Sleep(30 * time.Millisecond)
+	time.Sleep(30*time.Millisecond)
 
 	err = nsq.Finish(msg.Id).Write(conn)
 	assert.Equal(t, err, nil)
@@ -669,7 +669,7 @@ func TestOutputBuffering(t *testing.T) {
 
 	*verbose = true
 	options := NewNsqdOptions()
-	options.maxOutputBufferSize = 512 * 1024
+	options.maxOutputBufferSize = 512*1024
 	options.maxOutputBufferTimeout = time.Second
 	tcpAddr, _, nsqd := mustStartNSQd(options)
 	defer nsqd.Exit()
@@ -679,11 +679,11 @@ func TestOutputBuffering(t *testing.T) {
 	conn, err := mustConnectNSQd(tcpAddr)
 	assert.Equal(t, err, nil)
 
-	outputBufferSize := 256 * 1024
+	outputBufferSize := 256*1024
 	outputBufferTimeout := 500
 
 	topic := nsqd.GetTopic(topicName)
-	msg := nsq.NewMessage(<-nsqd.idChan, make([]byte, outputBufferSize-1024))
+	msg := nsq.NewMessage(<-nsqd.idChan, make([]byte, outputBufferSize - 1024))
 	topic.PutMessage(msg)
 
 	start := time.Now()
@@ -711,7 +711,7 @@ func TestOutputBufferingValidity(t *testing.T) {
 
 	*verbose = true
 	options := NewNsqdOptions()
-	options.maxOutputBufferSize = 512 * 1024
+	options.maxOutputBufferSize = 512*1024
 	options.maxOutputBufferTimeout = time.Second
 	tcpAddr, _, nsqd := mustStartNSQd(options)
 	defer nsqd.Exit()
@@ -722,7 +722,7 @@ func TestOutputBufferingValidity(t *testing.T) {
 	identifyOutputBuffering(t, conn, 512*1024, 1000, nsq.FrameTypeResponse, "OK")
 	identifyOutputBuffering(t, conn, -1, -1, nsq.FrameTypeResponse, "OK")
 	identifyOutputBuffering(t, conn, 0, 0, nsq.FrameTypeResponse, "OK")
-	identifyOutputBuffering(t, conn, 512*1024+1, 0, nsq.FrameTypeError, fmt.Sprintf("E_BAD_BODY IDENTIFY output buffer size (%d) is invalid", 512*1024+1))
+	identifyOutputBuffering(t, conn, 512*1024 + 1, 0, nsq.FrameTypeError, fmt.Sprintf("E_BAD_BODY IDENTIFY output buffer size (%d) is invalid", 512*1024 + 1))
 
 	conn, err = mustConnectNSQd(tcpAddr)
 	assert.Equal(t, err, nil)
@@ -989,7 +989,7 @@ func benchmarkProtocolV2Pub(b *testing.B, size int) {
 			}
 			rw := bufio.NewReadWriter(bufio.NewReader(conn), bufio.NewWriter(conn))
 
-			num := b.N / runtime.GOMAXPROCS(0) / batchSize
+			num := b.N/runtime.GOMAXPROCS(0)/batchSize
 			for i := 0; i < num; i += 1 {
 				cmd, _ := nsq.MultiPublish(topicName, batch)
 				err := cmd.Write(rw)
@@ -1019,19 +1019,19 @@ func benchmarkProtocolV2Pub(b *testing.B, size int) {
 	nsqd.Exit()
 }
 
-func BenchmarkProtocolV2Pub256(b *testing.B)  { benchmarkProtocolV2Pub(b, 256) }
-func BenchmarkProtocolV2Pub512(b *testing.B)  { benchmarkProtocolV2Pub(b, 512) }
-func BenchmarkProtocolV2Pub1k(b *testing.B)   { benchmarkProtocolV2Pub(b, 1024) }
-func BenchmarkProtocolV2Pub2k(b *testing.B)   { benchmarkProtocolV2Pub(b, 2*1024) }
-func BenchmarkProtocolV2Pub4k(b *testing.B)   { benchmarkProtocolV2Pub(b, 4*1024) }
-func BenchmarkProtocolV2Pub8k(b *testing.B)   { benchmarkProtocolV2Pub(b, 8*1024) }
-func BenchmarkProtocolV2Pub16k(b *testing.B)  { benchmarkProtocolV2Pub(b, 16*1024) }
-func BenchmarkProtocolV2Pub32k(b *testing.B)  { benchmarkProtocolV2Pub(b, 32*1024) }
-func BenchmarkProtocolV2Pub64k(b *testing.B)  { benchmarkProtocolV2Pub(b, 64*1024) }
+func BenchmarkProtocolV2Pub256(b *testing.B) { benchmarkProtocolV2Pub(b, 256) }
+func BenchmarkProtocolV2Pub512(b *testing.B) { benchmarkProtocolV2Pub(b, 512) }
+func BenchmarkProtocolV2Pub1k(b *testing.B) { benchmarkProtocolV2Pub(b, 1024) }
+func BenchmarkProtocolV2Pub2k(b *testing.B) { benchmarkProtocolV2Pub(b, 2*1024) }
+func BenchmarkProtocolV2Pub4k(b *testing.B) { benchmarkProtocolV2Pub(b, 4*1024) }
+func BenchmarkProtocolV2Pub8k(b *testing.B) { benchmarkProtocolV2Pub(b, 8*1024) }
+func BenchmarkProtocolV2Pub16k(b *testing.B) { benchmarkProtocolV2Pub(b, 16*1024) }
+func BenchmarkProtocolV2Pub32k(b *testing.B) { benchmarkProtocolV2Pub(b, 32*1024) }
+func BenchmarkProtocolV2Pub64k(b *testing.B) { benchmarkProtocolV2Pub(b, 64*1024) }
 func BenchmarkProtocolV2Pub128k(b *testing.B) { benchmarkProtocolV2Pub(b, 128*1024) }
 func BenchmarkProtocolV2Pub256k(b *testing.B) { benchmarkProtocolV2Pub(b, 256*1024) }
 func BenchmarkProtocolV2Pub512k(b *testing.B) { benchmarkProtocolV2Pub(b, 512*1024) }
-func BenchmarkProtocolV2Pub1m(b *testing.B)   { benchmarkProtocolV2Pub(b, 1024*1024) }
+func BenchmarkProtocolV2Pub1m(b *testing.B) { benchmarkProtocolV2Pub(b, 1024*1024) }
 
 func benchmarkProtocolV2Sub(b *testing.B, size int) {
 	var wg sync.WaitGroup
@@ -1085,7 +1085,7 @@ func subWorker(n int, workers int, tcpAddr *net.TCPAddr, topicName string, rdyCh
 	<-goChan
 	nsq.Ready(rdyCount).Write(rw)
 	rw.Flush()
-	num := n / workers
+	num := n/workers
 	numRdy := num/rdyCount - 1
 	rdy := rdyCount
 	for i := 0; i < num; i += 1 {
@@ -1115,19 +1115,19 @@ func subWorker(n int, workers int, tcpAddr *net.TCPAddr, topicName string, rdyCh
 	}
 }
 
-func BenchmarkProtocolV2Sub256(b *testing.B)  { benchmarkProtocolV2Sub(b, 256) }
-func BenchmarkProtocolV2Sub512(b *testing.B)  { benchmarkProtocolV2Sub(b, 512) }
-func BenchmarkProtocolV2Sub1k(b *testing.B)   { benchmarkProtocolV2Sub(b, 1024) }
-func BenchmarkProtocolV2Sub2k(b *testing.B)   { benchmarkProtocolV2Sub(b, 2*1024) }
-func BenchmarkProtocolV2Sub4k(b *testing.B)   { benchmarkProtocolV2Sub(b, 4*1024) }
-func BenchmarkProtocolV2Sub8k(b *testing.B)   { benchmarkProtocolV2Sub(b, 8*1024) }
-func BenchmarkProtocolV2Sub16k(b *testing.B)  { benchmarkProtocolV2Sub(b, 16*1024) }
-func BenchmarkProtocolV2Sub32k(b *testing.B)  { benchmarkProtocolV2Sub(b, 32*1024) }
-func BenchmarkProtocolV2Sub64k(b *testing.B)  { benchmarkProtocolV2Sub(b, 64*1024) }
+func BenchmarkProtocolV2Sub256(b *testing.B) { benchmarkProtocolV2Sub(b, 256) }
+func BenchmarkProtocolV2Sub512(b *testing.B) { benchmarkProtocolV2Sub(b, 512) }
+func BenchmarkProtocolV2Sub1k(b *testing.B) { benchmarkProtocolV2Sub(b, 1024) }
+func BenchmarkProtocolV2Sub2k(b *testing.B) { benchmarkProtocolV2Sub(b, 2*1024) }
+func BenchmarkProtocolV2Sub4k(b *testing.B) { benchmarkProtocolV2Sub(b, 4*1024) }
+func BenchmarkProtocolV2Sub8k(b *testing.B) { benchmarkProtocolV2Sub(b, 8*1024) }
+func BenchmarkProtocolV2Sub16k(b *testing.B) { benchmarkProtocolV2Sub(b, 16*1024) }
+func BenchmarkProtocolV2Sub32k(b *testing.B) { benchmarkProtocolV2Sub(b, 32*1024) }
+func BenchmarkProtocolV2Sub64k(b *testing.B) { benchmarkProtocolV2Sub(b, 64*1024) }
 func BenchmarkProtocolV2Sub128k(b *testing.B) { benchmarkProtocolV2Sub(b, 128*1024) }
 func BenchmarkProtocolV2Sub256k(b *testing.B) { benchmarkProtocolV2Sub(b, 256*1024) }
 func BenchmarkProtocolV2Sub512k(b *testing.B) { benchmarkProtocolV2Sub(b, 512*1024) }
-func BenchmarkProtocolV2Sub1m(b *testing.B)   { benchmarkProtocolV2Sub(b, 1024*1024) }
+func BenchmarkProtocolV2Sub1m(b *testing.B) { benchmarkProtocolV2Sub(b, 1024*1024) }
 
 func benchmarkProtocolV2MultiSub(b *testing.B, num int) {
 	var wg sync.WaitGroup
@@ -1140,7 +1140,7 @@ func benchmarkProtocolV2MultiSub(b *testing.B, num int) {
 	options.memQueueSize = int64(b.N)
 	tcpAddr, _, nsqd := mustStartNSQd(options)
 	msg := make([]byte, 256)
-	b.SetBytes(int64(len(msg) * num))
+	b.SetBytes(int64(len(msg)*num))
 
 	goChan := make(chan int)
 	rdyChan := make(chan int)
@@ -1172,8 +1172,8 @@ func benchmarkProtocolV2MultiSub(b *testing.B, num int) {
 	nsqd.Exit()
 }
 
-func BenchmarkProtocolV2MultiSub1(b *testing.B)  { benchmarkProtocolV2MultiSub(b, 1) }
-func BenchmarkProtocolV2MultiSub2(b *testing.B)  { benchmarkProtocolV2MultiSub(b, 2) }
-func BenchmarkProtocolV2MultiSub4(b *testing.B)  { benchmarkProtocolV2MultiSub(b, 4) }
-func BenchmarkProtocolV2MultiSub8(b *testing.B)  { benchmarkProtocolV2MultiSub(b, 8) }
+func BenchmarkProtocolV2MultiSub1(b *testing.B) { benchmarkProtocolV2MultiSub(b, 1) }
+func BenchmarkProtocolV2MultiSub2(b *testing.B) { benchmarkProtocolV2MultiSub(b, 2) }
+func BenchmarkProtocolV2MultiSub4(b *testing.B) { benchmarkProtocolV2MultiSub(b, 4) }
+func BenchmarkProtocolV2MultiSub8(b *testing.B) { benchmarkProtocolV2MultiSub(b, 8) }
 func BenchmarkProtocolV2MultiSub16(b *testing.B) { benchmarkProtocolV2MultiSub(b, 16) }

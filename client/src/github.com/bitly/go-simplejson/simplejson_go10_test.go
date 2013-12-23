@@ -33,7 +33,7 @@ func TestSimplejsonGo10(t *testing.T) {
 		case string:
 			iv, _ = strconv.Atoi(v.(string))
 		}
-		assert.Equal(t, i+1, iv)
+		assert.Equal(t, i + 1, iv)
 	}
 
 	ma := js.Get("test").Get("array").MustArray()

@@ -81,7 +81,7 @@ func (b *buffer) readNext(need int) (p []byte, err error) {
 		err = b.fill(need) // err deferred
 	}
 
-	p = b.buf[b.idx : b.idx+need]
+	p = b.buf[b.idx : b.idx + need]
 	b.idx += need
 	b.length -= need
 	return

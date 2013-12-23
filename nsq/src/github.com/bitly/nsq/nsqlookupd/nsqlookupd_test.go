@@ -133,7 +133,7 @@ func TestBasicLookupd(t *testing.T) {
 	}
 
 	conn.Close()
-	time.Sleep(10 * time.Millisecond)
+	time.Sleep(10*time.Millisecond)
 
 	// now there should be no producers, but still topic/channel entries
 	data, err = util.ApiRequest(endpoint)
@@ -201,7 +201,7 @@ func TestTombstoneRecover(t *testing.T) {
 
 	tcpAddr, httpAddr, nsqlookupd := mustStartLookupd()
 	defer nsqlookupd.Exit()
-	nsqlookupd.tombstoneLifetime = 50 * time.Millisecond
+	nsqlookupd.tombstoneLifetime = 50*time.Millisecond
 
 	topicName := "tombstone_recover"
 	topicName2 := topicName + "2"
@@ -233,7 +233,7 @@ func TestTombstoneRecover(t *testing.T) {
 	producers, _ = data.Get("producers").Array()
 	assert.Equal(t, len(producers), 1)
 
-	time.Sleep(55 * time.Millisecond)
+	time.Sleep(55*time.Millisecond)
 
 	endpoint = fmt.Sprintf("http://%s/lookup?topic=%s", httpAddr, topicName)
 	data, err = util.ApiRequest(endpoint)
@@ -248,7 +248,7 @@ func TestTombstoneUnregister(t *testing.T) {
 
 	tcpAddr, httpAddr, nsqlookupd := mustStartLookupd()
 	defer nsqlookupd.Exit()
-	nsqlookupd.tombstoneLifetime = 50 * time.Millisecond
+	nsqlookupd.tombstoneLifetime = 50*time.Millisecond
 
 	topicName := "tombstone_unregister"
 
@@ -273,7 +273,7 @@ func TestTombstoneUnregister(t *testing.T) {
 	_, err = nsq.ReadResponse(conn)
 	assert.Equal(t, err, nil)
 
-	time.Sleep(55 * time.Millisecond)
+	time.Sleep(55*time.Millisecond)
 
 	endpoint = fmt.Sprintf("http://%s/lookup?topic=%s", httpAddr, topicName)
 	data, err = util.ApiRequest(endpoint)
@@ -288,7 +288,7 @@ func TestInactiveNodes(t *testing.T) {
 
 	tcpAddr, httpAddr, nsqlookupd := mustStartLookupd()
 	defer nsqlookupd.Exit()
-	nsqlookupd.inactiveProducerTimeout = 50 * time.Millisecond
+	nsqlookupd.inactiveProducerTimeout = 50*time.Millisecond
 
 	lookupdHTTPAddrs := []string{fmt.Sprintf("%s", httpAddr)}
 
@@ -307,7 +307,7 @@ func TestInactiveNodes(t *testing.T) {
 	assert.Equal(t, producers[0].Topics[0].Topic, topicName)
 	assert.Equal(t, producers[0].Topics[0].Tombstoned, false)
 
-	time.Sleep(55 * time.Millisecond)
+	time.Sleep(55*time.Millisecond)
 
 	producers, _ = lookuputil.GetLookupdProducers(lookupdHTTPAddrs)
 	assert.Equal(t, len(producers), 0)
@@ -319,7 +319,7 @@ func TestTombstonedNodes(t *testing.T) {
 
 	tcpAddr, httpAddr, nsqlookupd := mustStartLookupd()
 	defer nsqlookupd.Exit()
-	nsqlookupd.inactiveProducerTimeout = 50 * time.Millisecond
+	nsqlookupd.inactiveProducerTimeout = 50*time.Millisecond
 
 	lookupdHTTPAddrs := []string{fmt.Sprintf("%s", httpAddr)}
 

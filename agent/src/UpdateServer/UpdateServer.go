@@ -1,4 +1,4 @@
-package main 
+package main
 
 import (
 	"html/template"
@@ -24,29 +24,29 @@ var db *sql.DB
 func dealRequest(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	action := r.FormValue("action")
-    switch action {
-    	case "get_list":
-    		ip := r.FormValue("ip")
-    		getList(ip, w)
-    	case "get_file":
-    		filename := r.FormValue("name")
-			version := r.FormValue("v")
-    		getFile(filename, version, w)
+	switch action {
+	case "get_list":
+		ip := r.FormValue("ip")
+		getList(ip, w)
+	case "get_file":
+		filename := r.FormValue("name")
+		version := r.FormValue("v")
+		getFile(filename, version, w)
 	case "set_done":
 		ip := r.FormValue("ip")
 		setDone(ip, w)
-    }
+	}
 }
 
 func getList(ip string, w http.ResponseWriter) {
-	rows,err := db.Query("select v,files from version where v=(select v from machine where ip=? and done=0)", ip)
+	rows, err := db.Query("select v,files from version where v=(select v from machine where ip=? and done=0)", ip)
 	if err != nil {
 		logger.Println("cannot query table version")
 		fmt.Fprintf(w, "")
 		return
 	}
 	for rows.Next() {
-		var v,files string
+		var v, files string
 		err = rows.Scan(&v, &files)
 		if err == nil {
 			fmt.Fprintf(w, "%s;%s", v, files)
@@ -60,7 +60,7 @@ func getList(ip string, w http.ResponseWriter) {
 func getFile(filename string, version string, w http.ResponseWriter) {
 	name, _ := url.QueryUnescape(filename)
 	_, err := strconv.Atoi(version)
-	if strings.Contains(name, "..") || err!=nil {
+	if strings.Contains(name, "..") || err != nil {
 		logger.Println("invalid query.")
 		fmt.Fprintf(w, "")
 		return
@@ -87,7 +87,7 @@ func setDone(ip string, w http.ResponseWriter) {
 }
 
 type FilesAndVersion struct {
-	Files string
+	Files   string
 	Version int
 }
 
@@ -100,14 +100,14 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 			t.Execute(w, "")
 		}
 	} else {
-		r.ParseMultipartForm(32 << 20)
+		r.ParseMultipartForm(32<<20)
 		file, handler, err := r.FormFile("uploadfile")
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
 		defer file.Close()
-		f, err := os.OpenFile("../up/"+handler.Filename, os.O_WRONLY|os.O_CREATE, 0666)
+		f, err := os.OpenFile("../up/" + handler.Filename, os.O_WRONLY | os.O_CREATE, 0666)
 		if err != nil {
 			fmt.Fprintf(w, err.Error())
 			return
@@ -115,7 +115,7 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 		defer f.Close()
 		io.Copy(f, file)
 		v := getNextVersion()
-		files, err := unzipAndMove("../up/"+handler.Filename, v)
+		files, err := unzipAndMove("../up/" + handler.Filename, v)
 		if err != nil {
 			logger.Println(err)
 			fmt.Fprintf(w, err.Error())
@@ -176,37 +176,37 @@ func getNextVersion() int {
 
 func unzipAndMove(filename string, version int) (string, error) {
 	var files string
-	os.RemoveAll("../up/"+ strconv.Itoa(version) + "/")
-	rd,err := zip.OpenReader(filename);
+	os.RemoveAll("../up/" + strconv.Itoa(version) + "/")
+	rd, err := zip.OpenReader(filename);
 	if err != nil {
 		return "", err
 	}
-    filenames := make([]string, 0, 100)
+	filenames := make([]string,0, 100)
 	for _, f := range rd.File {
 		fname := f.FileInfo().Name()
 		// exclude dir
 		if !strings.HasSuffix(fname, "/") {
-            filenames = append(filenames, fname)
+			filenames = append(filenames, fname)
 		}
 		rc, err := f.Open()
-		if err!=nil {
+		if err != nil {
 			return "", err
 		}
-		os.MkdirAll("../up/"+ strconv.Itoa(version) + "/" + path.Dir(fname), os.ModePerm)
-		fw, _ := os.Create("../up/"+ strconv.Itoa(version) + "/" +  fname)
-		if err!=nil {
+		os.MkdirAll("../up/" + strconv.Itoa(version) + "/" + path.Dir(fname), os.ModePerm)
+		fw, _ := os.Create("../up/" + strconv.Itoa(version) + "/" + fname)
+		if err != nil {
 			return "", err
 		}
 		_, err = io.Copy(fw, rc)
-		if err!=nil {
+		if err != nil {
 			return "", err
 		}
 		if fw != nil {
 			fw.Close()
 		}
 	}
-    files = strings.Join(filenames, ";")
-    //logger.Println(files)
+	files = strings.Join(filenames, ";")
+	//logger.Println(files)
 	defer rd.Close()
 	return files, nil
 }
@@ -216,20 +216,20 @@ func main() {
 	os.Mkdir("../log/", 0666)
 	os.Mkdir("../up/", 0666)
 	logger = utils.InitLogger("../log/server.log")
-	db,err = sql.Open("mysql", "root:@tcp(localhost:3306)/agentserver?charset=utf8")
+	db, err = sql.Open("mysql", "root:@tcp(localhost:3306)/agentserver?charset=utf8")
 	if err != nil {
 		logger.Fatalln("cannot open database")
 		os.Exit(1)
 	}
 	defer db.Close()
-    
-    http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("../static/"))))	
-    http.HandleFunc("/update", dealRequest)
+
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("../static/"))))
+	http.HandleFunc("/update", dealRequest)
 	http.HandleFunc("/upload", uploadFile)
 	http.HandleFunc("/store", store)
 	err = http.ListenAndServe(":9090", nil)
-    if err != nil {
-        logger.Fatalln("ListenAndServe: ", err)
-    }
+	if err != nil {
+		logger.Fatalln("ListenAndServe: ", err)
+	}
 }
 

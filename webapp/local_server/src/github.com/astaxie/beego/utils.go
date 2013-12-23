@@ -16,7 +16,7 @@ import (
 func webTime(t time.Time) string {
 	ftime := t.Format(time.RFC1123)
 	if strings.HasSuffix(ftime, "UTC") {
-		ftime = ftime[0:len(ftime)-3] + "GMT"
+		ftime = ftime[0:len(ftime) - 3] + "GMT"
 	}
 	return ftime
 }
@@ -103,7 +103,6 @@ var DatePatterns = []string{
 	"T", "MST",
 	"P", "-07:00",
 	"O", "-0700",
-
 	// RFC 2822
 	"r", time.RFC1123Z,
 }
@@ -330,7 +329,7 @@ func RenderForm(obj interface{}) template.HTML {
 		}
 
 		raw = append(raw, fmt.Sprintf(`%v<input name="%v" type="%v" value="%v">`,
-			label, name, fType, fieldV.Interface()))
+				label, name, fType, fieldV.Interface()))
 	}
 	return template.HTML(strings.Join(raw, "</br>"))
 }

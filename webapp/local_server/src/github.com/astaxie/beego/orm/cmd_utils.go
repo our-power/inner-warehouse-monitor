@@ -109,7 +109,7 @@ func getDbCreateSql(al *alias) (sqls []string, tableIndexes map[string][]dbIndex
 
 		sql += fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s%s%s (\n", Q, mi.table, Q)
 
-		columns := make([]string, 0, len(mi.fields.fieldsDB))
+		columns := make([]string,0, len(mi.fields.fieldsDB))
 
 		sqlIndexes := [][]string{}
 
@@ -156,7 +156,7 @@ func getDbCreateSql(al *alias) (sqls []string, tableIndexes map[string][]dbIndex
 				allnames = append(allnames, mi.uniques)
 			}
 			for _, names := range allnames {
-				cols := make([]string, 0, len(names))
+				cols := make([]string,0, len(names))
 				for _, name := range names {
 					if fi, ok := mi.fields.GetByAny(name); ok && fi.dbcol {
 						cols = append(cols, fi.column)
@@ -188,7 +188,7 @@ func getDbCreateSql(al *alias) (sqls []string, tableIndexes map[string][]dbIndex
 
 		if mi.model != nil {
 			for _, names := range getTableIndex(mi.addrField) {
-				cols := make([]string, 0, len(names))
+				cols := make([]string,0, len(names))
 				for _, name := range names {
 					if fi, ok := mi.fields.GetByAny(name); ok && fi.dbcol {
 						cols = append(cols, fi.column)

@@ -91,7 +91,7 @@ func valuesFromKeyPath(ret *[]interface{}, m interface{}, keys []string, getAttr
 		case []interface{}:
 			for _, v := range m.([]interface{}) {
 				switch v.(type) {
-				// flatten out a list of maps - keys are processed
+					// flatten out a list of maps - keys are processed
 				case map[string]interface{}:
 					for kk, vv := range v.(map[string]interface{}) {
 						if string(kk[:1]) == "-" && !getAttrs { // skip attributes?

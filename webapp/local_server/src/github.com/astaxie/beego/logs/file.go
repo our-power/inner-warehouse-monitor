@@ -61,7 +61,7 @@ func NewFileWriter() LoggerInterface {
 	w := &FileLogWriter{
 		filename: "",
 		maxlines: 1000000,
-		maxsize:  1 << 28, //256 MB
+		maxsize:  1<<28, //256 MB
 		daily:    true,
 		maxdays:  7,
 		rotate:   true,
@@ -70,7 +70,7 @@ func NewFileWriter() LoggerInterface {
 	// use MuxWriter instead direct use os.File for lock write when rotate
 	w.mw = new(MuxWriter)
 	// set MuxWriter as Logger's io.Writer
-	w.Logger = log.New(w.mw, "", log.Ldate|log.Ltime)
+	w.Logger = log.New(w.mw, "", log.Ldate | log.Ltime)
 	return w
 }
 
@@ -133,8 +133,8 @@ func (w *FileLogWriter) docheck(size int) {
 	w.startLock.Lock()
 	defer w.startLock.Unlock()
 	if (w.maxlines > 0 && w.maxlines_curlines >= w.maxlines) ||
-		(w.maxsize > 0 && w.maxsize_cursize >= w.maxsize) ||
-		(w.daily && time.Now().Day() != w.daily_opendate) {
+			(w.maxsize > 0 && w.maxsize_cursize >= w.maxsize) ||
+			(w.daily && time.Now().Day() != w.daily_opendate) {
 		if err := w.DoRotate(); err != nil {
 			fmt.Fprintf(os.Stderr, "FileLogWriter(%q): %s\n", w.filename, err)
 			return
@@ -156,7 +156,7 @@ func (w *FileLogWriter) WriteMsg(msg string, level int) error {
 
 func (w *FileLogWriter) createLogFile() (*os.File, error) {
 	// Open the log file
-	fd, err := os.OpenFile(w.filename, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0660)
+	fd, err := os.OpenFile(w.filename, os.O_WRONLY | os.O_APPEND | os.O_CREATE, 0660)
 	return fd, err
 }
 
@@ -224,13 +224,13 @@ func (w *FileLogWriter) DoRotate() error {
 func (w *FileLogWriter) deleteOldLog() {
 	dir := path.Dir(w.filename)
 	filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
-		if !info.IsDir() && info.ModTime().Unix() < (time.Now().Unix()-60*60*24*w.maxdays) {
-			if strings.HasPrefix(filepath.Base(path), filepath.Base(w.filename)) {
-				os.Remove(path)
+			if !info.IsDir() && info.ModTime().Unix() < (time.Now().Unix() - 60*60*24*w.maxdays) {
+				if strings.HasPrefix(filepath.Base(path), filepath.Base(w.filename)) {
+					os.Remove(path)
+				}
 			}
-		}
-		return nil
-	})
+			return nil
+		})
 }
 
 func (w *FileLogWriter) Destroy() {

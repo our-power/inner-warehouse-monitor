@@ -26,7 +26,7 @@ type ResultType struct {
 	Status        string
 }
 
-func queryMachine(col string, items string)(partialResults []ResultType){
+func queryMachine(col string, items string) (partialResults []ResultType) {
 	o.Using("default")
 	if items != "" {
 		item_s := strings.Split(items, ",")

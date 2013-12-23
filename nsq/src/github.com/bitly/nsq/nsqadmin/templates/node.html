@@ -12,39 +12,44 @@
 
 {{if $g.Enabled}}
 <div class="row-fluid">
-  <div class="span8 offset2">
-    <table class="table muted">
-      <tr>
-        <td>
-          <a href="{{$g.LargeGraph $node "*_bytes"}}"><img class="img-polaroid" width="200" src="{{$g.LargeGraph $node "*_bytes"}}"/></a>
-          <h5 style="text-align: center;">GC Pressure</h5>
-        </td>
-        <td>
-          <a href="{{$g.LargeGraph $node "gc_pause_*"}}"><img class="img-polaroid" width="200" src="{{$g.LargeGraph $node "gc_pause_*"}}"/></a>
-          <h5 style="text-align: center;">GC Pause Percentiles</h5>
-        </td>
-        <td>
-          <a href="{{$g.LargeGraph $node "gc_runs"}}"><img class="img-polaroid" width="200" src="{{$g.LargeGraph $node "gc_runs"}}"/></a>
-          <h5 style="text-align: center;">GC Runs</h5>
-        </td>
-        <td>
-          <a href="{{$g.LargeGraph $node "heap_objects"}}"><img class="img-polaroid" width="200" src="{{$g.LargeGraph $node "heap_objects"}}"/></a>
-          <h5 style="text-align: center;">Heap Objects In-Use</h5>
-        </td>
-      </tr>
-    </table>
-  </div>
+    <div class="span8 offset2">
+        <table class="table muted">
+            <tr>
+                <td>
+                    <a href="{{$g.LargeGraph $node "*_bytes"}}"><img class="img-polaroid" width="200"
+                                                                     src="{{$g.LargeGraph $node "*_bytes"}}"/></a>
+                    <h5 style="text-align: center;">GC Pressure</h5>
+                </td>
+                <td>
+                    <a href="{{$g.LargeGraph $node " gc_pause_*"}}"><img class="img-polaroid" width="200"
+                                                                         src="{{$g.LargeGraph $node "
+                                                                         gc_pause_*"}}"/></a>
+                    <h5 style="text-align: center;">GC Pause Percentiles</h5>
+                </td>
+                <td>
+                    <a href="{{$g.LargeGraph $node " gc_runs"}}"><img class="img-polaroid" width="200"
+                                                                      src="{{$g.LargeGraph $node " gc_runs"}}"/></a>
+                    <h5 style="text-align: center;">GC Runs</h5>
+                </td>
+                <td>
+                    <a href="{{$g.LargeGraph $node " heap_objects"}}"><img class="img-polaroid" width="200"
+                                                                           src="{{$g.LargeGraph $node " heap_objects"}}"/></a>
+                    <h5 style="text-align: center;">Heap Objects In-Use</h5>
+                </td>
+            </tr>
+        </table>
+    </div>
 </div>
 {{end}}
 
 <div class="row-fluid">
     <div class="span12">
-    {{if not .TopicStats}}
+        {{if not .TopicStats}}
         <div class="alert">
             <h4>Notice</h4> No topics exist on this node.
         </div>
-    {{else}}
-    {{range $t := .TopicStats}}
+        {{else}}
+        {{range $t := .TopicStats}}
         <table class="table table-condensed">
             <tr>
                 <td colspan="2"><strong>{{$numTopics}}</strong> Topics</td>
@@ -61,22 +66,29 @@
                 <th>Channels</th>
             </tr>
             <tr class="info">
-                <td colspan="2"><a href="/tombstone_topic_producer?topic={{.TopicName}}&node={{$node}}&rd=/node/{{$node}}" class="red">✘</a> {{.TopicName}}</td>
+                <td colspan="2"><a
+                        href="/tombstone_topic_producer?topic={{.TopicName}}&node={{$node}}&rd=/node/{{$node}}"
+                        class="red">✘</a> {{.TopicName}}
+                </td>
                 <td>
-                    {{if $g.Enabled}}<a href="{{$g.LargeGraph $t "depth"}}"><img width="120" src="{{$g.Sparkline $t "depth"}}"></a>{{end}}
-                    {{.Depth | commafy}}</td>
+                    {{if $g.Enabled}}<a href="{{$g.LargeGraph $t " depth"}}"><img width="120" src="{{$g.Sparkline $t "
+                                                                                  depth"}}"></a>{{end}}
+                    {{.Depth | commafy}}
+                </td>
                 <td>{{.MemoryDepth | commafy}} + {{.BackendDepth | commafy}}</td>
                 <td colspan="4"></td>
                 <td>
-                    {{if $g.Enabled}}<a href="{{$g.LargeGraph $t "message_count"}}"><img width="120" src="{{$g.Sparkline $t "message_count"}}"></a>{{end}}
+                    {{if $g.Enabled}}<a href="{{$g.LargeGraph $t " message_count"}}"><img width="120"
+                                                                                          src="{{$g.Sparkline $t "
+                                                                                          message_count"}}"></a>{{end}}
                     {{.MessageCount | commafy}}
-                    </td>
+                </td>
                 <td>{{.ChannelCount}}</td>
             </tr>
             {{if not .Channels}}
             <tr>
                 <td colspan="*">
-                  <div class="alert"><h4>Notice</h4> No channels exist for this topic.</div>
+                    <div class="alert"><h4>Notice</h4> No channels exist for this topic.</div>
                 </td>
             </tr>
             {{else}}
@@ -100,8 +112,11 @@
                     {{if $c.Paused}}<span class="label label-important">paused</span>{{end}}
                 </td>
                 <td>
-                    {{if $g.Enabled}}<a href="{{$g.LargeGraph $c "depth"}}"><img width="120" height="20" src="{{$g.Sparkline $c "depth"}}"></a>{{end}}
-                    {{$c.Depth | commafy}}</td>
+                    {{if $g.Enabled}}<a href="{{$g.LargeGraph $c " depth"}}"><img width="120" height="20"
+                                                                                  src="{{$g.Sparkline $c "
+                                                                                  depth"}}"></a>{{end}}
+                    {{$c.Depth | commafy}}
+                </td>
                 <td>{{$c.MemoryDepth | commafy}} + {{$c.BackendDepth | commafy}}</td>
                 <td>{{$c.InFlightCount | commafy}}</td>
                 <td>{{$c.DeferredCount | commafy}}</td>
@@ -109,7 +124,9 @@
                 <td>{{$c.TimeoutCount | commafy}}</td>
                 <td>{{$c.MessageCount | commafy}}</td>
                 <td>
-                    {{if $g.Enabled}}<a href="{{$g.LargeGraph $c "clients"}}"><img width="120" height="20" src="{{$g.Sparkline $c "clients"}}"></a>{{end}}
+                    {{if $g.Enabled}}<a href="{{$g.LargeGraph $c " clients"}}"><img width="120" height="20"
+                                                                                    src="{{$g.Sparkline $c " clients"}}"></a>
+                    {{end}}
                     {{$c.ClientCount}}
                 </td>
             </tr>
@@ -147,12 +164,12 @@
             </tr>
             {{end}}
             {{end}}
-        {{end}}
-        {{end}}
+            {{end}}
+            {{end}}
         </table>
-    {{end}}
-    {{end}}
-</div>
+        {{end}}
+        {{end}}
+    </div>
 
-{{template "js.html" .}}
-{{template "footer.html" .}}
+    {{template "js.html" .}}
+    {{template "footer.html" .}}

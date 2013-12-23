@@ -66,7 +66,7 @@ type DBTest struct {
 	db *sql.DB
 }
 
-func runTests(t *testing.T, dsn string, tests ...func(dbt *DBTest)) {
+func runTests(t *testing.T, dsn string, tests ...func (dbt *DBTest)) {
 	if !available {
 		t.Skipf("MySQL-Server not running on %s", netAddr)
 	}
@@ -111,212 +111,212 @@ func (dbt *DBTest) mustQuery(query string, args ...interface{}) (rows *sql.Rows)
 
 func TestCRUD(t *testing.T) {
 	runTests(t, dsn, func(dbt *DBTest) {
-		// Create Table
-		dbt.mustExec("CREATE TABLE test (value BOOL)")
+			// Create Table
+			dbt.mustExec("CREATE TABLE test (value BOOL)")
 
-		// Test for unexpected data
-		var out bool
-		rows := dbt.mustQuery("SELECT * FROM test")
-		if rows.Next() {
-			dbt.Error("unexpected data in empty table")
-		}
-
-		// Create Data
-		res := dbt.mustExec("INSERT INTO test VALUES (1)")
-		count, err := res.RowsAffected()
-		if err != nil {
-			dbt.Fatalf("res.RowsAffected() returned error: %s", err.Error())
-		}
-		if count != 1 {
-			dbt.Fatalf("Expected 1 affected row, got %d", count)
-		}
-
-		id, err := res.LastInsertId()
-		if err != nil {
-			dbt.Fatalf("res.LastInsertId() returned error: %s", err.Error())
-		}
-		if id != 0 {
-			dbt.Fatalf("Expected InsertID 0, got %d", id)
-		}
-
-		// Read
-		rows = dbt.mustQuery("SELECT value FROM test")
-		if rows.Next() {
-			rows.Scan(&out)
-			if true != out {
-				dbt.Errorf("true != %t", out)
-			}
-
+			// Test for unexpected data
+			var out bool
+			rows := dbt.mustQuery("SELECT * FROM test")
 			if rows.Next() {
-				dbt.Error("unexpected data")
-			}
-		} else {
-			dbt.Error("no data")
-		}
-
-		// Update
-		res = dbt.mustExec("UPDATE test SET value = ? WHERE value = ?", false, true)
-		count, err = res.RowsAffected()
-		if err != nil {
-			dbt.Fatalf("res.RowsAffected() returned error: %s", err.Error())
-		}
-		if count != 1 {
-			dbt.Fatalf("Expected 1 affected row, got %d", count)
-		}
-
-		// Check Update
-		rows = dbt.mustQuery("SELECT value FROM test")
-		if rows.Next() {
-			rows.Scan(&out)
-			if false != out {
-				dbt.Errorf("false != %t", out)
+				dbt.Error("unexpected data in empty table")
 			}
 
+			// Create Data
+			res := dbt.mustExec("INSERT INTO test VALUES (1)")
+			count, err := res.RowsAffected()
+			if err != nil {
+				dbt.Fatalf("res.RowsAffected() returned error: %s", err.Error())
+			}
+			if count != 1 {
+				dbt.Fatalf("Expected 1 affected row, got %d", count)
+			}
+
+			id, err := res.LastInsertId()
+			if err != nil {
+				dbt.Fatalf("res.LastInsertId() returned error: %s", err.Error())
+			}
+			if id != 0 {
+				dbt.Fatalf("Expected InsertID 0, got %d", id)
+			}
+
+			// Read
+			rows = dbt.mustQuery("SELECT value FROM test")
 			if rows.Next() {
-				dbt.Error("unexpected data")
+				rows.Scan(&out)
+				if true != out {
+					dbt.Errorf("true != %t", out)
+				}
+
+				if rows.Next() {
+					dbt.Error("unexpected data")
+				}
+			} else {
+				dbt.Error("no data")
 			}
-		} else {
-			dbt.Error("no data")
-		}
 
-		// Delete
-		res = dbt.mustExec("DELETE FROM test WHERE value = ?", false)
-		count, err = res.RowsAffected()
-		if err != nil {
-			dbt.Fatalf("res.RowsAffected() returned error: %s", err.Error())
-		}
-		if count != 1 {
-			dbt.Fatalf("Expected 1 affected row, got %d", count)
-		}
+			// Update
+			res = dbt.mustExec("UPDATE test SET value = ? WHERE value = ?", false, true)
+			count, err = res.RowsAffected()
+			if err != nil {
+				dbt.Fatalf("res.RowsAffected() returned error: %s", err.Error())
+			}
+			if count != 1 {
+				dbt.Fatalf("Expected 1 affected row, got %d", count)
+			}
 
-		// Check for unexpected rows
-		res = dbt.mustExec("DELETE FROM test")
-		count, err = res.RowsAffected()
-		if err != nil {
-			dbt.Fatalf("res.RowsAffected() returned error: %s", err.Error())
-		}
-		if count != 0 {
-			dbt.Fatalf("Expected 0 affected row, got %d", count)
-		}
-	})
+			// Check Update
+			rows = dbt.mustQuery("SELECT value FROM test")
+			if rows.Next() {
+				rows.Scan(&out)
+				if false != out {
+					dbt.Errorf("false != %t", out)
+				}
+
+				if rows.Next() {
+					dbt.Error("unexpected data")
+				}
+			} else {
+				dbt.Error("no data")
+			}
+
+			// Delete
+			res = dbt.mustExec("DELETE FROM test WHERE value = ?", false)
+			count, err = res.RowsAffected()
+			if err != nil {
+				dbt.Fatalf("res.RowsAffected() returned error: %s", err.Error())
+			}
+			if count != 1 {
+				dbt.Fatalf("Expected 1 affected row, got %d", count)
+			}
+
+			// Check for unexpected rows
+			res = dbt.mustExec("DELETE FROM test")
+			count, err = res.RowsAffected()
+			if err != nil {
+				dbt.Fatalf("res.RowsAffected() returned error: %s", err.Error())
+			}
+			if count != 0 {
+				dbt.Fatalf("Expected 0 affected row, got %d", count)
+			}
+		})
 }
 
 func TestInt(t *testing.T) {
 	runTests(t, dsn, func(dbt *DBTest) {
-		types := [5]string{"TINYINT", "SMALLINT", "MEDIUMINT", "INT", "BIGINT"}
-		in := int64(42)
-		var out int64
-		var rows *sql.Rows
+			types := [5]string{"TINYINT", "SMALLINT", "MEDIUMINT", "INT", "BIGINT"}
+			in := int64(42)
+			var out int64
+			var rows *sql.Rows
 
-		// SIGNED
-		for _, v := range types {
-			dbt.mustExec("CREATE TABLE test (value " + v + ")")
+			// SIGNED
+			for _, v := range types {
+				dbt.mustExec("CREATE TABLE test (value " + v + ")")
 
-			dbt.mustExec("INSERT INTO test VALUES (?)", in)
+				dbt.mustExec("INSERT INTO test VALUES (?)", in)
 
-			rows = dbt.mustQuery("SELECT value FROM test")
-			if rows.Next() {
-				rows.Scan(&out)
-				if in != out {
-					dbt.Errorf("%s: %d != %d", v, in, out)
+				rows = dbt.mustQuery("SELECT value FROM test")
+				if rows.Next() {
+					rows.Scan(&out)
+					if in != out {
+						dbt.Errorf("%s: %d != %d", v, in, out)
+					}
+				} else {
+					dbt.Errorf("%s: no data", v)
 				}
-			} else {
-				dbt.Errorf("%s: no data", v)
+
+				dbt.mustExec("DROP TABLE IF EXISTS test")
 			}
 
-			dbt.mustExec("DROP TABLE IF EXISTS test")
-		}
+			// UNSIGNED ZEROFILL
+			for _, v := range types {
+				dbt.mustExec("CREATE TABLE test (value " + v + " ZEROFILL)")
 
-		// UNSIGNED ZEROFILL
-		for _, v := range types {
-			dbt.mustExec("CREATE TABLE test (value " + v + " ZEROFILL)")
+				dbt.mustExec("INSERT INTO test VALUES (?)", in)
 
-			dbt.mustExec("INSERT INTO test VALUES (?)", in)
-
-			rows = dbt.mustQuery("SELECT value FROM test")
-			if rows.Next() {
-				rows.Scan(&out)
-				if in != out {
-					dbt.Errorf("%s ZEROFILL: %d != %d", v, in, out)
+				rows = dbt.mustQuery("SELECT value FROM test")
+				if rows.Next() {
+					rows.Scan(&out)
+					if in != out {
+						dbt.Errorf("%s ZEROFILL: %d != %d", v, in, out)
+					}
+				} else {
+					dbt.Errorf("%s ZEROFILL: no data", v)
 				}
-			} else {
-				dbt.Errorf("%s ZEROFILL: no data", v)
-			}
 
-			dbt.mustExec("DROP TABLE IF EXISTS test")
-		}
-	})
+				dbt.mustExec("DROP TABLE IF EXISTS test")
+			}
+		})
 }
 
 func TestFloat(t *testing.T) {
 	runTests(t, dsn, func(dbt *DBTest) {
-		types := [2]string{"FLOAT", "DOUBLE"}
-		in := float32(42.23)
-		var out float32
-		var rows *sql.Rows
-		for _, v := range types {
-			dbt.mustExec("CREATE TABLE test (value " + v + ")")
-			dbt.mustExec("INSERT INTO test VALUES (?)", in)
-			rows = dbt.mustQuery("SELECT value FROM test")
-			if rows.Next() {
-				rows.Scan(&out)
-				if in != out {
-					dbt.Errorf("%s: %g != %g", v, in, out)
+			types := [2]string{"FLOAT", "DOUBLE"}
+			in := float32(42.23)
+			var out float32
+			var rows *sql.Rows
+			for _, v := range types {
+				dbt.mustExec("CREATE TABLE test (value " + v + ")")
+				dbt.mustExec("INSERT INTO test VALUES (?)", in)
+				rows = dbt.mustQuery("SELECT value FROM test")
+				if rows.Next() {
+					rows.Scan(&out)
+					if in != out {
+						dbt.Errorf("%s: %g != %g", v, in, out)
+					}
+				} else {
+					dbt.Errorf("%s: no data", v)
 				}
-			} else {
-				dbt.Errorf("%s: no data", v)
+				dbt.mustExec("DROP TABLE IF EXISTS test")
 			}
-			dbt.mustExec("DROP TABLE IF EXISTS test")
-		}
-	})
+		})
 }
 
 func TestString(t *testing.T) {
 	runTests(t, dsn, func(dbt *DBTest) {
-		types := [6]string{"CHAR(255)", "VARCHAR(255)", "TINYTEXT", "TEXT", "MEDIUMTEXT", "LONGTEXT"}
-		in := "κόσμε üöäßñóùéàâÿœ'îë Árvíztűrő いろはにほへとちりぬるを イロハニホヘト דג סקרן чащах  น่าฟังเอย"
-		var out string
-		var rows *sql.Rows
+			types := [6]string{"CHAR(255)", "VARCHAR(255)", "TINYTEXT", "TEXT", "MEDIUMTEXT", "LONGTEXT"}
+			in := "κόσμε üöäßñóùéàâÿœ'îë Árvíztűrő いろはにほへとちりぬるを イロハニホヘト דג סקרן чащах  น่าฟังเอย"
+			var out string
+			var rows *sql.Rows
 
-		for _, v := range types {
-			dbt.mustExec("CREATE TABLE test (value " + v + ") CHARACTER SET utf8")
+			for _, v := range types {
+				dbt.mustExec("CREATE TABLE test (value " + v + ") CHARACTER SET utf8")
 
-			dbt.mustExec("INSERT INTO test VALUES (?)", in)
+				dbt.mustExec("INSERT INTO test VALUES (?)", in)
 
-			rows = dbt.mustQuery("SELECT value FROM test")
-			if rows.Next() {
-				rows.Scan(&out)
-				if in != out {
-					dbt.Errorf("%s: %s != %s", v, in, out)
+				rows = dbt.mustQuery("SELECT value FROM test")
+				if rows.Next() {
+					rows.Scan(&out)
+					if in != out {
+						dbt.Errorf("%s: %s != %s", v, in, out)
+					}
+				} else {
+					dbt.Errorf("%s: no data", v)
 				}
-			} else {
-				dbt.Errorf("%s: no data", v)
+
+				dbt.mustExec("DROP TABLE IF EXISTS test")
 			}
 
-			dbt.mustExec("DROP TABLE IF EXISTS test")
-		}
+			// BLOB
+			dbt.mustExec("CREATE TABLE test (id int, value BLOB) CHARACTER SET utf8")
 
-		// BLOB
-		dbt.mustExec("CREATE TABLE test (id int, value BLOB) CHARACTER SET utf8")
+			id := 2
+			in = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, " +
+					"sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, " +
+					"sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. " +
+					"Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. " +
+					"Lorem ipsum dolor sit amet, consetetur sadipscing elitr, " +
+					"sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, " +
+					"sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. " +
+					"Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet."
+			dbt.mustExec("INSERT INTO test VALUES (?, ?)", id, in)
 
-		id := 2
-		in = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, " +
-			"sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, " +
-			"sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. " +
-			"Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. " +
-			"Lorem ipsum dolor sit amet, consetetur sadipscing elitr, " +
-			"sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, " +
-			"sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. " +
-			"Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet."
-		dbt.mustExec("INSERT INTO test VALUES (?, ?)", id, in)
-
-		err := dbt.db.QueryRow("SELECT value FROM test WHERE id = ?", id).Scan(&out)
-		if err != nil {
-			dbt.Fatalf("Error on BLOB-Query: %s", err.Error())
-		} else if out != in {
-			dbt.Errorf("BLOB: %s != %s", in, out)
-		}
-	})
+			err := dbt.db.QueryRow("SELECT value FROM test WHERE id = ?", id).Scan(&out)
+			if err != nil {
+				dbt.Fatalf("Error on BLOB-Query: %s", err.Error())
+			} else if out != in {
+				dbt.Errorf("BLOB: %s != %s", in, out)
+			}
+		})
 }
 
 func TestDateTime(t *testing.T) {
@@ -330,52 +330,50 @@ func TestDateTime(t *testing.T) {
 		tOut    time.Time
 		tIsZero bool
 	}
-	type tester func(dbt *DBTest, rows *sql.Rows,
-		test *timetest, sqltype, resulttype, mode string)
+	type tester func (dbt *DBTest, rows *sql.Rows,
+	test *timetest, sqltype, resulttype, mode string)
 	type setup struct {
 		vartype   string
 		dsnSuffix string
 		test      tester
 	}
 	var (
-		modes = map[string]*testmode{
-			"text":   &testmode{},
-			"binary": &testmode{" WHERE 1 = ?", []interface{}{1}},
-		}
+		modes     = map[string]*testmode{
+		"text":   &testmode{},
+		"binary": &testmode{" WHERE 1 = ?", []interface{}{1}},
+	}
 		timetests = map[string][]*timetest{
-			"DATE": {
-				{sDate, sDate, tDate, false},
-				{sDate0, sDate0, tDate0, true},
-				{tDate, sDate, tDate, false},
-				{tDate0, sDate0, tDate0, true},
-			},
-			"DATETIME": {
-				{sDateTime, sDateTime, tDateTime, false},
-				{sDateTime0, sDateTime0, tDate0, true},
-				{tDateTime, sDateTime, tDateTime, false},
-				{tDate0, sDateTime0, tDate0, true},
-			},
-		}
-		setups = []*setup{
-			{"string", "&parseTime=false", func(
-				dbt *DBTest, rows *sql.Rows, test *timetest, sqltype, resulttype, mode string) {
-				var sOut string
-				if err := rows.Scan(&sOut); err != nil {
-					dbt.Errorf("%s (%s %s): %s", sqltype, resulttype, mode, err.Error())
-				} else if test.sOut != sOut {
-					dbt.Errorf("%s (%s %s): %s != %s", sqltype, resulttype, mode, test.sOut, sOut)
-				}
-			}},
-			{"time.Time", "&parseTime=true", func(
-				dbt *DBTest, rows *sql.Rows, test *timetest, sqltype, resulttype, mode string) {
-				var tOut time.Time
-				if err := rows.Scan(&tOut); err != nil {
-					dbt.Errorf("%s (%s %s): %s", sqltype, resulttype, mode, err.Error())
-				} else if test.tOut != tOut || test.tIsZero != tOut.IsZero() {
-					dbt.Errorf("%s (%s %s): %s [%t] != %s [%t]", sqltype, resulttype, mode, test.tOut, test.tIsZero, tOut, tOut.IsZero())
-				}
-			}},
-		}
+		"DATE": {
+			{sDate, sDate, tDate, false},
+			{sDate0, sDate0, tDate0, true},
+			{tDate, sDate, tDate, false},
+			{tDate0, sDate0, tDate0, true},
+		},
+		"DATETIME": {
+			{sDateTime, sDateTime, tDateTime, false},
+			{sDateTime0, sDateTime0, tDate0, true},
+			{tDateTime, sDateTime, tDateTime, false},
+			{tDate0, sDateTime0, tDate0, true},
+		},
+	}
+		setups    = []*setup{
+		{"string", "&parseTime=false", func(dbt *DBTest, rows *sql.Rows, test *timetest, sqltype, resulttype, mode string) {
+			var sOut string
+			if err := rows.Scan(&sOut); err != nil {
+				dbt.Errorf("%s (%s %s): %s", sqltype, resulttype, mode, err.Error())
+			} else if test.sOut != sOut {
+				dbt.Errorf("%s (%s %s): %s != %s", sqltype, resulttype, mode, test.sOut, sOut)
+			}
+		}},
+		{"time.Time", "&parseTime=true", func(dbt *DBTest, rows *sql.Rows, test *timetest, sqltype, resulttype, mode string) {
+			var tOut time.Time
+			if err := rows.Scan(&tOut); err != nil {
+				dbt.Errorf("%s (%s %s): %s", sqltype, resulttype, mode, err.Error())
+			} else if test.tOut != tOut || test.tIsZero != tOut.IsZero() {
+				dbt.Errorf("%s (%s %s): %s [%t] != %s [%t]", sqltype, resulttype, mode, test.tOut, test.tIsZero, tOut, tOut.IsZero())
+			}
+		}},
+	}
 	)
 
 	var s *setup
@@ -387,7 +385,7 @@ func TestDateTime(t *testing.T) {
 				for mode, q := range modes {
 					dbt.mustExec("TRUNCATE test")
 					dbt.mustExec("INSERT INTO test VALUES (?)", test.in)
-					rows = dbt.mustQuery("SELECT value FROM test"+q.selectSuffix, q.args...)
+					rows = dbt.mustQuery("SELECT value FROM test" + q.selectSuffix, q.args...)
 					if rows.Next() {
 						s.test(dbt, rows, test, sqltype, s.vartype, mode)
 					} else {
@@ -408,418 +406,418 @@ func TestDateTime(t *testing.T) {
 	timeDsn := dsn + "&sql_mode=ALLOW_INVALID_DATES"
 	for _, v := range setups {
 		s = v
-		runTests(t, timeDsn+s.dsnSuffix, testTime)
+		runTests(t, timeDsn + s.dsnSuffix, testTime)
 	}
 }
 
 func TestNULL(t *testing.T) {
 	runTests(t, dsn, func(dbt *DBTest) {
-		nullStmt, err := dbt.db.Prepare("SELECT NULL")
-		if err != nil {
-			dbt.Fatal(err)
-		}
-		defer nullStmt.Close()
-
-		nonNullStmt, err := dbt.db.Prepare("SELECT 1")
-		if err != nil {
-			dbt.Fatal(err)
-		}
-		defer nonNullStmt.Close()
-
-		// NullBool
-		var nb sql.NullBool
-		// Invalid
-		if err = nullStmt.QueryRow().Scan(&nb); err != nil {
-			dbt.Fatal(err)
-		}
-		if nb.Valid {
-			dbt.Error("Valid NullBool which should be invalid")
-		}
-		// Valid
-		if err = nonNullStmt.QueryRow().Scan(&nb); err != nil {
-			dbt.Fatal(err)
-		}
-		if !nb.Valid {
-			dbt.Error("Invalid NullBool which should be valid")
-		} else if nb.Bool != true {
-			dbt.Errorf("Unexpected NullBool value: %t (should be true)", nb.Bool)
-		}
-
-		// NullFloat64
-		var nf sql.NullFloat64
-		// Invalid
-		if err = nullStmt.QueryRow().Scan(&nf); err != nil {
-			dbt.Fatal(err)
-		}
-		if nf.Valid {
-			dbt.Error("Valid NullFloat64 which should be invalid")
-		}
-		// Valid
-		if err = nonNullStmt.QueryRow().Scan(&nf); err != nil {
-			dbt.Fatal(err)
-		}
-		if !nf.Valid {
-			dbt.Error("Invalid NullFloat64 which should be valid")
-		} else if nf.Float64 != float64(1) {
-			dbt.Errorf("Unexpected NullFloat64 value: %f (should be 1.0)", nf.Float64)
-		}
-
-		// NullInt64
-		var ni sql.NullInt64
-		// Invalid
-		if err = nullStmt.QueryRow().Scan(&ni); err != nil {
-			dbt.Fatal(err)
-		}
-		if ni.Valid {
-			dbt.Error("Valid NullInt64 which should be invalid")
-		}
-		// Valid
-		if err = nonNullStmt.QueryRow().Scan(&ni); err != nil {
-			dbt.Fatal(err)
-		}
-		if !ni.Valid {
-			dbt.Error("Invalid NullInt64 which should be valid")
-		} else if ni.Int64 != int64(1) {
-			dbt.Errorf("Unexpected NullInt64 value: %d (should be 1)", ni.Int64)
-		}
-
-		// NullString
-		var ns sql.NullString
-		// Invalid
-		if err = nullStmt.QueryRow().Scan(&ns); err != nil {
-			dbt.Fatal(err)
-		}
-		if ns.Valid {
-			dbt.Error("Valid NullString which should be invalid")
-		}
-		// Valid
-		if err = nonNullStmt.QueryRow().Scan(&ns); err != nil {
-			dbt.Fatal(err)
-		}
-		if !ns.Valid {
-			dbt.Error("Invalid NullString which should be valid")
-		} else if ns.String != `1` {
-			dbt.Error("Unexpected NullString value:" + ns.String + " (should be `1`)")
-		}
-
-		// nil-bytes
-		var b []byte
-		// Read nil
-		if err = nullStmt.QueryRow().Scan(&b); err != nil {
-			dbt.Fatal(err)
-		}
-		if b != nil {
-			dbt.Error("Non-nil []byte wich should be nil")
-		}
-		// Read non-nil
-		if err = nonNullStmt.QueryRow().Scan(&b); err != nil {
-			dbt.Fatal(err)
-		}
-		if b == nil {
-			dbt.Error("Nil []byte wich should be non-nil")
-		}
-		// Insert nil
-		b = nil
-		success := false
-		if err = dbt.db.QueryRow("SELECT ? IS NULL", b).Scan(&success); err != nil {
-			dbt.Fatal(err)
-		}
-		if !success {
-			dbt.Error("Inserting []byte(nil) as NULL failed")
-		}
-		// Check input==output with input==nil
-		b = nil
-		if err = dbt.db.QueryRow("SELECT ?", b).Scan(&b); err != nil {
-			dbt.Fatal(err)
-		}
-		if b != nil {
-			dbt.Error("Non-nil echo from nil input")
-		}
-		// Check input==output with input!=nil
-		b = []byte("")
-		if err = dbt.db.QueryRow("SELECT ?", b).Scan(&b); err != nil {
-			dbt.Fatal(err)
-		}
-		if b == nil {
-			dbt.Error("nil echo from non-nil input")
-		}
-
-		// Insert NULL
-		dbt.mustExec("CREATE TABLE test (dummmy1 int, value int, dummy2 int)")
-
-		dbt.mustExec("INSERT INTO test VALUES (?, ?, ?)", 1, nil, 2)
-
-		var out interface{}
-		rows := dbt.mustQuery("SELECT * FROM test")
-		if rows.Next() {
-			rows.Scan(&out)
-			if out != nil {
-				dbt.Errorf("%v != nil", out)
+			nullStmt, err := dbt.db.Prepare("SELECT NULL")
+			if err != nil {
+				dbt.Fatal(err)
 			}
-		} else {
-			dbt.Error("no data")
-		}
-	})
+			defer nullStmt.Close()
+
+			nonNullStmt, err := dbt.db.Prepare("SELECT 1")
+			if err != nil {
+				dbt.Fatal(err)
+			}
+			defer nonNullStmt.Close()
+
+			// NullBool
+			var nb sql.NullBool
+			// Invalid
+			if err = nullStmt.QueryRow().Scan(&nb); err != nil {
+				dbt.Fatal(err)
+			}
+			if nb.Valid {
+				dbt.Error("Valid NullBool which should be invalid")
+			}
+			// Valid
+			if err = nonNullStmt.QueryRow().Scan(&nb); err != nil {
+				dbt.Fatal(err)
+			}
+			if !nb.Valid {
+				dbt.Error("Invalid NullBool which should be valid")
+			} else if nb.Bool != true {
+				dbt.Errorf("Unexpected NullBool value: %t (should be true)", nb.Bool)
+			}
+
+			// NullFloat64
+			var nf sql.NullFloat64
+			// Invalid
+			if err = nullStmt.QueryRow().Scan(&nf); err != nil {
+				dbt.Fatal(err)
+			}
+			if nf.Valid {
+				dbt.Error("Valid NullFloat64 which should be invalid")
+			}
+			// Valid
+			if err = nonNullStmt.QueryRow().Scan(&nf); err != nil {
+				dbt.Fatal(err)
+			}
+			if !nf.Valid {
+				dbt.Error("Invalid NullFloat64 which should be valid")
+			} else if nf.Float64 != float64(1) {
+				dbt.Errorf("Unexpected NullFloat64 value: %f (should be 1.0)", nf.Float64)
+			}
+
+			// NullInt64
+			var ni sql.NullInt64
+			// Invalid
+			if err = nullStmt.QueryRow().Scan(&ni); err != nil {
+				dbt.Fatal(err)
+			}
+			if ni.Valid {
+				dbt.Error("Valid NullInt64 which should be invalid")
+			}
+			// Valid
+			if err = nonNullStmt.QueryRow().Scan(&ni); err != nil {
+				dbt.Fatal(err)
+			}
+			if !ni.Valid {
+				dbt.Error("Invalid NullInt64 which should be valid")
+			} else if ni.Int64 != int64(1) {
+				dbt.Errorf("Unexpected NullInt64 value: %d (should be 1)", ni.Int64)
+			}
+
+			// NullString
+			var ns sql.NullString
+			// Invalid
+			if err = nullStmt.QueryRow().Scan(&ns); err != nil {
+				dbt.Fatal(err)
+			}
+			if ns.Valid {
+				dbt.Error("Valid NullString which should be invalid")
+			}
+			// Valid
+			if err = nonNullStmt.QueryRow().Scan(&ns); err != nil {
+				dbt.Fatal(err)
+			}
+			if !ns.Valid {
+				dbt.Error("Invalid NullString which should be valid")
+			} else if ns.String != `1` {
+				dbt.Error("Unexpected NullString value:" + ns.String + " (should be `1`)")
+			}
+
+			// nil-bytes
+			var b []byte
+			// Read nil
+			if err = nullStmt.QueryRow().Scan(&b); err != nil {
+				dbt.Fatal(err)
+			}
+			if b != nil {
+				dbt.Error("Non-nil []byte wich should be nil")
+			}
+			// Read non-nil
+			if err = nonNullStmt.QueryRow().Scan(&b); err != nil {
+				dbt.Fatal(err)
+			}
+			if b == nil {
+				dbt.Error("Nil []byte wich should be non-nil")
+			}
+			// Insert nil
+			b = nil
+			success := false
+			if err = dbt.db.QueryRow("SELECT ? IS NULL", b).Scan(&success); err != nil {
+				dbt.Fatal(err)
+			}
+			if !success {
+				dbt.Error("Inserting []byte(nil) as NULL failed")
+			}
+			// Check input==output with input==nil
+			b = nil
+			if err = dbt.db.QueryRow("SELECT ?", b).Scan(&b); err != nil {
+				dbt.Fatal(err)
+			}
+			if b != nil {
+				dbt.Error("Non-nil echo from nil input")
+			}
+			// Check input==output with input!=nil
+			b = []byte("")
+			if err = dbt.db.QueryRow("SELECT ?", b).Scan(&b); err != nil {
+				dbt.Fatal(err)
+			}
+			if b == nil {
+				dbt.Error("nil echo from non-nil input")
+			}
+
+			// Insert NULL
+			dbt.mustExec("CREATE TABLE test (dummmy1 int, value int, dummy2 int)")
+
+			dbt.mustExec("INSERT INTO test VALUES (?, ?, ?)", 1, nil, 2)
+
+			var out interface{}
+			rows := dbt.mustQuery("SELECT * FROM test")
+			if rows.Next() {
+				rows.Scan(&out)
+				if out != nil {
+					dbt.Errorf("%v != nil", out)
+				}
+			} else {
+				dbt.Error("no data")
+			}
+		})
 }
 
 func TestLongData(t *testing.T) {
 	runTests(t, dsn, func(dbt *DBTest) {
-		var maxAllowedPacketSize int
-		err := dbt.db.QueryRow("select @@max_allowed_packet").Scan(&maxAllowedPacketSize)
-		if err != nil {
-			dbt.Fatal(err)
-		}
-		maxAllowedPacketSize--
-
-		// don't get too ambitious
-		if maxAllowedPacketSize > 1<<25 {
-			maxAllowedPacketSize = 1 << 25
-		}
-
-		dbt.mustExec("CREATE TABLE test (value LONGBLOB)")
-
-		in := strings.Repeat(`a`, maxAllowedPacketSize+1)
-		var out string
-		var rows *sql.Rows
-
-		// Long text data
-		const nonDataQueryLen = 28 // length query w/o value
-		inS := in[:maxAllowedPacketSize-nonDataQueryLen]
-		dbt.mustExec("INSERT INTO test VALUES('" + inS + "')")
-		rows = dbt.mustQuery("SELECT value FROM test")
-		if rows.Next() {
-			rows.Scan(&out)
-			if inS != out {
-				dbt.Fatalf("LONGBLOB: length in: %d, length out: %d", len(inS), len(out))
+			var maxAllowedPacketSize int
+			err := dbt.db.QueryRow("select @@max_allowed_packet").Scan(&maxAllowedPacketSize)
+			if err != nil {
+				dbt.Fatal(err)
 			}
+			maxAllowedPacketSize--
+
+			// don't get too ambitious
+			if maxAllowedPacketSize > 1<<25 {
+				maxAllowedPacketSize = 1<<25
+			}
+
+			dbt.mustExec("CREATE TABLE test (value LONGBLOB)")
+
+			in := strings.Repeat(`a`, maxAllowedPacketSize + 1)
+			var out string
+			var rows *sql.Rows
+
+			// Long text data
+			const nonDataQueryLen = 28 // length query w/o value
+			inS := in[:maxAllowedPacketSize - nonDataQueryLen]
+			dbt.mustExec("INSERT INTO test VALUES('" + inS + "')")
+			rows = dbt.mustQuery("SELECT value FROM test")
 			if rows.Next() {
-				dbt.Error("LONGBLOB: unexpexted row")
-			}
-		} else {
-			dbt.Fatalf("LONGBLOB: no data")
-		}
-
-		// Empty table
-		dbt.mustExec("TRUNCATE TABLE test")
-
-		// Long binary data
-		dbt.mustExec("INSERT INTO test VALUES(?)", in)
-		rows = dbt.mustQuery("SELECT value FROM test WHERE 1=?", 1)
-		if rows.Next() {
-			rows.Scan(&out)
-			if in != out {
-				dbt.Fatalf("LONGBLOB: length in: %d, length out: %d", len(in), len(out))
-			}
-			if rows.Next() {
-				dbt.Error("LONGBLOB: unexpexted row")
-			}
-		} else {
-			if err = rows.Err(); err != nil {
-				dbt.Fatalf("LONGBLOB: no data (err: %s)", err.Error())
+				rows.Scan(&out)
+				if inS != out {
+					dbt.Fatalf("LONGBLOB: length in: %d, length out: %d", len(inS), len(out))
+				}
+				if rows.Next() {
+					dbt.Error("LONGBLOB: unexpexted row")
+				}
 			} else {
-				dbt.Fatal("LONGBLOB: no data (err: <nil>)")
+				dbt.Fatalf("LONGBLOB: no data")
 			}
-		}
-	})
+
+			// Empty table
+			dbt.mustExec("TRUNCATE TABLE test")
+
+			// Long binary data
+			dbt.mustExec("INSERT INTO test VALUES(?)", in)
+			rows = dbt.mustQuery("SELECT value FROM test WHERE 1=?", 1)
+			if rows.Next() {
+				rows.Scan(&out)
+				if in != out {
+					dbt.Fatalf("LONGBLOB: length in: %d, length out: %d", len(in), len(out))
+				}
+				if rows.Next() {
+					dbt.Error("LONGBLOB: unexpexted row")
+				}
+			} else {
+				if err = rows.Err(); err != nil {
+					dbt.Fatalf("LONGBLOB: no data (err: %s)", err.Error())
+				} else {
+					dbt.Fatal("LONGBLOB: no data (err: <nil>)")
+				}
+			}
+		})
 }
 
 func TestLoadData(t *testing.T) {
 	runTests(t, dsn, func(dbt *DBTest) {
-		verifyLoadDataResult := func() {
-			rows, err := dbt.db.Query("SELECT * FROM test")
-			if err != nil {
-				dbt.Fatal(err.Error())
-			}
-
-			i := 0
-			values := [4]string{
-				"a string",
-				"a string containing a \t",
-				"a string containing a \n",
-				"a string containing both \t\n",
-			}
-
-			var id int
-			var value string
-
-			for rows.Next() {
-				i++
-				err = rows.Scan(&id, &value)
+			verifyLoadDataResult := func() {
+				rows, err := dbt.db.Query("SELECT * FROM test")
 				if err != nil {
 					dbt.Fatal(err.Error())
 				}
-				if i != id {
-					dbt.Fatalf("%d != %d", i, id)
+
+				i := 0
+				values := [4]string{
+					"a string",
+					"a string containing a \t",
+					"a string containing a \n",
+					"a string containing both \t\n",
 				}
-				if values[i-1] != value {
-					dbt.Fatalf("%s != %s", values[i-1], value)
+
+				var id int
+				var value string
+
+				for rows.Next() {
+					i++
+					err = rows.Scan(&id, &value)
+					if err != nil {
+						dbt.Fatal(err.Error())
+					}
+					if i != id {
+						dbt.Fatalf("%d != %d", i, id)
+					}
+					if values[i - 1] != value {
+						dbt.Fatalf("%s != %s", values[i - 1], value)
+					}
+				}
+				err = rows.Err()
+				if err != nil {
+					dbt.Fatal(err.Error())
+				}
+
+				if i != 4 {
+					dbt.Fatalf("Rows count mismatch. Got %d, want 4", i)
 				}
 			}
-			err = rows.Err()
-			if err != nil {
-				dbt.Fatal(err.Error())
-			}
-
-			if i != 4 {
-				dbt.Fatalf("Rows count mismatch. Got %d, want 4", i)
-			}
-		}
-		file, err := ioutil.TempFile("", "gotest")
-		defer os.Remove(file.Name())
-		if err != nil {
-			dbt.Fatal(err)
-		}
-		file.WriteString("1\ta string\n2\ta string containing a \\t\n3\ta string containing a \\n\n4\ta string containing both \\t\\n\n")
-		file.Close()
-
-		dbt.db.Exec("DROP TABLE IF EXISTS test")
-		dbt.mustExec("CREATE TABLE test (id INT NOT NULL PRIMARY KEY, value TEXT NOT NULL) CHARACTER SET utf8")
-
-		// Local File
-		RegisterLocalFile(file.Name())
-		dbt.mustExec(fmt.Sprintf("LOAD DATA LOCAL INFILE '%q' INTO TABLE test", file.Name()))
-		verifyLoadDataResult()
-		// negative test
-		_, err = dbt.db.Exec("LOAD DATA LOCAL INFILE 'doesnotexist' INTO TABLE test")
-		if err == nil {
-			dbt.Fatal("Load non-existent file didn't fail")
-		} else if err.Error() != "Local File 'doesnotexist' is not registered. Use the DSN parameter 'allowAllFiles=true' to allow all files" {
-			dbt.Fatal(err.Error())
-		}
-
-		// Empty table
-		dbt.mustExec("TRUNCATE TABLE test")
-
-		// Reader
-		RegisterReaderHandler("test", func() io.Reader {
-			file, err = os.Open(file.Name())
+			file, err := ioutil.TempFile("", "gotest")
+			defer os.Remove(file.Name())
 			if err != nil {
 				dbt.Fatal(err)
 			}
-			return file
+			file.WriteString("1\ta string\n2\ta string containing a \\t\n3\ta string containing a \\n\n4\ta string containing both \\t\\n\n")
+			file.Close()
+
+			dbt.db.Exec("DROP TABLE IF EXISTS test")
+			dbt.mustExec("CREATE TABLE test (id INT NOT NULL PRIMARY KEY, value TEXT NOT NULL) CHARACTER SET utf8")
+
+			// Local File
+			RegisterLocalFile(file.Name())
+			dbt.mustExec(fmt.Sprintf("LOAD DATA LOCAL INFILE '%q' INTO TABLE test", file.Name()))
+			verifyLoadDataResult()
+			// negative test
+			_, err = dbt.db.Exec("LOAD DATA LOCAL INFILE 'doesnotexist' INTO TABLE test")
+			if err == nil {
+				dbt.Fatal("Load non-existent file didn't fail")
+			} else if err.Error() != "Local File 'doesnotexist' is not registered. Use the DSN parameter 'allowAllFiles=true' to allow all files" {
+				dbt.Fatal(err.Error())
+			}
+
+			// Empty table
+			dbt.mustExec("TRUNCATE TABLE test")
+
+			// Reader
+			RegisterReaderHandler("test", func() io.Reader {
+					file, err = os.Open(file.Name())
+					if err != nil {
+						dbt.Fatal(err)
+					}
+					return file
+				})
+			dbt.mustExec("LOAD DATA LOCAL INFILE 'Reader::test' INTO TABLE test")
+			verifyLoadDataResult()
+			// negative test
+			_, err = dbt.db.Exec("LOAD DATA LOCAL INFILE 'Reader::doesnotexist' INTO TABLE test")
+			if err == nil {
+				dbt.Fatal("Load non-existent Reader didn't fail")
+			} else if err.Error() != "Reader 'doesnotexist' is not registered" {
+				dbt.Fatal(err.Error())
+			}
 		})
-		dbt.mustExec("LOAD DATA LOCAL INFILE 'Reader::test' INTO TABLE test")
-		verifyLoadDataResult()
-		// negative test
-		_, err = dbt.db.Exec("LOAD DATA LOCAL INFILE 'Reader::doesnotexist' INTO TABLE test")
-		if err == nil {
-			dbt.Fatal("Load non-existent Reader didn't fail")
-		} else if err.Error() != "Reader 'doesnotexist' is not registered" {
-			dbt.Fatal(err.Error())
-		}
-	})
 }
 
 func TestFoundRows(t *testing.T) {
 	runTests(t, dsn, func(dbt *DBTest) {
-		dbt.mustExec("CREATE TABLE test (id INT NOT NULL ,data INT NOT NULL)")
-		dbt.mustExec("INSERT INTO test (id, data) VALUES (0, 0),(0, 0),(1, 0),(1, 0),(1, 1)")
+			dbt.mustExec("CREATE TABLE test (id INT NOT NULL ,data INT NOT NULL)")
+			dbt.mustExec("INSERT INTO test (id, data) VALUES (0, 0),(0, 0),(1, 0),(1, 0),(1, 1)")
 
-		res := dbt.mustExec("UPDATE test SET data = 1 WHERE id = 0")
-		count, err := res.RowsAffected()
-		if err != nil {
-			dbt.Fatalf("res.RowsAffected() returned error: %s", err.Error())
-		}
-		if count != 2 {
-			dbt.Fatalf("Expected 2 affected rows, got %d", count)
-		}
-		res = dbt.mustExec("UPDATE test SET data = 1 WHERE id = 1")
-		count, err = res.RowsAffected()
-		if err != nil {
-			dbt.Fatalf("res.RowsAffected() returned error: %s", err.Error())
-		}
-		if count != 2 {
-			dbt.Fatalf("Expected 2 affected rows, got %d", count)
-		}
-	})
-	runTests(t, dsn+"&clientFoundRows=true", func(dbt *DBTest) {
-		dbt.mustExec("CREATE TABLE test (id INT NOT NULL ,data INT NOT NULL)")
-		dbt.mustExec("INSERT INTO test (id, data) VALUES (0, 0),(0, 0),(1, 0),(1, 0),(1, 1)")
+			res := dbt.mustExec("UPDATE test SET data = 1 WHERE id = 0")
+			count, err := res.RowsAffected()
+			if err != nil {
+				dbt.Fatalf("res.RowsAffected() returned error: %s", err.Error())
+			}
+			if count != 2 {
+				dbt.Fatalf("Expected 2 affected rows, got %d", count)
+			}
+			res = dbt.mustExec("UPDATE test SET data = 1 WHERE id = 1")
+			count, err = res.RowsAffected()
+			if err != nil {
+				dbt.Fatalf("res.RowsAffected() returned error: %s", err.Error())
+			}
+			if count != 2 {
+				dbt.Fatalf("Expected 2 affected rows, got %d", count)
+			}
+		})
+	runTests(t, dsn + "&clientFoundRows=true", func(dbt *DBTest) {
+			dbt.mustExec("CREATE TABLE test (id INT NOT NULL ,data INT NOT NULL)")
+			dbt.mustExec("INSERT INTO test (id, data) VALUES (0, 0),(0, 0),(1, 0),(1, 0),(1, 1)")
 
-		res := dbt.mustExec("UPDATE test SET data = 1 WHERE id = 0")
-		count, err := res.RowsAffected()
-		if err != nil {
-			dbt.Fatalf("res.RowsAffected() returned error: %s", err.Error())
-		}
-		if count != 2 {
-			dbt.Fatalf("Expected 2 matched rows, got %d", count)
-		}
-		res = dbt.mustExec("UPDATE test SET data = 1 WHERE id = 1")
-		count, err = res.RowsAffected()
-		if err != nil {
-			dbt.Fatalf("res.RowsAffected() returned error: %s", err.Error())
-		}
-		if count != 3 {
-			dbt.Fatalf("Expected 3 matched rows, got %d", count)
-		}
-	})
+			res := dbt.mustExec("UPDATE test SET data = 1 WHERE id = 0")
+			count, err := res.RowsAffected()
+			if err != nil {
+				dbt.Fatalf("res.RowsAffected() returned error: %s", err.Error())
+			}
+			if count != 2 {
+				dbt.Fatalf("Expected 2 matched rows, got %d", count)
+			}
+			res = dbt.mustExec("UPDATE test SET data = 1 WHERE id = 1")
+			count, err = res.RowsAffected()
+			if err != nil {
+				dbt.Fatalf("res.RowsAffected() returned error: %s", err.Error())
+			}
+			if count != 3 {
+				dbt.Fatalf("Expected 3 matched rows, got %d", count)
+			}
+		})
 }
 
 func TestStrict(t *testing.T) {
 	// ALLOW_INVALID_DATES to get rid of stricter modes - we want to test for warnings, not errors
 	relaxedDsn := dsn + "&sql_mode=ALLOW_INVALID_DATES"
 	runTests(t, relaxedDsn, func(dbt *DBTest) {
-		dbt.mustExec("CREATE TABLE test (a TINYINT NOT NULL, b CHAR(4))")
+			dbt.mustExec("CREATE TABLE test (a TINYINT NOT NULL, b CHAR(4))")
 
-		var queries = [...]struct {
-			in    string
-			codes []string
-		}{
-			{"DROP TABLE IF EXISTS no_such_table", []string{"1051"}},
-			{"INSERT INTO test VALUES(10,'mysql'),(NULL,'test'),(300,'Open Source')", []string{"1265", "1048", "1264", "1265"}},
-		}
-		var err error
-
-		var checkWarnings = func(err error, mode string, idx int) {
-			if err == nil {
-				dbt.Errorf("Expected STRICT error on query [%s] %s", mode, queries[idx].in)
+			var queries = [...]struct {
+				in    string
+				codes []string
+			}{
+				{"DROP TABLE IF EXISTS no_such_table", []string{"1051"}},
+				{"INSERT INTO test VALUES(10,'mysql'),(NULL,'test'),(300,'Open Source')", []string{"1265", "1048", "1264", "1265"}},
 			}
+			var err error
 
-			if warnings, ok := err.(MySQLWarnings); ok {
-				var codes = make([]string, len(warnings))
-				for i := range warnings {
-					codes[i] = warnings[i].Code
-				}
-				if len(codes) != len(queries[idx].codes) {
-					dbt.Errorf("Unexpected STRICT error count on query [%s] %s: Wanted %v, Got %v", mode, queries[idx].in, queries[idx].codes, codes)
+			var checkWarnings = func(err error, mode string, idx int) {
+				if err == nil {
+					dbt.Errorf("Expected STRICT error on query [%s] %s", mode, queries[idx].in)
 				}
 
-				for i := range warnings {
-					if codes[i] != queries[idx].codes[i] {
-						dbt.Errorf("Unexpected STRICT error codes on query [%s] %s: Wanted %v, Got %v", mode, queries[idx].in, queries[idx].codes, codes)
-						return
+				if warnings, ok := err.(MySQLWarnings); ok {
+					var codes = make([]string, len(warnings))
+					for i := range warnings {
+						codes[i] = warnings[i].Code
 					}
+					if len(codes) != len(queries[idx].codes) {
+						dbt.Errorf("Unexpected STRICT error count on query [%s] %s: Wanted %v, Got %v", mode, queries[idx].in, queries[idx].codes, codes)
+					}
+
+					for i := range warnings {
+						if codes[i] != queries[idx].codes[i] {
+							dbt.Errorf("Unexpected STRICT error codes on query [%s] %s: Wanted %v, Got %v", mode, queries[idx].in, queries[idx].codes, codes)
+							return
+						}
+					}
+
+				} else {
+					dbt.Errorf("Unexpected error on query [%s] %s: %s", mode, queries[idx].in, err.Error())
+				}
+			}
+
+			// text protocol
+			for i := range queries {
+				_, err = dbt.db.Exec(queries[i].in)
+				checkWarnings(err, "text", i)
+			}
+
+			var stmt *sql.Stmt
+
+			// binary protocol
+			for i := range queries {
+				stmt, err = dbt.db.Prepare(queries[i].in)
+				if err != nil {
+					dbt.Errorf("Error on preparing query %s: %s", queries[i].in, err.Error())
 				}
 
-			} else {
-				dbt.Errorf("Unexpected error on query [%s] %s: %s", mode, queries[idx].in, err.Error())
+				_, err = stmt.Exec()
+				checkWarnings(err, "binary", i)
+
+				err = stmt.Close()
+				if err != nil {
+					dbt.Errorf("Error on closing stmt for query %s: %s", queries[i].in, err.Error())
+				}
 			}
-		}
-
-		// text protocol
-		for i := range queries {
-			_, err = dbt.db.Exec(queries[i].in)
-			checkWarnings(err, "text", i)
-		}
-
-		var stmt *sql.Stmt
-
-		// binary protocol
-		for i := range queries {
-			stmt, err = dbt.db.Prepare(queries[i].in)
-			if err != nil {
-				dbt.Errorf("Error on preparing query %s: %s", queries[i].in, err.Error())
-			}
-
-			_, err = stmt.Exec()
-			checkWarnings(err, "binary", i)
-
-			err = stmt.Close()
-			if err != nil {
-				dbt.Errorf("Error on closing stmt for query %s: %s", queries[i].in, err.Error())
-			}
-		}
-	})
+		})
 }
 
 func TestTLS(t *testing.T) {
@@ -846,13 +844,13 @@ func TestTLS(t *testing.T) {
 		}
 	}
 
-	runTests(t, dsn+"&tls=skip-verify", tlsTest)
+	runTests(t, dsn + "&tls=skip-verify", tlsTest)
 
 	// Verify that registering / using a custom cfg works
 	RegisterTLSConfig("custom-skip-verify", &tls.Config{
-		InsecureSkipVerify: true,
-	})
-	runTests(t, dsn+"&tls=custom-skip-verify", tlsTest)
+			InsecureSkipVerify: true,
+		})
+	runTests(t, dsn + "&tls=custom-skip-verify", tlsTest)
 }
 
 func TestReuseClosedConnection(t *testing.T) {
@@ -897,21 +895,21 @@ func TestCharset(t *testing.T) {
 	}
 
 	mustSetCharset := func(charsetParam, expected string) {
-		runTests(t, dsn+"&"+charsetParam, func(dbt *DBTest) {
-			rows := dbt.mustQuery("SELECT @@character_set_connection")
-			defer rows.Close()
+		runTests(t, dsn + "&" + charsetParam, func(dbt *DBTest) {
+				rows := dbt.mustQuery("SELECT @@character_set_connection")
+				defer rows.Close()
 
-			if !rows.Next() {
-				dbt.Fatalf("Error getting connection charset: %s", rows.Err())
-			}
+				if !rows.Next() {
+					dbt.Fatalf("Error getting connection charset: %s", rows.Err())
+				}
 
-			var got string
-			rows.Scan(&got)
+				var got string
+				rows.Scan(&got)
 
-			if got != expected {
-				dbt.Fatalf("Expected connection charset %s but got %s", expected, got)
-			}
-		})
+				if got != expected {
+					dbt.Fatalf("Expected connection charset %s but got %s", expected, got)
+				}
+			})
 	}
 
 	// non utf8 test
@@ -926,32 +924,32 @@ func TestCharset(t *testing.T) {
 }
 
 func TestFailingCharset(t *testing.T) {
-	runTests(t, dsn+"&charset=none", func(dbt *DBTest) {
-		// run query to really establish connection...
-		_, err := dbt.db.Exec("SELECT 1")
-		if err == nil {
-			dbt.db.Close()
-			t.Fatalf("Connection must not succeed without a valid charset")
-		}
-	})
+	runTests(t, dsn + "&charset=none", func(dbt *DBTest) {
+			// run query to really establish connection...
+			_, err := dbt.db.Exec("SELECT 1")
+			if err == nil {
+				dbt.db.Close()
+				t.Fatalf("Connection must not succeed without a valid charset")
+			}
+		})
 }
 
 func TestRawBytesResultExceedsBuffer(t *testing.T) {
 	runTests(t, dsn, func(dbt *DBTest) {
-		// defaultBufSize from buffer.go
-		expected := strings.Repeat("abc", defaultBufSize)
+			// defaultBufSize from buffer.go
+			expected := strings.Repeat("abc", defaultBufSize)
 
-		rows := dbt.mustQuery("SELECT '" + expected + "'")
-		defer rows.Close()
-		if !rows.Next() {
-			dbt.Error("expected result, got none")
-		}
-		var result sql.RawBytes
-		rows.Scan(&result)
-		if expected != string(result) {
-			dbt.Error("result did not match expected value")
-		}
-	})
+			rows := dbt.mustQuery("SELECT '" + expected + "'")
+			defer rows.Close()
+			if !rows.Next() {
+				dbt.Error("expected result, got none")
+			}
+			var result sql.RawBytes
+			rows.Scan(&result)
+			if expected != string(result) {
+				dbt.Error("result did not match expected value")
+			}
+		})
 }
 
 func TestTimezoneConversion(t *testing.T) {
@@ -989,7 +987,7 @@ func TestTimezoneConversion(t *testing.T) {
 	}
 
 	for _, tz := range zones {
-		runTests(t, dsn+"&parseTime=true&loc="+url.QueryEscape(tz), tzTest)
+		runTests(t, dsn + "&parseTime=true&loc=" + url.QueryEscape(tz), tzTest)
 	}
 }
 
@@ -999,213 +997,213 @@ func TestTimezoneConversion(t *testing.T) {
 // time strings.
 func TestTimeSign(t *testing.T) {
 	runTests(t, dsn, func(dbt *DBTest) {
-		var sTimes = []struct {
-			value     string
-			fieldType string
-		}{
-			{"12:34:56", "TIME"},
-			{"-12:34:56", "TIME"},
-			// As described in http://dev.mysql.com/doc/refman/5.6/en/fractional-seconds.html
-			// they *should* work, but only in 5.6+.
-			// { "12:34:56.789", "TIME(3)" },
-			// { "-12:34:56.789", "TIME(3)" },
-		}
-
-		for _, sTime := range sTimes {
-			dbt.db.Exec("DROP TABLE IF EXISTS test")
-			dbt.mustExec("CREATE TABLE test (id INT, time_field " + sTime.fieldType + ")")
-			dbt.mustExec("INSERT INTO test (id, time_field) VALUES(1, '" + sTime.value + "')")
-			rows := dbt.mustQuery("SELECT time_field FROM test WHERE id = ?", 1)
-			if rows.Next() {
-				var oTime string
-				rows.Scan(&oTime)
-				if oTime != sTime.value {
-					dbt.Errorf(`time values differ: got %q, expected %q.`, oTime, sTime.value)
-				}
-			} else {
-				dbt.Error("expecting at least one row.")
+			var sTimes = []struct {
+				value     string
+				fieldType string
+			}{
+				{"12:34:56", "TIME"},
+				{"-12:34:56", "TIME"},
+				// As described in http://dev.mysql.com/doc/refman/5.6/en/fractional-seconds.html
+				// they *should* work, but only in 5.6+.
+				// { "12:34:56.789", "TIME(3)" },
+				// { "-12:34:56.789", "TIME(3)" },
 			}
-		}
-	})
+
+			for _, sTime := range sTimes {
+				dbt.db.Exec("DROP TABLE IF EXISTS test")
+				dbt.mustExec("CREATE TABLE test (id INT, time_field " + sTime.fieldType + ")")
+				dbt.mustExec("INSERT INTO test (id, time_field) VALUES(1, '" + sTime.value + "')")
+				rows := dbt.mustQuery("SELECT time_field FROM test WHERE id = ?", 1)
+				if rows.Next() {
+					var oTime string
+					rows.Scan(&oTime)
+					if oTime != sTime.value {
+						dbt.Errorf(`time values differ: got %q, expected %q.`, oTime, sTime.value)
+					}
+				} else {
+					dbt.Error("expecting at least one row.")
+				}
+			}
+		})
 }
 
 // Special cases
 
 func TestRowsClose(t *testing.T) {
 	runTests(t, dsn, func(dbt *DBTest) {
-		rows, err := dbt.db.Query("SELECT 1")
-		if err != nil {
-			dbt.Fatal(err)
-		}
+			rows, err := dbt.db.Query("SELECT 1")
+			if err != nil {
+				dbt.Fatal(err)
+			}
 
-		err = rows.Close()
-		if err != nil {
-			dbt.Fatal(err)
-		}
+			err = rows.Close()
+			if err != nil {
+				dbt.Fatal(err)
+			}
 
-		if rows.Next() {
-			dbt.Fatal("Unexpected row after rows.Close()")
-		}
+			if rows.Next() {
+				dbt.Fatal("Unexpected row after rows.Close()")
+			}
 
-		err = rows.Err()
-		if err != nil {
-			dbt.Fatal(err)
-		}
-	})
+			err = rows.Err()
+			if err != nil {
+				dbt.Fatal(err)
+			}
+		})
 }
 
 // dangling statements
 // http://code.google.com/p/go/issues/detail?id=3865
 func TestCloseStmtBeforeRows(t *testing.T) {
 	runTests(t, dsn, func(dbt *DBTest) {
-		stmt, err := dbt.db.Prepare("SELECT 1")
-		if err != nil {
-			dbt.Fatal(err)
-		}
-
-		rows, err := stmt.Query()
-		if err != nil {
-			stmt.Close()
-			dbt.Fatal(err)
-		}
-		defer rows.Close()
-
-		err = stmt.Close()
-		if err != nil {
-			dbt.Fatal(err)
-		}
-
-		if !rows.Next() {
-			dbt.Fatal("Getting row failed")
-		} else {
-			err = rows.Err()
+			stmt, err := dbt.db.Prepare("SELECT 1")
 			if err != nil {
 				dbt.Fatal(err)
 			}
 
-			var out bool
-			err = rows.Scan(&out)
+			rows, err := stmt.Query()
 			if err != nil {
-				dbt.Fatalf("Error on rows.Scan(): %s", err.Error())
+				stmt.Close()
+				dbt.Fatal(err)
 			}
-			if out != true {
-				dbt.Errorf("true != %t", out)
+			defer rows.Close()
+
+			err = stmt.Close()
+			if err != nil {
+				dbt.Fatal(err)
 			}
-		}
-	})
+
+			if !rows.Next() {
+				dbt.Fatal("Getting row failed")
+			} else {
+				err = rows.Err()
+				if err != nil {
+					dbt.Fatal(err)
+				}
+
+				var out bool
+				err = rows.Scan(&out)
+				if err != nil {
+					dbt.Fatalf("Error on rows.Scan(): %s", err.Error())
+				}
+				if out != true {
+					dbt.Errorf("true != %t", out)
+				}
+			}
+		})
 }
 
 // It is valid to have multiple Rows for the same Stmt
 // http://code.google.com/p/go/issues/detail?id=3734
 func TestStmtMultiRows(t *testing.T) {
 	runTests(t, dsn, func(dbt *DBTest) {
-		stmt, err := dbt.db.Prepare("SELECT 1 UNION SELECT 0")
-		if err != nil {
-			dbt.Fatal(err)
-		}
-
-		rows1, err := stmt.Query()
-		if err != nil {
-			stmt.Close()
-			dbt.Fatal(err)
-		}
-		defer rows1.Close()
-
-		rows2, err := stmt.Query()
-		if err != nil {
-			stmt.Close()
-			dbt.Fatal(err)
-		}
-		defer rows2.Close()
-
-		var out bool
-
-		// 1
-		if !rows1.Next() {
-			dbt.Fatal("1st rows1.Next failed")
-		} else {
-			err = rows1.Err()
+			stmt, err := dbt.db.Prepare("SELECT 1 UNION SELECT 0")
 			if err != nil {
 				dbt.Fatal(err)
 			}
 
-			err = rows1.Scan(&out)
+			rows1, err := stmt.Query()
 			if err != nil {
-				dbt.Fatalf("Error on rows.Scan(): %s", err.Error())
-			}
-			if out != true {
-				dbt.Errorf("true != %t", out)
-			}
-		}
-
-		if !rows2.Next() {
-			dbt.Fatal("1st rows2.Next failed")
-		} else {
-			err = rows2.Err()
-			if err != nil {
+				stmt.Close()
 				dbt.Fatal(err)
 			}
+			defer rows1.Close()
 
-			err = rows2.Scan(&out)
+			rows2, err := stmt.Query()
 			if err != nil {
-				dbt.Fatalf("Error on rows.Scan(): %s", err.Error())
-			}
-			if out != true {
-				dbt.Errorf("true != %t", out)
-			}
-		}
-
-		// 2
-		if !rows1.Next() {
-			dbt.Fatal("2nd rows1.Next failed")
-		} else {
-			err = rows1.Err()
-			if err != nil {
+				stmt.Close()
 				dbt.Fatal(err)
 			}
+			defer rows2.Close()
 
-			err = rows1.Scan(&out)
-			if err != nil {
-				dbt.Fatalf("Error on rows.Scan(): %s", err.Error())
-			}
-			if out != false {
-				dbt.Errorf("false != %t", out)
-			}
+			var out bool
 
-			if rows1.Next() {
-				dbt.Fatal("Unexpected row on rows1")
-			}
-			err = rows1.Close()
-			if err != nil {
-				dbt.Fatal(err)
-			}
-		}
+			// 1
+			if !rows1.Next() {
+				dbt.Fatal("1st rows1.Next failed")
+			} else {
+				err = rows1.Err()
+				if err != nil {
+					dbt.Fatal(err)
+				}
 
-		if !rows2.Next() {
-			dbt.Fatal("2nd rows2.Next failed")
-		} else {
-			err = rows2.Err()
-			if err != nil {
-				dbt.Fatal(err)
+				err = rows1.Scan(&out)
+				if err != nil {
+					dbt.Fatalf("Error on rows.Scan(): %s", err.Error())
+				}
+				if out != true {
+					dbt.Errorf("true != %t", out)
+				}
 			}
 
-			err = rows2.Scan(&out)
-			if err != nil {
-				dbt.Fatalf("Error on rows.Scan(): %s", err.Error())
-			}
-			if out != false {
-				dbt.Errorf("false != %t", out)
+			if !rows2.Next() {
+				dbt.Fatal("1st rows2.Next failed")
+			} else {
+				err = rows2.Err()
+				if err != nil {
+					dbt.Fatal(err)
+				}
+
+				err = rows2.Scan(&out)
+				if err != nil {
+					dbt.Fatalf("Error on rows.Scan(): %s", err.Error())
+				}
+				if out != true {
+					dbt.Errorf("true != %t", out)
+				}
 			}
 
-			if rows2.Next() {
-				dbt.Fatal("Unexpected row on rows2")
+			// 2
+			if !rows1.Next() {
+				dbt.Fatal("2nd rows1.Next failed")
+			} else {
+				err = rows1.Err()
+				if err != nil {
+					dbt.Fatal(err)
+				}
+
+				err = rows1.Scan(&out)
+				if err != nil {
+					dbt.Fatalf("Error on rows.Scan(): %s", err.Error())
+				}
+				if out != false {
+					dbt.Errorf("false != %t", out)
+				}
+
+				if rows1.Next() {
+					dbt.Fatal("Unexpected row on rows1")
+				}
+				err = rows1.Close()
+				if err != nil {
+					dbt.Fatal(err)
+				}
 			}
-			err = rows2.Close()
-			if err != nil {
-				dbt.Fatal(err)
+
+			if !rows2.Next() {
+				dbt.Fatal("2nd rows2.Next failed")
+			} else {
+				err = rows2.Err()
+				if err != nil {
+					dbt.Fatal(err)
+				}
+
+				err = rows2.Scan(&out)
+				if err != nil {
+					dbt.Fatalf("Error on rows.Scan(): %s", err.Error())
+				}
+				if out != false {
+					dbt.Errorf("false != %t", out)
+				}
+
+				if rows2.Next() {
+					dbt.Fatal("Unexpected row on rows2")
+				}
+				err = rows2.Close()
+				if err != nil {
+					dbt.Fatal(err)
+				}
 			}
-		}
-	})
+		})
 }
 
 func TestConcurrent(t *testing.T) {
@@ -1214,46 +1212,46 @@ func TestConcurrent(t *testing.T) {
 	}
 
 	runTests(t, dsn, func(dbt *DBTest) {
-		var max int
-		err := dbt.db.QueryRow("SELECT @@max_connections").Scan(&max)
-		if err != nil {
-			dbt.Fatalf("%s", err.Error())
-		}
-		dbt.Logf("Testing up to %d concurrent connections \r\n", max)
-		canStop := false
-		c := make(chan struct{}, max)
-		for i := 0; i < max; i++ {
-			go func(id int) {
-				tx, err := dbt.db.Begin()
-				if err != nil {
-					canStop = true
-					if err.Error() == "Error 1040: Too many connections" {
-						max--
-						return
-					} else {
-						dbt.Fatalf("Error on Con %d: %s", id, err.Error())
+			var max int
+			err := dbt.db.QueryRow("SELECT @@max_connections").Scan(&max)
+			if err != nil {
+				dbt.Fatalf("%s", err.Error())
+			}
+			dbt.Logf("Testing up to %d concurrent connections \r\n", max)
+			canStop := false
+			c := make(chan struct{}, max)
+			for i := 0; i < max; i++ {
+				go func(id int) {
+					tx, err := dbt.db.Begin()
+					if err != nil {
+						canStop = true
+						if err.Error() == "Error 1040: Too many connections" {
+							max--
+							return
+						} else {
+							dbt.Fatalf("Error on Con %d: %s", id, err.Error())
+						}
 					}
-				}
-				c <- struct{}{}
-				for !canStop {
-					_, err = tx.Exec("SELECT 1")
+					c <- struct{}{}
+					for !canStop {
+						_, err = tx.Exec("SELECT 1")
+						if err != nil {
+							canStop = true
+							dbt.Fatalf("Error on Con %d: %s", id, err.Error())
+						}
+					}
+					err = tx.Commit()
 					if err != nil {
 						canStop = true
 						dbt.Fatalf("Error on Con %d: %s", id, err.Error())
 					}
-				}
-				err = tx.Commit()
-				if err != nil {
-					canStop = true
-					dbt.Fatalf("Error on Con %d: %s", id, err.Error())
-				}
-			}(i)
-		}
-		for i := 0; i < max; i++ {
-			<-c
-		}
-		canStop = true
+				}(i)
+			}
+			for i := 0; i < max; i++ {
+				<-c
+			}
+			canStop = true
 
-		dbt.Logf("Reached %d concurrent connections \r\n", max)
-	})
+			dbt.Logf("Reached %d concurrent connections \r\n", max)
+		})
 }

@@ -14,7 +14,6 @@ type ApiController struct {
 	beego.Controller
 }
 
-
 /*
 	GET /api/status_overview?role=xxx
 */
@@ -75,7 +74,7 @@ func (this *ApiController) GetMachineIndicatorData() {
 	dateStr := date.Format("20060102")
 
 	var dataContainerLength int
-	path := beego.AppConfig.String("multidb") + dateStr + "/" + strings.Replace(hardwareAddr, ":", "_", -1) + "/"
+	path := multidbRoot + dateStr + "/" + strings.Replace(hardwareAddr, ":", "_", -1) + "/"
 	dbName := path
 	dbName = dbName + indicator + ".db"
 	db, err := sql.Open("sqlite3", dbName)
@@ -211,7 +210,7 @@ func (this *ApiController) GetMachineAccessibilityData() {
 	var pingTimeIndex int
 	var telnetTimeIndex int
 
-	path := beego.AppConfig.String("multidb") + dateStr + "/" + strings.Replace(hardwareAddr, ":", "_", -1) + "/"
+	path := multidbRoot + dateStr + "/" + strings.Replace(hardwareAddr, ":", "_", -1) + "/"
 	dbName := path + "accessibility.db"
 	db, err := sql.Open("sqlite3", dbName)
 	if err != nil {

@@ -36,7 +36,7 @@ func (p *ProtocolV2) IOLoop(conn net.Conn) error {
 	go p.messagePump(client)
 	for {
 		if client.HeartbeatInterval > 0 {
-			client.SetReadDeadline(time.Now().Add(client.HeartbeatInterval * 2))
+			client.SetReadDeadline(time.Now().Add(client.HeartbeatInterval*2))
 		} else {
 			client.SetReadDeadline(zeroTime)
 		}
@@ -49,10 +49,10 @@ func (p *ProtocolV2) IOLoop(conn net.Conn) error {
 		}
 
 		// trim the '\n'
-		line = line[:len(line)-1]
+		line = line[:len(line) - 1]
 		// optionally trim the '\r'
-		if len(line) > 0 && line[len(line)-1] == '\r' {
-			line = line[:len(line)-1]
+		if len(line) > 0 && line[len(line) - 1] == '\r' {
+			line = line[:len(line) - 1]
 		}
 		params := bytes.Split(line, separatorBytes)
 
@@ -302,7 +302,7 @@ func (p *ProtocolV2) IDENTIFY(client *ClientV2, params [][]byte) ([]byte, error)
 
 	err = client.Identify(identifyData)
 	if err != nil {
-		return nil, util.NewFatalClientErr(err, "E_BAD_BODY", "IDENTIFY "+err.Error())
+		return nil, util.NewFatalClientErr(err, "E_BAD_BODY", "IDENTIFY " + err.Error())
 	}
 
 	// bail out early if we're not negotiating features
@@ -338,8 +338,8 @@ func (p *ProtocolV2) IDENTIFY(client *ClientV2, params [][]byte) ([]byte, error)
 	}{
 		MaxRdyCount:     p.context.nsqd.options.maxRdyCount,
 		Version:         util.BINARY_VERSION,
-		MaxMsgTimeout:   int64(p.context.nsqd.options.maxMsgTimeout / time.Millisecond),
-		MsgTimeout:      int64(p.context.nsqd.options.msgTimeout / time.Millisecond),
+		MaxMsgTimeout:   int64(p.context.nsqd.options.maxMsgTimeout/time.Millisecond),
+		MsgTimeout:      int64(p.context.nsqd.options.msgTimeout/time.Millisecond),
 		TLSv1:           tlsv1,
 		Deflate:         deflate,
 		DeflateLevel:    deflateLevel,
@@ -352,19 +352,19 @@ func (p *ProtocolV2) IDENTIFY(client *ClientV2, params [][]byte) ([]byte, error)
 
 	err = p.Send(client, nsq.FrameTypeResponse, resp)
 	if err != nil {
-		return nil, util.NewFatalClientErr(err, "E_IDENTIFY_FAILED", "IDENTIFY failed "+err.Error())
+		return nil, util.NewFatalClientErr(err, "E_IDENTIFY_FAILED", "IDENTIFY failed " + err.Error())
 	}
 
 	if tlsv1 {
 		log.Printf("PROTOCOL(V2): [%s] upgrading connection to TLS", client)
 		err = client.UpgradeTLS()
 		if err != nil {
-			return nil, util.NewFatalClientErr(err, "E_IDENTIFY_FAILED", "IDENTIFY failed "+err.Error())
+			return nil, util.NewFatalClientErr(err, "E_IDENTIFY_FAILED", "IDENTIFY failed " + err.Error())
 		}
 
 		err = p.Send(client, nsq.FrameTypeResponse, okBytes)
 		if err != nil {
-			return nil, util.NewFatalClientErr(err, "E_IDENTIFY_FAILED", "IDENTIFY failed "+err.Error())
+			return nil, util.NewFatalClientErr(err, "E_IDENTIFY_FAILED", "IDENTIFY failed " + err.Error())
 		}
 	}
 
@@ -372,12 +372,12 @@ func (p *ProtocolV2) IDENTIFY(client *ClientV2, params [][]byte) ([]byte, error)
 		log.Printf("PROTOCOL(V2): [%s] upgrading connection to snappy", client)
 		err = client.UpgradeSnappy()
 		if err != nil {
-			return nil, util.NewFatalClientErr(err, "E_IDENTIFY_FAILED", "IDENTIFY failed "+err.Error())
+			return nil, util.NewFatalClientErr(err, "E_IDENTIFY_FAILED", "IDENTIFY failed " + err.Error())
 		}
 
 		err = p.Send(client, nsq.FrameTypeResponse, okBytes)
 		if err != nil {
-			return nil, util.NewFatalClientErr(err, "E_IDENTIFY_FAILED", "IDENTIFY failed "+err.Error())
+			return nil, util.NewFatalClientErr(err, "E_IDENTIFY_FAILED", "IDENTIFY failed " + err.Error())
 		}
 	}
 
@@ -385,12 +385,12 @@ func (p *ProtocolV2) IDENTIFY(client *ClientV2, params [][]byte) ([]byte, error)
 		log.Printf("PROTOCOL(V2): [%s] upgrading connection to deflate", client)
 		err = client.UpgradeDeflate(deflateLevel)
 		if err != nil {
-			return nil, util.NewFatalClientErr(err, "E_IDENTIFY_FAILED", "IDENTIFY failed "+err.Error())
+			return nil, util.NewFatalClientErr(err, "E_IDENTIFY_FAILED", "IDENTIFY failed " + err.Error())
 		}
 
 		err = p.Send(client, nsq.FrameTypeResponse, okBytes)
 		if err != nil {
-			return nil, util.NewFatalClientErr(err, "E_IDENTIFY_FAILED", "IDENTIFY failed "+err.Error())
+			return nil, util.NewFatalClientErr(err, "E_IDENTIFY_FAILED", "IDENTIFY failed " + err.Error())
 		}
 	}
 
@@ -507,7 +507,7 @@ func (p *ProtocolV2) REQ(client *ClientV2, params [][]byte) ([]byte, error) {
 		return nil, util.NewFatalClientErr(err, "E_INVALID",
 			fmt.Sprintf("REQ could not parse timeout %s", params[2]))
 	}
-	timeoutDuration := time.Duration(timeoutMs) * time.Millisecond
+	timeoutDuration := time.Duration(timeoutMs)*time.Millisecond
 
 	if timeoutDuration < 0 || timeoutDuration > maxTimeout {
 		return nil, util.NewFatalClientErr(nil, "E_INVALID",
@@ -577,7 +577,7 @@ func (p *ProtocolV2) PUB(client *ClientV2, params [][]byte) ([]byte, error) {
 	msg := nsq.NewMessage(<-p.context.nsqd.idChan, messageBody)
 	err = topic.PutMessage(msg)
 	if err != nil {
-		return nil, util.NewFatalClientErr(err, "E_PUB_FAILED", "PUB failed "+err.Error())
+		return nil, util.NewFatalClientErr(err, "E_PUB_FAILED", "PUB failed " + err.Error())
 	}
 
 	return okBytes, nil
@@ -623,7 +623,7 @@ func (p *ProtocolV2) MPUB(client *ClientV2, params [][]byte) ([]byte, error) {
 	// this next call (and no messages will be queued in that case)
 	err = topic.PutMessages(messages)
 	if err != nil {
-		return nil, util.NewFatalClientErr(err, "E_MPUB_FAILED", "MPUB failed "+err.Error())
+		return nil, util.NewFatalClientErr(err, "E_MPUB_FAILED", "MPUB failed " + err.Error())
 	}
 
 	return okBytes, nil
@@ -660,7 +660,7 @@ func readMPUB(r io.Reader, tmp []byte, idChan chan nsq.MessageID, maxMessageSize
 			fmt.Sprintf("MPUB invalid message count %d", numMessages))
 	}
 
-	messages := make([]*nsq.Message, 0, numMessages)
+	messages := make([]*nsq.Message,0, numMessages)
 	for i := int32(0); i < numMessages; i++ {
 		messageSize, err := readLen(r, tmp)
 		if err != nil {

@@ -153,7 +153,7 @@ func (mp *MysqlProvider) SessionDestroy(sid string) error {
 
 func (mp *MysqlProvider) SessionGC() {
 	c := mp.connectInit()
-	c.Exec("DELETE from session where session_expiry < ?", time.Now().Unix()-mp.maxlifetime)
+	c.Exec("DELETE from session where session_expiry < ?", time.Now().Unix() - mp.maxlifetime)
 	c.Close()
 	return
 }

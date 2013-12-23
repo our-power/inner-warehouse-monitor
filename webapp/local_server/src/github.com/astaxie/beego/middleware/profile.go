@@ -73,7 +73,7 @@ func ShowGCStat() {
 	go func() {
 		var numGC int64
 
-		interval := time.Duration(100) * time.Millisecond
+		interval := time.Duration(100)*time.Millisecond
 		gcstats := &debug.GCStats{PauseQuantiles: make([]time.Duration, 100)}
 		memStats := &runtime.MemStats{}
 		for {
@@ -103,8 +103,8 @@ func printGC(memStats *runtime.MemStats, gcstats *debug.GCStats) {
 	if gcstats.NumGC > 0 {
 		lastPause := gcstats.Pause[0]
 		elapsed := time.Now().Sub(startTime)
-		overhead := float64(gcstats.PauseTotal) / float64(elapsed) * 100
-		allocatedRate := float64(memStats.TotalAlloc) / elapsed.Seconds()
+		overhead := float64(gcstats.PauseTotal)/float64(elapsed)*100
+		allocatedRate := float64(memStats.TotalAlloc)/elapsed.Seconds()
 
 		fmt.Printf("NumGC:%d Pause:%s Pause(Avg):%s Overhead:%3.2f%% Alloc:%s Sys:%s Alloc(Rate):%s/s Histogram:%s %s %s \n",
 			gcstats.NumGC,
@@ -120,7 +120,7 @@ func printGC(memStats *runtime.MemStats, gcstats *debug.GCStats) {
 	} else {
 		// while GC has disabled
 		elapsed := time.Now().Sub(startTime)
-		allocatedRate := float64(memStats.TotalAlloc) / elapsed.Seconds()
+		allocatedRate := float64(memStats.TotalAlloc)/elapsed.Seconds()
 
 		fmt.Printf("Alloc:%s Sys:%s Alloc(Rate):%s/s\n",
 			toH(memStats.Alloc),
@@ -134,7 +134,7 @@ func avg(items []time.Duration) time.Duration {
 	for _, item := range items {
 		sum += item
 	}
-	return time.Duration(int64(sum) / int64(len(items)))
+	return time.Duration(int64(sum)/int64(len(items)))
 }
 
 // human readable format

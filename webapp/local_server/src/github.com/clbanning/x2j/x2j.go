@@ -353,7 +353,7 @@ func WriteMap(m interface{}, offset ...int) string {
 			for i := 0; i < indent; i++ {
 				s += "  "
 			}
-			s += WriteMap(v, indent+1)
+			s += WriteMap(v, indent + 1)
 		}
 	case map[string]interface{}:
 		for k, v := range m.(map[string]interface{}) {
@@ -362,7 +362,7 @@ func WriteMap(m interface{}, offset ...int) string {
 				s += "  "
 			}
 			// s += "[map[string]interface{}] "+k+" :"+WriteMap(v,indent+1)
-			s += k + " :" + WriteMap(v, indent+1)
+			s += k + " :" + WriteMap(v, indent + 1)
 		}
 	default:
 		// shouldn't ever be here ...
@@ -495,7 +495,7 @@ func NewAttributeMap(kv ...string) (map[string]interface{}, error) {
 			return nil, errors.New("attribute not \"name:value\" pair: " + v)
 		}
 		// attributes are stored as keys prepended with hyphen
-		m["-"+vv[0]] = interface{}(vv[1])
+		m["-" + vv[0]] = interface{}(vv[1])
 	}
 	return m, nil
 }

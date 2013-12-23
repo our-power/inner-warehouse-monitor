@@ -44,14 +44,14 @@ func strftime(format string, t time.Time) string {
 	layout := ""
 	length := len(format)
 	for i := 0; i < length; i++ {
-		if format[i] == '%' && i <= length-2 {
-			if layoutCmd, ok := conversion[format[i+1:i+2]]; ok {
+		if format[i] == '%' && i <= length - 2 {
+			if layoutCmd, ok := conversion[format[i + 1:i + 2]]; ok {
 				layout = layout + layoutCmd
 				i++
 				continue
 			}
 		}
-		layout = layout + format[i:i+1]
+		layout = layout + format[i:i + 1]
 	}
 	return t.Format(layout)
 }

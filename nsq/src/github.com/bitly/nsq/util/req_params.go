@@ -48,7 +48,7 @@ type PostParams struct {
 
 func (p *PostParams) Get(key string) (string, error) {
 	if p.Request.Form == nil {
-		p.Request.ParseMultipartForm(1 << 20)
+		p.Request.ParseMultipartForm(1<<20)
 	}
 	if vs, ok := p.Request.Form[key]; ok {
 		return vs[0], nil

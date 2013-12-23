@@ -12,7 +12,7 @@
     vertical-align: top;
 }
 
-#query_date_input, #machine-list{
+#query_date_input, #machine-list {
     margin-right: 15px;
 }
 
@@ -28,7 +28,7 @@ body {
     padding-top: 80px;
 }
 
-.normal{
+.normal {
     background-color: #e6fcf0;
 }
 

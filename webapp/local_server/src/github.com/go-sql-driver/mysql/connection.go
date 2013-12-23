@@ -50,7 +50,7 @@ type config struct {
 func (mc *mysqlConn) handleParams() (err error) {
 	for param, val := range mc.cfg.params {
 		switch param {
-		// Charset
+			// Charset
 		case "charset":
 			charsets := strings.Split(val, ",")
 			for i := range charsets {
@@ -64,7 +64,7 @@ func (mc *mysqlConn) handleParams() (err error) {
 				return
 			}
 
-		// time.Time parsing
+			// time.Time parsing
 		case "parseTime":
 			var isBool bool
 			mc.parseTime, isBool = readBool(val)
@@ -72,7 +72,7 @@ func (mc *mysqlConn) handleParams() (err error) {
 				return errors.New("Invalid Bool value: " + val)
 			}
 
-		// Strict mode
+			// Strict mode
 		case "strict":
 			var isBool bool
 			mc.strict, isBool = readBool(val)
@@ -80,12 +80,12 @@ func (mc *mysqlConn) handleParams() (err error) {
 				return errors.New("Invalid Bool value: " + val)
 			}
 
-		// Compression
+			// Compression
 		case "compress":
 			err = errors.New("Compression not implemented yet")
 			return
 
-		// System Vars
+			// System Vars
 		default:
 			err = mc.exec("SET " + param + "=" + val + "")
 			if err != nil {
@@ -235,7 +235,7 @@ func (mc *mysqlConn) Query(query string, args []driver.Value) (driver.Rows, erro
 // The returned byte slice is only valid until the next read
 func (mc *mysqlConn) getSystemVar(name string) ([]byte, error) {
 	// Send command
-	if err := mc.writeCommandPacketStr(comQuery, "SELECT @@"+name); err != nil {
+	if err := mc.writeCommandPacketStr(comQuery, "SELECT @@" + name); err != nil {
 		return nil, err
 	}
 

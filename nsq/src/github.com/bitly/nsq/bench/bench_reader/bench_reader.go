@@ -42,9 +42,9 @@ func main() {
 	duration := end.Sub(start)
 	log.Printf("duration: %s - %.03fmb/s - %.03fops/s - %.03fus/op",
 		duration,
-		float64(*num*200)/duration.Seconds()/1024/1024,
-		float64(*num)/duration.Seconds(),
-		float64(duration/time.Microsecond)/float64(*num))
+					float64(*num*200)/duration.Seconds()/1024/1024,
+			float64(*num)/duration.Seconds(),
+			float64(duration/time.Microsecond)/float64(*num))
 }
 
 func subWorker(n int, workers int, tcpAddr string, topic string, channel string, rdyChan chan int, goChan chan int, id int) {
@@ -67,7 +67,7 @@ func subWorker(n int, workers int, tcpAddr string, topic string, channel string,
 	rw.Flush()
 	nsq.ReadResponse(rw)
 	nsq.ReadResponse(rw)
-	num := n / workers
+	num := n/workers
 	numRdy := num/rdyCount - 1
 	rdy := rdyCount
 	for i := 0; i < num; i += 1 {

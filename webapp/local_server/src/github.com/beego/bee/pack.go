@@ -98,9 +98,9 @@ type walker interface {
 
 type byName []os.FileInfo
 
-func (f byName) Len() int           { return len(f) }
+func (f byName) Len() int { return len(f) }
 func (f byName) Less(i, j int) bool { return f[i].Name() < f[j].Name() }
-func (f byName) Swap(i, j int)      { f[i], f[j] = f[j], f[i] }
+func (f byName) Swap(i, j int) { f[i], f[j] = f[j], f[i] }
 
 type walkFileTree struct {
 	wak           walker
@@ -140,7 +140,7 @@ func (wft *walkFileTree) isEmpty(fpath string) bool {
 		if wft.isExclude(wft.virPath(fp)) {
 			continue
 		}
-		if fi.Mode()&os.ModeSymlink > 0 {
+		if fi.Mode() & os.ModeSymlink > 0 {
 			continue
 		}
 		if fi.IsDir() && wft.isEmpty(fp) {
@@ -197,7 +197,7 @@ func (wft *walkFileTree) walkLeaf(fpath string, fi os.FileInfo, err error) error
 		return nil
 	}
 
-	if ssym && fi.Mode()&os.ModeSymlink > 0 {
+	if ssym && fi.Mode() & os.ModeSymlink > 0 {
 		return nil
 	}
 
@@ -217,7 +217,7 @@ func (wft *walkFileTree) walkLeaf(fpath string, fi os.FileInfo, err error) error
 }
 
 func (wft *walkFileTree) iterDirectory(fpath string, fi os.FileInfo) error {
-	doFSym := fsym && fi.Mode()&os.ModeSymlink > 0
+	doFSym := fsym && fi.Mode() & os.ModeSymlink > 0
 	if doFSym {
 		nfi, err := os.Stat(fpath)
 		if os.IsNotExist(err) {
@@ -269,7 +269,7 @@ type tarWalk struct {
 }
 
 func (wft *tarWalk) compress(name, fpath string, fi os.FileInfo) (bool, error) {
-	isSym := fi.Mode()&os.ModeSymlink > 0
+	isSym := fi.Mode() & os.ModeSymlink > 0
 	link := ""
 	if isSym {
 		link, _ = os.Readlink(fpath)
@@ -309,7 +309,7 @@ type zipWalk struct {
 }
 
 func (wft *zipWalk) compress(name, fpath string, fi os.FileInfo) (bool, error) {
-	isSym := fi.Mode()&os.ModeSymlink > 0
+	isSym := fi.Mode() & os.ModeSymlink > 0
 	if isSym {
 		// golang1.1 doesn't support embed symlink
 		// what i miss something?
@@ -347,7 +347,7 @@ func packDirectory(excludePrefix []string, excludeSuffix []string, includePath .
 	fmt.Printf("exclude prefix: %s\n", strings.Join(excludePrefix, ":"))
 	fmt.Printf("exclude suffix: %s\n", strings.Join(excludeSuffix, ":"))
 
-	w, err := os.OpenFile(outputP, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
+	w, err := os.OpenFile(outputP, os.O_CREATE | os.O_WRONLY | os.O_TRUNC, 0644)
 	if err != nil {
 		return err
 	}
@@ -461,7 +461,7 @@ func packApp(cmd *Command, args []string) {
 	str := strconv.FormatInt(time.Now().UnixNano(), 10)[9:]
 
 	gobin := path.Join(runtime.GOROOT(), "bin", "go")
-	tmpdir := path.Join(os.TempDir(), "beePack-"+str)
+	tmpdir := path.Join(os.TempDir(), "beePack-" + str)
 
 	os.Mkdir(tmpdir, 0700)
 

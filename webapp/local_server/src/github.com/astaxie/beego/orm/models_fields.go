@@ -9,7 +9,7 @@ import (
 
 const (
 	// bool
-	TypeBooleanField = 1 << iota
+	TypeBooleanField = 1<<iota
 
 	// string
 	TypeCharField
@@ -52,9 +52,9 @@ const (
 )
 
 const (
-	IsIntegerField        = ^-TypePositiveBigIntegerField >> 4 << 5
-	IsPostiveIntegerField = ^-TypePositiveBigIntegerField >> 8 << 9
-	IsRelField            = ^-RelReverseMany >> 14 << 15
+	IsIntegerField        = ^-TypePositiveBigIntegerField>>4<<5
+	IsPostiveIntegerField = ^-TypePositiveBigIntegerField>>8<<9
+	IsRelField            = ^-RelReverseMany>>14<<15
 	IsFieldType           = ^-RelReverseMany<<1 + 1
 )
 

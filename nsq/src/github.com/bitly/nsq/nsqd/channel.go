@@ -16,7 +16,7 @@ import (
 )
 
 // the amount of time a worker will wait when idle
-const defaultWorkerWait = 100 * time.Millisecond
+const defaultWorkerWait = 100*time.Millisecond
 
 type Consumer interface {
 	UnPause()
@@ -60,7 +60,7 @@ type Channel struct {
 	clients          map[int64]Consumer
 	paused           int32
 	ephemeralChannel bool
-	deleteCallback   func(*Channel)
+	deleteCallback   func (*Channel)
 	deleter          sync.Once
 
 	// Stats tracking
@@ -86,7 +86,7 @@ type inFlightMessage struct {
 
 // NewChannel creates a new instance of the Channel type and returns a pointer
 func NewChannel(topicName string, channelName string, context *Context,
-	deleteCallback func(*Channel)) *Channel {
+deleteCallback func (*Channel)) *Channel {
 
 	c := &Channel{
 		topicName:       topicName,
@@ -614,35 +614,35 @@ exit:
 
 func (c *Channel) deferredWorker() {
 	c.pqWorker(&c.deferredPQ, &c.deferredMutex, func(item *pqueue.Item) {
-		msg := item.Value.(*nsq.Message)
-		_, err := c.popDeferredMessage(msg.Id)
-		if err != nil {
-			return
-		}
-		c.doRequeue(msg)
-	})
+			msg := item.Value.(*nsq.Message)
+			_, err := c.popDeferredMessage(msg.Id)
+			if err != nil {
+				return
+			}
+			c.doRequeue(msg)
+		})
 }
 
 func (c *Channel) inFlightWorker() {
 	c.pqWorker(&c.inFlightPQ, &c.inFlightMutex, func(item *pqueue.Item) {
-		clientID := item.Value.(*inFlightMessage).clientID
-		msg := item.Value.(*inFlightMessage).msg
-		_, err := c.popInFlightMessage(clientID, msg.Id)
-		if err != nil {
-			return
-		}
-		atomic.AddUint64(&c.timeoutCount, 1)
-		client, ok := c.clients[clientID]
-		if ok {
-			client.TimedOutMessage()
-		}
-		c.doRequeue(msg)
-	})
+			clientID := item.Value.(*inFlightMessage).clientID
+			msg := item.Value.(*inFlightMessage).msg
+			_, err := c.popInFlightMessage(clientID, msg.Id)
+			if err != nil {
+				return
+			}
+			atomic.AddUint64(&c.timeoutCount, 1)
+			client, ok := c.clients[clientID]
+			if ok {
+				client.TimedOutMessage()
+			}
+			c.doRequeue(msg)
+		})
 }
 
 // generic loop (executed in a goroutine) that periodically wakes up to walk
 // the priority queue and call the callback
-func (c *Channel) pqWorker(pq *pqueue.PriorityQueue, mutex *sync.Mutex, callback func(item *pqueue.Item)) {
+func (c *Channel) pqWorker(pq *pqueue.PriorityQueue, mutex *sync.Mutex, callback func (item *pqueue.Item)) {
 	ticker := time.NewTicker(defaultWorkerWait)
 	for {
 		select {

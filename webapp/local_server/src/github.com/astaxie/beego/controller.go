@@ -181,7 +181,7 @@ func (c *Controller) UrlFor(endpoint string, values ...string) string {
 		return ""
 	}
 	if endpoint[0] == '.' {
-		return UrlFor(reflect.Indirect(reflect.ValueOf(c.AppController)).Type().Name()+endpoint, values...)
+		return UrlFor(reflect.Indirect(reflect.ValueOf(c.AppController)).Type().Name() + endpoint, values...)
 	} else {
 		return UrlFor(endpoint, values...)
 	}
@@ -273,7 +273,7 @@ func (c *Controller) SaveToFile(fromfile, tofile string) error {
 		return err
 	}
 	defer file.Close()
-	f, err := os.OpenFile(tofile, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+	f, err := os.OpenFile(tofile, os.O_WRONLY | os.O_CREATE | os.O_TRUNC, 0666)
 	if err != nil {
 		return err
 	}
@@ -395,7 +395,7 @@ func (c *Controller) CheckXsrfCookie() bool {
 
 func (c *Controller) XsrfFormHtml() string {
 	return "<input type=\"hidden\" name=\"_xsrf\" value=\"" +
-		c._xsrf_token + "\"/>"
+			c._xsrf_token + "\"/>"
 }
 
 func (c *Controller) GoToFunc(funcname string) {

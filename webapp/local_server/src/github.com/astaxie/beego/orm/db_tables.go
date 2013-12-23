@@ -98,7 +98,7 @@ func (t *dbTables) parseRelated(rels []string, depth int) {
 	for i, s := range related {
 		var (
 			exs    = strings.Split(s, ExprSep)
-			names  = make([]string, 0, len(exs))
+			names  = make([]string,0, len(exs))
 			mmi    = t.mi
 			cancel = true
 			jtl    *dbTable
@@ -338,7 +338,7 @@ func (t *dbTables) getOrderSql(orders []string) (orderSql string) {
 
 	Q := t.base.TableQuote()
 
-	orderSqls := make([]string, 0, len(orders))
+	orderSqls := make([]string,0, len(orders))
 	for _, order := range orders {
 		asc := "ASC"
 		if order[0] == '-' {

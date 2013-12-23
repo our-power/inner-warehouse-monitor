@@ -196,7 +196,7 @@ func TestWriterHeartbeat(t *testing.T) {
 
 	w := NewWriter("127.0.0.1:4150")
 	defer w.Stop()
-	w.HeartbeatInterval = 1 * time.Millisecond
+	w.HeartbeatInterval = 1*time.Millisecond
 
 	_, _, err := w.Publish(topicName, []byte("publish_test_case"))
 	if err == nil {
@@ -208,14 +208,14 @@ func TestWriterHeartbeat(t *testing.T) {
 
 	w = NewWriter("127.0.0.1:4150")
 	defer w.Stop()
-	w.HeartbeatInterval = 1000 * time.Millisecond
+	w.HeartbeatInterval = 1000*time.Millisecond
 
 	_, _, err = w.Publish(topicName, []byte("publish_test_case"))
 	if err != nil {
 		t.Fatalf(err.Error())
 	}
 
-	time.Sleep(1100 * time.Millisecond)
+	time.Sleep(1100*time.Millisecond)
 
 	msgCount := 10
 	for i := 0; i < msgCount; i++ {
@@ -230,14 +230,14 @@ func TestWriterHeartbeat(t *testing.T) {
 		t.Fatalf("frametype %d data %s error %s", frameType, string(data), err.Error())
 	}
 
-	readMessages(topicName, t, msgCount+1)
+	readMessages(topicName, t, msgCount + 1)
 }
 
 func readMessages(topicName string, t *testing.T, msgCount int) {
 	q, _ := NewReader(topicName, "ch")
 	q.VerboseLogging = true
 	q.DefaultRequeueDelay = 0
-	q.SetMaxBackoffDuration(time.Millisecond * 50)
+	q.SetMaxBackoffDuration(time.Millisecond*50)
 
 	h := &ReaderHandler{
 		t: t,

@@ -39,7 +39,7 @@ func NewQuantile(WindowTime time.Duration, Percentiles []float64) *Quantile {
 	q := Quantile{
 		currentIndex:   0,
 		lastMoveWindow: time.Now(),
-		MoveWindowTime: WindowTime / 2,
+		MoveWindowTime: WindowTime/2,
 		Percentiles:    Percentiles,
 	}
 	for i := 0; i < 2; i++ {
@@ -130,7 +130,7 @@ type E2eProcessingLatencyAggregate struct {
 }
 
 func (e *E2eProcessingLatencyAggregate) Target(key string) ([]string, string) {
-	targets := make([]string, 0, len(e.Percentiles))
+	targets := make([]string,0, len(e.Percentiles))
 	var target string
 	for _, percentile := range e.Percentiles {
 		if e.Channel != "" {
@@ -214,7 +214,7 @@ func (A *E2eProcessingLatencyAggregate) Add(B *E2eProcessingLatencyAggregate, N 
 
 			ap[indexA]["count"] += value["count"]
 			delta := value["average"] - ap[indexA]["average"]
-			R := delta * value["count"] / ap[indexA]["count"]
+			R := delta*value["count"]/ap[indexA]["count"]
 			ap[indexA]["average"] = ap[indexA]["average"] + R
 		}
 	}

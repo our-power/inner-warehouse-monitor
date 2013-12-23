@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-type FilterFunc func(*context.Context)
+type FilterFunc func (*context.Context)
 
 type App struct {
 	Handlers *ControllerRegistor
@@ -46,8 +46,8 @@ func (app *App) Run() {
 		if EnableHotUpdate {
 			server := &http.Server{
 				Handler:      app.Handlers,
-				ReadTimeout:  time.Duration(HttpServerTimeOut) * time.Second,
-				WriteTimeout: time.Duration(HttpServerTimeOut) * time.Second,
+				ReadTimeout:  time.Duration(HttpServerTimeOut)*time.Second,
+				WriteTimeout: time.Duration(HttpServerTimeOut)*time.Second,
 			}
 			laddr, err := net.ResolveTCPAddr("tcp", addr)
 			if nil != err {
@@ -62,8 +62,8 @@ func (app *App) Run() {
 			s := &http.Server{
 				Addr:         addr,
 				Handler:      app.Handlers,
-				ReadTimeout:  time.Duration(HttpServerTimeOut) * time.Second,
-				WriteTimeout: time.Duration(HttpServerTimeOut) * time.Second,
+				ReadTimeout:  time.Duration(HttpServerTimeOut)*time.Second,
+				WriteTimeout: time.Duration(HttpServerTimeOut)*time.Second,
 			}
 			if HttpTLS {
 				err = s.ListenAndServeTLS(HttpCertFile, HttpKeyFile)
@@ -74,7 +74,7 @@ func (app *App) Run() {
 	}
 	if err != nil {
 		BeeLogger.Critical("ListenAndServe: ", err)
-		time.Sleep(100 * time.Microsecond)
+		time.Sleep(100*time.Microsecond)
 	}
 }
 

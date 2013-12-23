@@ -13,7 +13,7 @@ type ConsoleWriter struct {
 
 func NewConsole() LoggerInterface {
 	cw := new(ConsoleWriter)
-	cw.lg = log.New(os.Stdout, "", log.Ldate|log.Ltime)
+	cw.lg = log.New(os.Stdout, "", log.Ldate | log.Ltime)
 	cw.level = LevelTrace
 	return cw
 }

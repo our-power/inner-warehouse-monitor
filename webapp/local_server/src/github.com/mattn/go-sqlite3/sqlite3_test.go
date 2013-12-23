@@ -14,7 +14,7 @@ import (
 func TempFilename() string {
 	randBytes := make([]byte, 16)
 	rand.Read(randBytes)
-	return filepath.Join(os.TempDir(), "foo"+hex.EncodeToString(randBytes)+".db")
+	return filepath.Join(os.TempDir(), "foo" + hex.EncodeToString(randBytes) + ".db")
 }
 
 func TestOpen(t *testing.T) {

@@ -44,7 +44,7 @@ func (b *buffer) fill(need int) error {
 	//       Maybe keep the org buf slice and swap back?
 	if need > len(b.buf) {
 		// Round up to the next multiple of the default size
-		newBuf := make([]byte, ((need/defaultBufSize)+1)*defaultBufSize)
+		newBuf := make([]byte, ((need/defaultBufSize) + 1)*defaultBufSize)
 		copy(newBuf, b.buf)
 		b.buf = newBuf
 	}

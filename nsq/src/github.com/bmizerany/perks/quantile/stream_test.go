@@ -9,7 +9,7 @@ import (
 
 func TestQuantRandQuery(t *testing.T) {
 	s := NewTargeted(0.5, 0.90, 0.99)
-	a := make([]float64, 0, 1e5)
+	a := make([]float64,0, 1e5)
 	rand.Seed(42)
 	for i := 0; i < cap(a); i++ {
 		v := float64(rand.Int63())
@@ -19,19 +19,19 @@ func TestQuantRandQuery(t *testing.T) {
 	t.Logf("len: %d", s.Count())
 	sort.Float64s(a)
 	w := getPerc(a, 0.50)
-	if g := s.Query(0.50); math.Abs(w-g)/w > 0.03 {
+	if g := s.Query(0.50); math.Abs(w - g)/w > 0.03 {
 		t.Errorf("perc50: want %v, got %v", w, g)
-		t.Logf("e: %f", math.Abs(w-g)/w)
+		t.Logf("e: %f", math.Abs(w - g)/w)
 	}
 	w = getPerc(a, 0.90)
-	if g := s.Query(0.90); math.Abs(w-g)/w > 0.03 {
+	if g := s.Query(0.90); math.Abs(w - g)/w > 0.03 {
 		t.Errorf("perc90: want %v, got %v", w, g)
-		t.Logf("e: %f", math.Abs(w-g)/w)
+		t.Logf("e: %f", math.Abs(w - g)/w)
 	}
 	w = getPerc(a, 0.99)
-	if g := s.Query(0.99); math.Abs(w-g)/w > 0.03 {
+	if g := s.Query(0.99); math.Abs(w - g)/w > 0.03 {
 		t.Errorf("perc99: want %v, got %v", w, g)
-		t.Logf("e: %f", math.Abs(w-g)/w)
+		t.Logf("e: %f", math.Abs(w - g)/w)
 	}
 }
 
@@ -49,7 +49,7 @@ func TestQuantRandMergeQuery(t *testing.T) {
 	}
 
 	rand.Seed(42)
-	a := make([]float64, 0, 1e6)
+	a := make([]float64,0, 1e6)
 	for i := 0; i < cap(a); i++ {
 		v := float64(rand.Int63())
 		a = append(a, v)
@@ -64,19 +64,19 @@ func TestQuantRandMergeQuery(t *testing.T) {
 	t.Logf("len: %d", s.Count())
 	sort.Float64s(a)
 	w := getPerc(a, 0.50)
-	if g := s.Query(0.50); math.Abs(w-g)/w > 0.03 {
+	if g := s.Query(0.50); math.Abs(w - g)/w > 0.03 {
 		t.Errorf("perc50: want %v, got %v", w, g)
-		t.Logf("e: %f", math.Abs(w-g)/w)
+		t.Logf("e: %f", math.Abs(w - g)/w)
 	}
 	w = getPerc(a, 0.90)
-	if g := s.Query(0.90); math.Abs(w-g)/w > 0.03 {
+	if g := s.Query(0.90); math.Abs(w - g)/w > 0.03 {
 		t.Errorf("perc90: want %v, got %v", w, g)
-		t.Logf("e: %f", math.Abs(w-g)/w)
+		t.Logf("e: %f", math.Abs(w - g)/w)
 	}
 	w = getPerc(a, 0.99)
-	if g := s.Query(0.99); math.Abs(w-g)/w > 0.03 {
+	if g := s.Query(0.99); math.Abs(w - g)/w > 0.03 {
 		t.Errorf("perc99: want %v, got %v", w, g)
-		t.Logf("e: %f", math.Abs(w-g)/w)
+		t.Logf("e: %f", math.Abs(w - g)/w)
 	}
 }
 
@@ -91,7 +91,7 @@ func TestUncompressed(t *testing.T) {
 	}
 	// Before compression, Query should have 100% accuracy.
 	for _, v := range tests {
-		w := v * 100
+		w := v*100
 		if g := q.Query(v); g != w {
 			t.Errorf("want %f, got %f", w, g)
 		}
@@ -123,6 +123,6 @@ func TestDefaults(t *testing.T) {
 }
 
 func getPerc(x []float64, p float64) float64 {
-	k := int(float64(len(x)) * p)
+	k := int(float64(len(x))*p)
 	return x[k]
 }

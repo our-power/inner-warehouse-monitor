@@ -34,7 +34,7 @@ func (this *NavItemsController) GetMachineDataGroupByStep() {
 		if err == nil {
 			this.Data["nav_now"] = step
 			this.Data["machine_info_list"] = &maps
-		}else{
+		}else {
 			this.Data["machine_info_list"] = nil
 		}
 		this.TplNames = "machineDataGroupByStep.html"

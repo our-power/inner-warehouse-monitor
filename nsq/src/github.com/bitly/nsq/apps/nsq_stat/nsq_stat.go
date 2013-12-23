@@ -33,7 +33,7 @@ func init() {
 }
 
 func statLoop(interval time.Duration, topic string, channel string,
-	nsqdTCPAddrs []string, lookupdHTTPAddrs []string) {
+nsqdTCPAddrs []string, lookupdHTTPAddrs []string) {
 	i := 0
 	for {
 		var producers []string

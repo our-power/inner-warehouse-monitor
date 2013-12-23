@@ -74,7 +74,7 @@ func (ini *IniConfig) Parse(name string) (ConfigContainer, error) {
 		}
 
 		key := strings.TrimSpace(string(val[0]))
-		cfg.comment[nComment-1] = append(cfg.comment[nComment-1], key)
+		cfg.comment[nComment - 1] = append(cfg.comment[nComment - 1], key)
 		cfg.data[key] = strings.TrimSpace(string(val[1]))
 		cfg.offset[key] = off
 	}

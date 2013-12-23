@@ -15,7 +15,7 @@ import (
 	"time"
 )
 
-const DefaultBufferSize = 16 * 1024
+const DefaultBufferSize = 16*1024
 
 type IdentifyDataV2 struct {
 	ShortId             string `json:"short_id"`
@@ -88,16 +88,12 @@ func NewClientV2(id int64, conn net.Conn, context *Context) *ClientV2 {
 	c := &ClientV2{
 		ID:      id,
 		context: context,
-
 		Conn: conn,
-
 		Reader: bufio.NewReaderSize(conn, DefaultBufferSize),
 		Writer: bufio.NewWriterSize(conn, DefaultBufferSize),
-
 		OutputBufferSize:              DefaultBufferSize,
-		OutputBufferTimeout:           time.NewTicker(250 * time.Millisecond),
+		OutputBufferTimeout:           time.NewTicker(250*time.Millisecond),
 		OutputBufferTimeoutUpdateChan: make(chan time.Duration, 1),
-
 		// ReadyStateChan has a buffer of 1 to guarantee that in the event
 		// there is a race the state update is not lost
 		ReadyStateChan:  make(chan int, 1),
@@ -107,10 +103,9 @@ func NewClientV2(id int64, conn net.Conn, context *Context) *ClientV2 {
 		LongIdentifier:  identifier,
 		State:           nsq.StateInit,
 		SubEventChan:    make(chan *Channel, 1),
-
 		// heartbeats are client configurable but default to 30s
-		Heartbeat:           time.NewTicker(context.nsqd.options.clientTimeout / 2),
-		HeartbeatInterval:   context.nsqd.options.clientTimeout / 2,
+		Heartbeat:           time.NewTicker(context.nsqd.options.clientTimeout/2),
+		HeartbeatInterval:   context.nsqd.options.clientTimeout/2,
 		HeartbeatUpdateChan: make(chan time.Duration, 1),
 	}
 	c.lenSlice = c.lenBuf[:]
@@ -242,7 +237,7 @@ func (c *ClientV2) SetHeartbeatInterval(desiredInterval int) error {
 		// do nothing (use default)
 	case desiredInterval >= 1000 &&
 		desiredInterval <= int(c.context.nsqd.options.maxHeartbeatInterval/time.Millisecond):
-		interval = (time.Duration(desiredInterval) * time.Millisecond)
+		interval = (time.Duration(desiredInterval)*time.Millisecond)
 	default:
 		return errors.New(fmt.Sprintf("heartbeat interval (%d) is invalid", desiredInterval))
 	}
@@ -299,7 +294,7 @@ func (c *ClientV2) SetOutputBufferTimeout(desiredTimeout int) error {
 		// do nothing (use default)
 	case desiredTimeout >= 1 &&
 		desiredTimeout <= int(c.context.nsqd.options.maxOutputBufferTimeout/time.Millisecond):
-		timeout = (time.Duration(desiredTimeout) * time.Millisecond)
+		timeout = (time.Duration(desiredTimeout)*time.Millisecond)
 	default:
 		return errors.New(fmt.Sprintf("output buffer timeout (%d) is invalid", desiredTimeout))
 	}

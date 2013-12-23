@@ -51,7 +51,7 @@ func main() {
 		aMetricVal := v.(map[string]interface{})
 		id := aMetricVal["-id"].(string)
 		desc := aMetricVal["-description"].(string)
-		mf, mferr := os.OpenFile(id+".csv", os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0666)
+		mf, mferr := os.OpenFile(id + ".csv", os.O_WRONLY | os.O_TRUNC | os.O_CREATE, 0666)
 		if mferr != nil {
 			fmt.Println("mferr:", mferr.Error())
 			return

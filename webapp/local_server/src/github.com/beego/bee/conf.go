@@ -40,22 +40,22 @@ var conf struct {
 	Version int
 	// gopm support
 	Gopm struct {
-		Enable bool
-	}
+	Enable bool
+}
 	// Indicates whether execute "go install" before "go build".
 	GoInstall bool     `json:"go_install"`
 	WatchExt  []string `json:"watch_ext"`
 	DirStruct struct {
-		Controllers string
-		Models      string
-		Others      []string // Other directories.
-	} `json:"dir_structure"`
+	Controllers string
+	Models      string
+	Others      []string // Other directories.
+} `json:"dir_structure"`
 
 	Bale struct {
-		Import string
-		Dirs   []string
-		IngExt []string `json:"ignore_ext"`
-	}
+	Import string
+	Dirs   []string
+	IngExt []string `json:"ignore_ext"`
+}
 }
 
 // loadConfig loads customized configuration.

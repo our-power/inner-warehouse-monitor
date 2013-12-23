@@ -160,7 +160,7 @@ func BenchmarkHTTPput(b *testing.B) {
 	for j := 0; j < runtime.GOMAXPROCS(0); j++ {
 		wg.Add(1)
 		go func() {
-			num := b.N / runtime.GOMAXPROCS(0)
+			num := b.N/runtime.GOMAXPROCS(0)
 			for i := 0; i < num; i += 1 {
 				buf := bytes.NewBuffer(msg)
 				req, _ := http.NewRequest("POST", url, buf)

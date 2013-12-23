@@ -52,7 +52,7 @@ func ScanStruct(reply interface{}, dst interface{}) error {
 		if !ok {
 			return errors.New("redigo: ScanStruct key not a bulk value")
 		}
-		value, ok := p[i+1].([]byte)
+		value, ok := p[i + 1].([]byte)
 		if !ok {
 			return errors.New("redigo: ScanStruct value not a bulk value")
 		}

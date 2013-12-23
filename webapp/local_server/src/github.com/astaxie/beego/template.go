@@ -62,7 +62,7 @@ func (self *templatefile) visit(paths string, f os.FileInfo, err error) error {
 	if f == nil {
 		return err
 	}
-	if f.IsDir() || (f.Mode()&os.ModeSymlink) > 0 {
+	if f.IsDir() || (f.Mode() & os.ModeSymlink) > 0 {
 		return nil
 	}
 	if !HasTemplateEXt(paths) {
@@ -87,7 +87,7 @@ func (self *templatefile) visit(paths string, f os.FileInfo, err error) error {
 
 func HasTemplateEXt(paths string) bool {
 	for _, v := range BeeTemplateExt {
-		if strings.HasSuffix(paths, "."+v) {
+		if strings.HasSuffix(paths, "." + v) {
 			return true
 		}
 	}
@@ -116,8 +116,8 @@ func BuildTemplate(dir string) error {
 		files: make(map[string][]string),
 	}
 	err := filepath.Walk(dir, func(path string, f os.FileInfo, err error) error {
-		return self.visit(path, f, err)
-	})
+			return self.visit(path, f, err)
+		})
 	if err != nil {
 		fmt.Printf("filepath.Walk() returned %v\n", err)
 		return err

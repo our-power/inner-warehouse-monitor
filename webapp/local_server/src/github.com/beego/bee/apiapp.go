@@ -284,8 +284,8 @@ func checkEnv(appname string) (apppath, packpath string, err error) {
 	}
 
 	if !haspath {
-		err = fmt.Errorf("can't create application outside of GOPATH `%s`\n"+
-			"you first should `cd $GOPATH%ssrc` then use create\n", gopath, string(path.Separator))
+		err = fmt.Errorf("can't create application outside of GOPATH `%s`\n" +
+					"you first should `cd $GOPATH%ssrc` then use create\n", gopath, string(path.Separator))
 		return
 	}
 	apppath = path.Join(curpath, appname)
@@ -294,6 +294,6 @@ func checkEnv(appname string) (apppath, packpath string, err error) {
 		err = fmt.Errorf("path `%s` exists, can not create app without remove it\n", apppath)
 		return
 	}
-	packpath = strings.Join(strings.Split(apppath[len(appsrcpath)+1:], string(path.Separator)), "/")
+	packpath = strings.Join(strings.Split(apppath[len(appsrcpath) + 1:], string(path.Separator)), "/")
 	return
 }

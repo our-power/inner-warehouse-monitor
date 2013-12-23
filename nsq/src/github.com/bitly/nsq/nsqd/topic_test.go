@@ -93,7 +93,7 @@ func TestDeleteLast(t *testing.T) {
 
 	msg := nsq.NewMessage(<-nsqd.idChan, []byte("aaaaaaaaaaaaaaaaaaaaaaaaaaa"))
 	err = topic.PutMessage(msg)
-	time.Sleep(100 * time.Millisecond)
+	time.Sleep(100*time.Millisecond)
 	assert.Equal(t, nil, err)
 	assert.Equal(t, topic.Depth(), int64(1))
 }

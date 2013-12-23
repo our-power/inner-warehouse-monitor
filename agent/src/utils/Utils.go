@@ -14,12 +14,12 @@ import (
 )
 
 type Settings struct {
-	InModules []map[string] string
-	OutModules []map[string] string
+	InModules    []map[string] string
+	OutModules   []map[string] string
 	UpdateServer []map[string] string
-	Hb int
-	Update int
-	Role string
+	Hb           int
+	Update       int
+	Role         string
 }
 
 /* Load settings */
@@ -45,7 +45,7 @@ func LoadSettings() (settings Settings, err error) {
 */
 func checkSettings(settings Settings) (err error) {
 	// input check
-	if len(settings.InModules)<=0||len(settings.InModules)>15 {
+	if len(settings.InModules) <= 0 || len(settings.InModules) > 15 {
 		err = errors.New("Too many or too few Input modules")
 		return
 	}
@@ -60,7 +60,7 @@ func checkSettings(settings Settings) (err error) {
 		}
 	}
 	// output check
-	if len(settings.OutModules)<=0||len(settings.OutModules)>15 {
+	if len(settings.OutModules) <= 0 || len(settings.OutModules) > 15 {
 		err = errors.New("Too many or too few output modules")
 		return
 	}
@@ -73,7 +73,7 @@ func checkSettings(settings Settings) (err error) {
 		}
 	}
 	// update server check
-	if len(settings.UpdateServer)!=1 {
+	if len(settings.UpdateServer) != 1 {
 		err = errors.New("One and only one UpdateServer can be configured")
 		return
 	}
@@ -92,12 +92,12 @@ func checkSettings(settings Settings) (err error) {
 */
 func GetLocalInfo() (ip string, hostName string, macAddress string, err error) {
 	addrs, err := net.InterfaceAddrs()
-    for _, ad := range addrs {
-    	if tmp := strings.Split(ad.String(),"/")[0]; !strings.HasPrefix(tmp, "127.0.0") && !strings.HasPrefix(tmp, "0.0.0") {
-    		ip = tmp
-    		break
-    	}
-    }
+	for _, ad := range addrs {
+		if tmp := strings.Split(ad.String(), "/")[0]; !strings.HasPrefix(tmp, "127.0.0") && !strings.HasPrefix(tmp, "0.0.0") {
+			ip = tmp
+			break
+		}
+	}
 	hostName, _ = os.Hostname()
 	ifs, err := net.Interfaces()
 	if err != nil || len(ifs) <= 0 {
@@ -116,15 +116,15 @@ func ReadRemote(method string, urlString string, content string, hostHeader stri
 	req, _ := http.NewRequest(method, urlString, strings.NewReader(content))
 	if hostHeader != "" {
 		req.Header.Set("Host", hostHeader)
-	} 
+	}
 	res, err := client.Do(req)
 	if err != nil {
-	    return
+		return
 	}
 	resp, err := ioutil.ReadAll(res.Body)
 	defer res.Body.Close()
 	if err != nil {
-	    return
+		return
 	}
 	b = resp
 	return
@@ -133,7 +133,7 @@ func ReadRemote(method string, urlString string, content string, hostHeader stri
 func BuildClient() *http.Client {
 	var myTransport http.RoundTripper = &http.Transport {
 		// Timeout is set to 10 seconds
-		ResponseHeaderTimeout: time.Second * 10,
+		ResponseHeaderTimeout: time.Second*10,
 	}
 	client := &http.Client{ Transport: myTransport }
 	return client
@@ -141,11 +141,11 @@ func BuildClient() *http.Client {
 
 /* Initiate and return a logger by the filename passed in */
 func InitLogger(filename string) (logger *log.Logger) {
-	logfile,err := os.OpenFile(filename, os.O_CREATE | os.O_RDWR | os.O_APPEND, 0666) 
-	if err!=nil {
+	logfile, err := os.OpenFile(filename, os.O_CREATE | os.O_RDWR | os.O_APPEND, 0666)
+	if err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
 		os.Exit(1)
 	}
-	logger = log.New(logfile,"\r\n",log.Ldate|log.Ltime|log.Lshortfile)
+	logger = log.New(logfile, "\r\n", log.Ldate | log.Ltime | log.Lshortfile)
 	return
 }

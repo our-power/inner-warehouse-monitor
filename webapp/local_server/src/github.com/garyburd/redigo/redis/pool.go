@@ -21,7 +21,9 @@ import (
 	"time"
 )
 
-var nowFunc = time.Now // for testing
+var nowFunc = time.Now
+
+// for testing
 
 // ErrPoolExhausted is returned from pool connection methods when the maximum
 // number of database connections in the pool has been reached.
@@ -73,14 +75,14 @@ var errPoolClosed = errors.New("redigo: connection pool closed")
 type Pool struct {
 
 	// Dial is an application supplied function for creating new connections.
-	Dial func() (Conn, error)
+	Dial func () (Conn, error)
 
 	// TestOnBorrow is an optional application supplied function for checking
 	// the health of an idle connection before the connection is used again by
 	// the application. Argument t is the time that the connection was returned
 	// to the pool. If the function returns an error, then the connection is
 	// closed.
-	TestOnBorrow func(c Conn, t time.Time) error
+	TestOnBorrow func (c Conn, t time.Time) error
 
 	// Maximum number of idle connections in the pool.
 	MaxIdle int
@@ -110,7 +112,7 @@ type idleConn struct {
 
 // NewPool returns a pool that uses newPool to create connections as needed.
 // The pool keeps a maximum of maxIdle idle connections.
-func NewPool(newFn func() (Conn, error), maxIdle int) *Pool {
+func NewPool(newFn func () (Conn, error), maxIdle int) *Pool {
 	return &Pool{Dial: newFn, MaxIdle: maxIdle}
 }
 

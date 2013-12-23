@@ -47,7 +47,7 @@ func (e *FileEvent) IsDelete() bool { return (e.mask & sys_NOTE_DELETE) == sys_N
 
 // IsModify reports whether the FileEvent was triggerd by a file modification
 func (e *FileEvent) IsModify() bool {
-	return ((e.mask&sys_NOTE_WRITE) == sys_NOTE_WRITE || (e.mask&sys_NOTE_ATTRIB) == sys_NOTE_ATTRIB)
+	return ((e.mask & sys_NOTE_WRITE) == sys_NOTE_WRITE || (e.mask & sys_NOTE_ATTRIB) == sys_NOTE_ATTRIB)
 }
 
 // IsRename reports whether the FileEvent was triggerd by a change name
@@ -150,7 +150,7 @@ func (w *Watcher) addWatch(path string, flags uint32) error {
 		}
 
 		// don't watch socket
-		if fi.Mode()&os.ModeSocket == os.ModeSocket {
+		if fi.Mode() & os.ModeSocket == os.ModeSocket {
 			return nil
 		}
 
@@ -160,7 +160,7 @@ func (w *Watcher) addWatch(path string, flags uint32) error {
 		// consistency, we will act like everything is fine. There will simply
 		// be no file events for broken symlinks.
 		// Hence the returns of nil on errors.
-		if fi.Mode()&os.ModeSymlink == os.ModeSymlink {
+		if fi.Mode() & os.ModeSymlink == os.ModeSymlink {
 			path, err := filepath.EvalSymlinks(path)
 			if err != nil {
 				return nil
@@ -191,8 +191,8 @@ func (w *Watcher) addWatch(path string, flags uint32) error {
 	w.pmut.Lock()
 	w.enmut.Lock()
 	if w.finfo[watchfd].IsDir() &&
-		(flags&sys_NOTE_WRITE) == sys_NOTE_WRITE &&
-		(!found || (w.enFlags[path]&sys_NOTE_WRITE) != sys_NOTE_WRITE) {
+		(flags & sys_NOTE_WRITE) == sys_NOTE_WRITE &&
+			(!found || (w.enFlags[path] & sys_NOTE_WRITE) != sys_NOTE_WRITE) {
 		watchDir = true
 	}
 	w.enmut.Unlock()
@@ -205,7 +205,7 @@ func (w *Watcher) addWatch(path string, flags uint32) error {
 	w.bufmut.Lock()
 	watchEntry := &w.kbuf[0]
 	watchEntry.Fflags = flags
-	syscall.SetKevent(watchEntry, watchfd, syscall.EVFILT_VNODE, syscall.EV_ADD|syscall.EV_CLEAR)
+	syscall.SetKevent(watchEntry, watchfd, syscall.EVFILT_VNODE, syscall.EV_ADD | syscall.EV_CLEAR)
 	entryFlags := watchEntry.Flags
 	w.bufmut.Unlock()
 

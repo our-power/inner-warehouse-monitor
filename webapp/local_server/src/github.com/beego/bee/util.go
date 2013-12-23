@@ -25,7 +25,7 @@ import (
 
 // Go is a basic promise implementation: it wraps calls a function in a goroutine
 // and returns a channel which will later return the function's return value.
-func Go(f func() error) chan error {
+func Go(f func () error) chan error {
 	ch := make(chan error)
 	go func() {
 		ch <- f()
@@ -90,15 +90,15 @@ func ColorLogS(format string, a ...interface{}) string {
 			clog += "[" + getColorLevel(log[1:i]) + "]"
 		}
 
-		log = log[i+1:]
+		log = log[i + 1:]
 
 		// Error.
 		log = strings.Replace(log, "[ ", fmt.Sprintf("[\033[%dm", Red), -1)
-		log = strings.Replace(log, " ]", EndColor+"]", -1)
+		log = strings.Replace(log, " ]", EndColor + "]", -1)
 
 		// Path.
 		log = strings.Replace(log, "( ", fmt.Sprintf("(\033[%dm", Yellow), -1)
-		log = strings.Replace(log, " )", EndColor+")", -1)
+		log = strings.Replace(log, " )", EndColor + ")", -1)
 
 		// Highlights.
 		log = strings.Replace(log, "# ", fmt.Sprintf("\033[%dm", Gray), -1)
@@ -113,7 +113,7 @@ func ColorLogS(format string, a ...interface{}) string {
 			clog += "[" + log[1:i] + "]"
 		}
 
-		log = log[i+1:]
+		log = log[i + 1:]
 
 		// Error.
 		log = strings.Replace(log, "[ ", "[", -1)

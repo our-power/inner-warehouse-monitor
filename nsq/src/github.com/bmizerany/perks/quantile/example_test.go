@@ -66,7 +66,7 @@ func Example_window() {
 	ch := make(chan float64)
 	go sendStreamValues(ch)
 
-	tick := time.NewTicker(1 * time.Minute)
+	tick := time.NewTicker(1*time.Minute)
 	q := quantile.NewTargeted(0.90, 0.95, 0.99)
 	for {
 		select {
@@ -91,7 +91,7 @@ func flushToDB(t time.Time, samples quantile.Samples) {
 // servers via http or something like it.
 func getDBQuerySamples(ch chan quantile.Samples) {}
 
-func sendFloats(ch chan<- float64) {
+func sendFloats(ch chan <- float64) {
 	f, err := os.Open("exampledata.txt")
 	if err != nil {
 		log.Fatal(err)

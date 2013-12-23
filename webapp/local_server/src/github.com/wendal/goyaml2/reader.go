@@ -118,7 +118,7 @@ func (y *yamlReader) ReadList(minIndent int) ([]interface{}, error) {
 				}
 				y.lastLine = _line
 				_indent, _str := getIndent(line)
-				if _indent >= minIndent+2 {
+				if _indent >= minIndent + 2 {
 					switch _str[0] {
 					case '-':
 						return nil, y.Error("Unexpect", nil)
@@ -139,7 +139,7 @@ func (y *yamlReader) ReadList(minIndent int) ([]interface{}, error) {
 			}
 			continue
 		default:
-			return nil, y.Error("Bad Indent\n"+line, nil)
+			return nil, y.Error("Bad Indent\n" + line, nil)
 		}
 	}
 	panic("ERROR")
@@ -227,7 +227,7 @@ OUT:
 			}
 		default:
 			//log.Println("Bad", indent, str)
-			return nil, y.Error("Bad Indent\n"+line, nil)
+			return nil, y.Error("Bad Indent\n" + line, nil)
 		}
 	}
 	panic("ERROR")
@@ -286,7 +286,7 @@ func (y *yamlReader) asMapKeyValue(str string) (key interface{}, val interface{}
 		return key, nil, nil
 	}
 	if tokens[1] != ":" {
-		return "", nil, y.Error("Unexpect "+str, nil)
+		return "", nil, y.Error("Unexpect " + str, nil)
 	}
 
 	if len(tokens) == 2 {
@@ -298,24 +298,24 @@ func (y *yamlReader) asMapKeyValue(str string) (key interface{}, val interface{}
 	switch tokens[2] {
 	case "[":
 		list := []interface{}{}
-		for i := 3; i < len(tokens)-1; i++ {
+		for i := 3; i < len(tokens) - 1; i++ {
 			list = append(list, tokens[i])
 		}
 		return key, list, nil
 	case "{":
 		_map := map[string]interface{}{}
-		for i := 3; i < len(tokens)-1; i += 4 {
+		for i := 3; i < len(tokens) - 1; i += 4 {
 			//log.Println(">>>", i, tokens[i])
-			if i > len(tokens)-2 {
-				return "", nil, y.Error("Unexpect "+str, nil)
+			if i > len(tokens) - 2 {
+				return "", nil, y.Error("Unexpect " + str, nil)
 			}
-			if tokens[i+1] != ":" {
-				return "", nil, y.Error("Unexpect "+str, nil)
+			if tokens[i + 1] != ":" {
+				return "", nil, y.Error("Unexpect " + str, nil)
 			}
-			_map[tokens[i].(string)] = tokens[i+2]
+			_map[tokens[i].(string)] = tokens[i + 2]
 			if (i + 3) < (len(tokens) - 1) {
-				if tokens[i+3] != "," {
-					return "", "", y.Error("Unexpect "+str, nil)
+				if tokens[i + 3] != "," {
+					return "", "", y.Error("Unexpect " + str, nil)
 				}
 			} else {
 				break
@@ -324,7 +324,7 @@ func (y *yamlReader) asMapKeyValue(str string) (key interface{}, val interface{}
 		return key, _map, nil
 	}
 	//log.Println(str, tokens)
-	return "", nil, y.Error("Unexpect "+str, nil)
+	return "", nil, y.Error("Unexpect " + str, nil)
 }
 
 func splitToken(str string) (tokens []interface{}) {
@@ -352,7 +352,7 @@ func splitToken(str string) (tokens []interface{}) {
 			if i > lastPos {
 				tokens = append(tokens, str[lastPos:i])
 			}
-			tokens = append(tokens, str[i:i+1])
+			tokens = append(tokens, str[i:i + 1])
 			lastPos = i + 1
 		case ' ':
 			if i > lastPos {
@@ -402,10 +402,10 @@ func splitToken(str string) (tokens []interface{}) {
 		}
 		str = strings.Trim(strings.SplitN(str, ":", 2)[1], "\t ")
 		if len(str) > 2 {
-			if str[0] == '\'' && str[len(str)-1] == '\'' {
-				str = str[1 : len(str)-1]
-			} else if str[0] == '"' && str[len(str)-1] == '"' {
-				str = str[1 : len(str)-1]
+			if str[0] == '\'' && str[len(str) - 1] == '\'' {
+				str = str[1 : len(str) - 1]
+			} else if str[0] == '"' && str[len(str) - 1] == '"' {
+				str = str[1 : len(str) - 1]
 			}
 		}
 		val := string2Val(str)
@@ -414,10 +414,10 @@ func splitToken(str string) (tokens []interface{}) {
 	}
 
 	if len(str) > 2 {
-		if str[0] == '\'' && str[len(str)-1] == '\'' {
-			str = str[1 : len(str)-1]
-		} else if str[0] == '"' && str[len(str)-1] == '"' {
-			str = str[1 : len(str)-1]
+		if str[0] == '\'' && str[len(str) - 1] == '\'' {
+			str = str[1 : len(str) - 1]
+		} else if str[0] == '"' && str[len(str) - 1] == '"' {
+			str = str[1 : len(str) - 1]
 		}
 	}
 	val := string2Val(str)

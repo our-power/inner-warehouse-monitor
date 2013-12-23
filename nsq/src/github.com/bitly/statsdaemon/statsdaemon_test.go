@@ -120,11 +120,11 @@ func TestUpperPercentile(t *testing.T) {
 	var buff bytes.Buffer
 	var num int64
 	num += processTimers(&buff, time.Now().Unix(), Percentiles{
-		&Percentile{
-			75,
-			"75",
-		},
-	})
+			&Percentile{
+				75,
+				"75",
+			},
+		})
 	assert.Equal(t, num, int64(1))
 	dataForGraphite := buff.String()
 
@@ -145,11 +145,11 @@ func TestLowerPercentile(t *testing.T) {
 	var buff bytes.Buffer
 	var num int64
 	num += processTimers(&buff, time.Now().Unix(), Percentiles{
-		&Percentile{
-			-75,
-			"-75",
-		},
-	})
+			&Percentile{
+				-75,
+				"-75",
+			},
+		})
 	assert.Equal(t, num, int64(1))
 	dataForGraphite := buff.String()
 

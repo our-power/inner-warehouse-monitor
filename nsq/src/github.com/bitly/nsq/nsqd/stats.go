@@ -22,7 +22,6 @@ func NewTopicStats(t *Topic, channels []ChannelStats) TopicStats {
 		Depth:        t.Depth(),
 		BackendDepth: t.backend.Depth(),
 		MessageCount: t.messageCount,
-
 		E2eProcessingLatency: t.AggregateChannelE2eProcessingLatency().PercentileResult(),
 	}
 }
@@ -54,7 +53,6 @@ func NewChannelStats(c *Channel, clients []ClientStats) ChannelStats {
 		TimeoutCount:  c.timeoutCount,
 		Clients:       clients,
 		Paused:        c.IsPaused(),
-
 		E2eProcessingLatency: c.e2eProcessingLatencyStream.PercentileResult(),
 	}
 }
@@ -74,7 +72,7 @@ type ClientStats struct {
 
 type Topics []*Topic
 
-func (t Topics) Len() int      { return len(t) }
+func (t Topics) Len() int { return len(t) }
 func (t Topics) Swap(i, j int) { t[i], t[j] = t[j], t[i] }
 
 type TopicsByName struct {
@@ -85,7 +83,7 @@ func (t TopicsByName) Less(i, j int) bool { return t.Topics[i].name < t.Topics[j
 
 type Channels []*Channel
 
-func (c Channels) Len() int      { return len(c) }
+func (c Channels) Len() int { return len(c) }
 func (c Channels) Swap(i, j int) { c[i], c[j] = c[j], c[i] }
 
 type ChannelsByName struct {
@@ -98,26 +96,26 @@ func (n *NSQd) getStats() []TopicStats {
 	n.RLock()
 	defer n.RUnlock()
 
-	realTopics := make([]*Topic, 0, len(n.topicMap))
+	realTopics := make([]*Topic,0, len(n.topicMap))
 	for _, t := range n.topicMap {
 		realTopics = append(realTopics, t)
 	}
 	sort.Sort(TopicsByName{realTopics})
 
-	topics := make([]TopicStats, 0, len(n.topicMap))
+	topics := make([]TopicStats,0, len(n.topicMap))
 	for _, t := range realTopics {
 		t.RLock()
 
-		realChannels := make([]*Channel, 0, len(t.channelMap))
+		realChannels := make([]*Channel,0, len(t.channelMap))
 		for _, c := range t.channelMap {
 			realChannels = append(realChannels, c)
 		}
 		sort.Sort(ChannelsByName{realChannels})
 
-		channels := make([]ChannelStats, 0, len(t.channelMap))
+		channels := make([]ChannelStats,0, len(t.channelMap))
 		for _, c := range realChannels {
 			c.RLock()
-			clients := make([]ClientStats, 0, len(c.clients))
+			clients := make([]ClientStats,0, len(c.clients))
 			for _, client := range c.clients {
 				clients = append(clients, client.Stats())
 			}

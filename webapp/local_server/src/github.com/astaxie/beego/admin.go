@@ -23,7 +23,7 @@ var BeeAdminApp *AdminApp
 //}
 
 //beego.FilterMonitorFunc = MyFilterMonitor
-var FilterMonitorFunc func(string, string, time.Duration) bool
+var FilterMonitorFunc func (string, string, time.Duration) bool
 
 func init() {
 	BeeAdminApp = &AdminApp{

@@ -108,7 +108,7 @@ func (ph *PublishHandler) HandleMessage(m *nsq.Message) error {
 			}
 		}
 	case ModeRoundRobin:
-		idx := ph.counter % uint64(len(ph.addresses))
+		idx := ph.counter%uint64(len(ph.addresses))
 		err := ph.Publish(ph.addresses[idx], m.Body)
 		if err != nil {
 			return err
@@ -133,11 +133,11 @@ func (ph *PublishHandler) HandleMessage(m *nsq.Message) error {
 		for _, v := range ph.reqs {
 			total += v
 		}
-		avgMs := (total.Seconds() * 1000) / float64(len(ph.reqs))
+		avgMs := (total.Seconds()*1000)/float64(len(ph.reqs))
 
 		sort.Sort(ph.reqs)
-		p95Ms := percentile(95.0, ph.reqs, len(ph.reqs)).Seconds() * 1000
-		p99Ms := percentile(99.0, ph.reqs, len(ph.reqs)).Seconds() * 1000
+		p95Ms := percentile(95.0, ph.reqs, len(ph.reqs)).Seconds()*1000
+		p99Ms := percentile(99.0, ph.reqs, len(ph.reqs)).Seconds()*1000
 
 		log.Printf("handler(%d): finished %d requests - 99th: %.02fms - 95th: %.02fms - avg: %.02fms",
 			ph.id, *statusEvery, p99Ms, p95Ms, avgMs)
@@ -149,7 +149,7 @@ func (ph *PublishHandler) HandleMessage(m *nsq.Message) error {
 }
 
 func percentile(perc float64, arr []time.Duration, length int) time.Duration {
-	indexOfPerc := int(math.Ceil(((perc / 100.0) * float64(length)) + 0.5))
+	indexOfPerc := int(math.Ceil(((perc/100.0)*float64(length)) + 0.5))
 	if indexOfPerc >= length {
 		indexOfPerc = length - 1
 	}
@@ -290,7 +290,7 @@ func main() {
 			Publisher: publisher,
 			addresses: addresses,
 			mode:      selectedMode,
-			reqs:      make(Durations, 0, *statusEvery),
+			reqs:      make(Durations,0, *statusEvery),
 			id:        i,
 			hostPool:  hostpool.New(addresses),
 		}

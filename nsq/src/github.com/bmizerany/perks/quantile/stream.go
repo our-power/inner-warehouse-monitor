@@ -43,7 +43,7 @@ func (a Samples) Swap(i, j int) {
 	a[i], a[j] = a[j], a[i]
 }
 
-type invariant func(s *stream, r float64) float64
+type invariant func (s *stream, r float64) float64
 
 // NewBiased returns an initialized Stream for high-biased quantiles (e.g.
 // 50th, 90th, 99th) not known a priori with ﬁner error guarantees for the
@@ -51,7 +51,7 @@ type invariant func(s *stream, r float64) float64
 // See http://www.cs.rutgers.edu/~muthu/bquant.pdf for time, space, and error properties.
 func NewBiased() *Stream {
 	ƒ := func(s *stream, r float64) float64 {
-		return 2 * s.epsilon * r
+		return 2*s.epsilon*r
 	}
 	return newStream(ƒ)
 }
@@ -66,9 +66,9 @@ func NewTargeted(quantiles ...float64) *Stream {
 		var f float64
 		for _, q := range quantiles {
 			if q*s.n <= r {
-				f = (2 * s.epsilon * r) / q
+				f = (2*s.epsilon*r)/q
 			} else {
-				f = (2 * s.epsilon * (s.n - r)) / (1 - q)
+				f = (2*s.epsilon*(s.n - r))/(1 - q)
 			}
 			m = math.Min(m, f)
 		}
@@ -88,7 +88,7 @@ type Stream struct {
 func newStream(ƒ invariant) *Stream {
 	const defaultEpsilon = 0.01
 	x := &stream{epsilon: defaultEpsilon, ƒ: ƒ, l: list.New()}
-	return &Stream{x, make(Samples, 0, 500), true}
+	return &Stream{x, make(Samples,0, 500), true}
 }
 
 // Insert inserts v into the stream.
@@ -116,7 +116,7 @@ func (s *Stream) Query(q float64) float64 {
 		if l == 0 {
 			return 0
 		}
-		i := int(float64(l) * q)
+		i := int(float64(l)*q)
 		if i > 0 {
 			i -= 1
 		}
@@ -205,7 +205,7 @@ func (s *stream) merge(samples Samples) {
 	}
 }
 
-func (s *stream) mergeFunc() func(v, w float64) {
+func (s *stream) mergeFunc() func (v, w float64) {
 	// NOTE: I used a goto over defer because it bought me a few extra
 	// nanoseconds. I know. I know.
 	var r float64
@@ -232,14 +232,14 @@ func (s *stream) count() int {
 
 func (s *stream) query(q float64) float64 {
 	e := s.l.Front()
-	t := math.Ceil(q * s.n)
-	t += math.Ceil(s.ƒ(s, t) / 2)
+	t := math.Ceil(q*s.n)
+	t += math.Ceil(s.ƒ(s, t)/2)
 	p := e.Value.(*Sample)
 	e = e.Next()
 	r := float64(0)
 	for e != nil {
 		c := e.Value.(*Sample)
-		if r+c.Width+c.Delta > t {
+		if r + c.Width + c.Delta > t {
 			return p.Value
 		}
 		r += p.Width
@@ -259,7 +259,7 @@ func (s *stream) compress() {
 	e = e.Prev()
 	for e != nil {
 		c := e.Value.(*Sample)
-		if c.Width+x.Width+x.Delta <= s.ƒ(s, r) {
+		if c.Width + x.Width + x.Delta <= s.ƒ(s, r) {
 			x.Width += c.Width
 			o := e
 			e = e.Prev()
@@ -273,7 +273,7 @@ func (s *stream) compress() {
 }
 
 func (s *stream) samples() Samples {
-	samples := make(Samples, 0, s.l.Len())
+	samples := make(Samples,0, s.l.Len())
 	for e := s.l.Front(); e != nil; e = e.Next() {
 		samples = append(samples, *e.Value.(*Sample))
 	}

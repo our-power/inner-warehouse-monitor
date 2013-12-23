@@ -186,7 +186,7 @@ func (output *BeegoOutput) Xml(data interface{}, hasIndent bool) error {
 func (output *BeegoOutput) Download(file string) {
 	output.Header("Content-Description", "File Transfer")
 	output.Header("Content-Type", "application/octet-stream")
-	output.Header("Content-Disposition", "attachment; filename="+filepath.Base(file))
+	output.Header("Content-Disposition", "attachment; filename=" + filepath.Base(file))
 	output.Header("Content-Transfer-Encoding", "binary")
 	output.Header("Expires", "0")
 	output.Header("Cache-Control", "must-revalidate")

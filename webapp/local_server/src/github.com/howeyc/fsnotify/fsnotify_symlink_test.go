@@ -63,7 +63,7 @@ func TestFsnotifyFakeSymlink(t *testing.T) {
 	t.Logf("Created bogus symlink")
 
 	// We expect this event to be received almost immediately, but let's wait 500 ms to be sure
-	time.Sleep(500 * time.Millisecond)
+	time.Sleep(500*time.Millisecond)
 
 	// Should not be error, just no events for broken links (watching nothing)
 	if errorsReceived.value() > 0 {

@@ -74,11 +74,10 @@ func NewWriter(addr string) *Writer {
 		exitChan:        make(chan int),
 		closeChan:       make(chan int),
 		dataChan:        make(chan []byte),
-
 		// can be overriden before connecting
 		Addr:              addr,
 		WriteTimeout:      time.Second,
-		HeartbeatInterval: DefaultClientTimeout / 2,
+		HeartbeatInterval: DefaultClientTimeout/2,
 		ShortIdentifier:   strings.Split(hostname, ".")[0],
 		LongIdentifier:    hostname,
 	}
@@ -211,7 +210,7 @@ func (w *Writer) connect() error {
 	ci := make(map[string]interface{})
 	ci["short_id"] = w.ShortIdentifier
 	ci["long_id"] = w.LongIdentifier
-	ci["heartbeat_interval"] = int64(w.HeartbeatInterval / time.Millisecond)
+	ci["heartbeat_interval"] = int64(w.HeartbeatInterval/time.Millisecond)
 	ci["feature_negotiation"] = true
 	cmd, err := Identify(ci)
 	if err != nil {
@@ -228,7 +227,7 @@ func (w *Writer) connect() error {
 		return err
 	}
 
-	w.SetReadDeadline(time.Now().Add(w.HeartbeatInterval * 2))
+	w.SetReadDeadline(time.Now().Add(w.HeartbeatInterval*2))
 	resp, err := ReadResponse(w)
 	if err != nil {
 		log.Printf("ERROR: [%s] failed to read IDENTIFY response - %s", w, err)
@@ -341,7 +340,7 @@ func (w *Writer) transactionCleanup() {
 				return
 			}
 			// give the runtime a chance to schedule other racing goroutines
-			time.Sleep(5 * time.Millisecond)
+			time.Sleep(5*time.Millisecond)
 			continue
 		}
 	}
@@ -350,7 +349,7 @@ func (w *Writer) transactionCleanup() {
 func (w *Writer) readLoop() {
 	rbuf := bufio.NewReader(w.Conn)
 	for {
-		w.SetReadDeadline(time.Now().Add(w.HeartbeatInterval * 2))
+		w.SetReadDeadline(time.Now().Add(w.HeartbeatInterval*2))
 		resp, err := ReadResponse(rbuf)
 		if err != nil {
 			if !strings.Contains(err.Error(), "use of closed network connection") {

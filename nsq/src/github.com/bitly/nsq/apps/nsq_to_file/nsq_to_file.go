@@ -74,7 +74,7 @@ func (f *FileLogger) router(r *nsq.Reader, termChan chan os.Signal, hupChan chan
 	pos := 0
 	output := make([]*Message, *maxInFlight)
 	sync := false
-	ticker := time.NewTicker(time.Duration(30) * time.Second)
+	ticker := time.NewTicker(time.Duration(30)*time.Second)
 	closing := false
 	closeFile := false
 	exit := false
@@ -132,21 +132,22 @@ func (f *FileLogger) router(r *nsq.Reader, termChan chan os.Signal, hupChan chan
 					pos--
 					m := output[pos]
 					m.returnChannel <- &nsq.FinishedMessage{m.Id, 0, true}
-					output[pos] = nil
-				}
+				output[pos] = nil
 			}
-			sync = false
 		}
-
-		if closeFile {
-			f.Close()
-			closeFile = false
-		}
-		if exit {
-			close(f.ExitChan)
-			break
-		}
+		sync = false
 	}
+
+	if closeFile {
+		f.Close()
+		closeFile = false
+	}
+	if exit {
+		close(f.ExitChan)
+		break
+	}
+}
+
 }
 
 func (f *FileLogger) Close() {
@@ -211,7 +212,7 @@ func (f *FileLogger) updateFile() bool {
 				}
 				tempFilename := strings.Replace(filename, "<GZIPREV>", revisionSuffix, -1)
 				fullPath := path.Join(*outputDir, tempFilename)
-				newFile, err = os.OpenFile(fullPath, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0666)
+				newFile, err = os.OpenFile(fullPath, os.O_WRONLY | os.O_CREATE | os.O_EXCL, 0666)
 				if err != nil && os.IsExist(err) {
 					log.Printf("INFO: file already exists: %s", fullPath)
 					continue
@@ -227,7 +228,7 @@ func (f *FileLogger) updateFile() bool {
 			}
 		} else {
 			log.Printf("opening %s/%s", *outputDir, filename)
-			newFile, err = os.OpenFile(path.Join(*outputDir, filename), os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0666)
+			newFile, err = os.OpenFile(path.Join(*outputDir, filename), os.O_WRONLY | os.O_CREATE | os.O_APPEND, 0666)
 			if err != nil {
 				log.Fatal(err)
 			}
