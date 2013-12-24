@@ -1,33 +1,30 @@
 package register
 
 import (
-	"strings"
-	"strconv"
+	"database/sql"
 	"github.com/bitly/go-nsq"
-    "github.com/influxdb/influxdb-go"
-    "util"
+	_ "github.com/mattn/go-sqlite3"
+	"strconv"
+	"strings"
 )
 
 type RegisterToDBHandler struct {
-	db_client *influxdb.Client
-    table_name string
+	db *sql.DB
 }
-
-var column_names = []string{"time", "date", "time_index", "ip", "host_name", "hardware_addr", "agent_version", "machine_role", "status"}
 
 func (h *RegisterToDBHandler) HandleMessage(m *nsq.Message) (err error) {
 	/*
-	实现队列消息处理功能
+		实现队列消息处理功能
 	*/
 	bodyParts := strings.Split(string(m.Body), "\r\n")
 	if len(bodyParts) == 6 {
 		time_index, err := strconv.Atoi(bodyParts[1])
-        time_index := util.FormatTime(bodyParts[0], time_index)
+
 		/*
-		0:机器正常关闭
-		1:机器正在运行
-		-1:机器没有正常发送心跳数据
-		-2:删除机器（该机器不再投入使用）
+			0:机器正常关闭
+			1:机器正在运行
+			-1:机器没有正常发送心跳数据
+			-2:删除机器（该机器不再投入使用）
 		*/
 		var status int
 		if bodyParts[5] == "shutdown" {
@@ -49,10 +46,9 @@ func (h *RegisterToDBHandler) HandleMessage(m *nsq.Message) (err error) {
 	return nil
 }
 
-func NewRegisterToDBHandler(client *influxdb.Client) (registerToDBHandler *RegisterToDBHandler, err error) {
-	registerToDBHandler = &RegisterToDBHandler {
-		db_client: client,
-        table_name: "register",
+func NewRegisterToDBHandler(dbLink *sql.DB) (registerToDBHandler *RegisterToDBHandler, err error) {
+	registerToDBHandler = &RegisterToDBHandler{
+		db: dbLink,
 	}
 	return registerToDBHandler, err
 }
