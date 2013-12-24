@@ -20,7 +20,7 @@ func init() {
 		if dbName_DbSource[0] == "register" {
 			// beego的ORM要求必须要有个default的数据库
 			orm.RegisterDataBase("default", beego.AppConfig.String("dbdriver"), dbName_DbSource[1])
-		}else{
+		} else {
 			orm.RegisterDataBase(dbName_DbSource[0], beego.AppConfig.String("dbdriver"), dbName_DbSource[1])
 		}
 	}
