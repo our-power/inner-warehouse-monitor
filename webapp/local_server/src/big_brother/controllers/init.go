@@ -17,5 +17,5 @@ func InitControllers() {
 		Password: beego.AppConfig.String("influxdb_passwd"),
 		Database: beego.AppConfig.String("influxdb_database"),
 	}
-	client, err := influxdb.NewClient(&config)
+	client, _ = influxdb.NewClient(&config)
 }

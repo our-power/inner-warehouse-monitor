@@ -1,14 +1,14 @@
 package controllers
 
 import (
-	//"fmt"
+	"fmt"
 	"time"
 
 	"runtime"
 
+	"big_brother/models"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
-	"big_brother/models"
 )
 
 type ApiController struct {
@@ -25,7 +25,7 @@ func (this *ApiController) GetMachineList() {
 	_, err := o.QueryTable("register").All(&serverList)
 	if err == nil {
 		this.Data["json"] = &serverList
-	}else {
+	} else {
 		this.Data["json"] = nil
 	}
 	this.ServeJson()
@@ -34,7 +34,7 @@ func (this *ApiController) GetMachineList() {
 /*
 	GET /api/status_overview?role=xxx
 */
-func (this * ApiController) GetStatusOverview() {
+func (this *ApiController) GetStatusOverview() {
 	machineRole := this.GetString("role")
 	var serverList []orm.Params
 	var available, shutdown, exception int
@@ -56,7 +56,7 @@ func (this * ApiController) GetStatusOverview() {
 				exception++
 			}
 		}
-		statistics := []interface {}{available, shutdown, exception, &serverList}
+		statistics := []interface{}{available, shutdown, exception, &serverList}
 		this.Data["json"] = statistics
 	}
 	this.ServeJson()
@@ -87,7 +87,7 @@ func (this *ApiController) GetStepIndicatorData() {
 	}
 
 	var dataTable string
-	switch indicator{
+	switch indicator {
 	case "cpu_view":
 		dataTable = "cpu_usage"
 	case "memory_view":
@@ -103,39 +103,37 @@ func (this *ApiController) GetStepIndicatorData() {
 
 	if role == "" || dataTable == "" {
 		this.Data["json"] = nil
-	}else {
-		database := dataTable
+	} else {
 		var maps []orm.Params
 		o.Using("default")
 		_, err := o.QueryTable("register").Filter("machine_role", role).Limit(-1).Values(&maps, "host_name", "hardware_addr")
 		if err == nil {
-			o.Using(database)
 			if dataTable == "cpu_usage" || dataTable == "mem_usage" {
 				type ResultType struct {
 					Host_name string
-					Data	  []float64
+					Data      []float64
 				}
-				results := make([]ResultType,0, 50)
+				results := make([]ResultType, 0, 50)
 				for _, machine := range maps {
-					var rows []orm.Params
-					num, err := o.QueryTable(dataTable).Filter("hardware_addr", machine["Hardware_addr"]).Filter("date", dateStr).OrderBy("time_index").Limit(-1).Values(&rows, "time_index", "usage")
-					if err == nil && num > 0 {
-						dataContainerLength := int(rows[num - 1]["Time_index"].(int64)) + 1
+					query := fmt.Sprintf("SELECT time_index, usage FROM %s WHERE hardware_addr=%s AND date=%s", dataTable, machine["Hardware_addr"], dateStr)
+					series, _ := client.Query(query)
+					if len(series) > 0 && len(series[0].Points) > 0 {
+						//By default, InfluxDB returns data in time descending order.
+						dataContainerLength := int(series[0].Points[0][2].(int64)) + 1
 						usageData := make([]float64, dataContainerLength)
 						for index := 0; index < dataContainerLength; index++ {
-							usageData[index] = -1;
+							usageData[index] = -1
 						}
-						for _, row := range rows {
-							time_index, _ := row["Time_index"].(int64)
-							usageData[time_index] = row["Usage"].(float64)
+						for _, point := range series[0].Points {
+							time_index := int(point[2].(int64))
+							usageData[time_index] = point[3].(float64)
 						}
-
 						host_name, _ := machine["Host_name"].(string)
 						results = append(results, ResultType{Host_name: host_name, Data: usageData})
 					}
 				}
 				this.Data["json"] = results
-			}else if dataTable == "net_flow" {
+			} else if dataTable == "net_flow" {
 				type NcDataType struct {
 					Out_bytes   []int
 					In_bytes    []int
@@ -144,15 +142,14 @@ func (this *ApiController) GetStepIndicatorData() {
 				}
 				type ResultType struct {
 					Host_name string
-					Data	  NcDataType
+					Data      NcDataType
 				}
-				results := make([]ResultType,0, 50)
+				results := make([]ResultType, 0, 50)
 				for _, machine := range maps {
-					var rows []orm.Params;
-					num, err := o.QueryTable(dataTable).Filter("hardware_addr", machine["Hardware_addr"]).Filter("date", dateStr).OrderBy("time_index").Limit(-1).Values(&rows, "time_index", "out_bytes", "in_bytes", "out_packets", "in_packets")
-					if err == nil && num > 0 {
-						dataContainerLength := int(rows[num - 1]["Time_index"].(int64)) + 1
-
+					query := fmt.Sprintf("SELECT time_index, out_bytes, in_bytes, out_packets, in_packets FROM net_flow WHERE hardware_addr=%s AND date=%s", machine["Hardware_addr"], dateStr)
+					series, _ := client.Query(query)
+					if len(series) > 0 && len(series[0].Points) > 0 {
+						dataContainerLength := int(series[0].Points[0][2].(int64)) + 1
 						outBytes := make([]int, dataContainerLength)
 						inBytes := make([]int, dataContainerLength)
 						outPackets := make([]int, dataContainerLength)
@@ -164,23 +161,24 @@ func (this *ApiController) GetStepIndicatorData() {
 							inPackets[index] = -1
 						}
 						ncData := NcDataType{
-							Out_bytes: outBytes,
-							In_bytes: inBytes,
+							Out_bytes:   outBytes,
+							In_bytes:    inBytes,
 							Out_packets: outPackets,
-							In_packets: inPackets,
+							In_packets:  inPackets,
 						}
-						for _, row := range rows {
-							ncData.Out_bytes[int(row["Time_index"].(int64))] = int(row["Out_bytes"].(int64))
-							ncData.In_bytes[int(row["Time_index"].(int64))] = int(row["In_bytes"].(int64))
-							ncData.Out_packets[int(row["Time_index"].(int64))] = int(row["Out_packets"].(int64))
-							ncData.In_packets[int(row["Time_index"].(int64))] = int(row["In_packets"].(int64))
+						for _, point := range series[0].Points {
+							time_index := int(point[2].(int64))
+							ncData.Out_bytes[time_index] = int(point[3].(int64))
+							ncData.In_bytes[time_index] = int(point[4].(int64))
+							ncData.Out_packets[time_index] = int(point[5].(int64))
+							ncData.In_packets[time_index] = int(point[6].(int64))
 						}
 						results = append(results, ResultType{Host_name: machine["Host_name"].(string), Data: ncData})
 					}
 				}
 				this.Data["json"] = results
 			}
-		}else {
+		} else {
 			this.Data["json"] = nil
 		}
 	}
@@ -200,50 +198,47 @@ func (this *ApiController) GetMachineIndicatorData() {
 	dateStr := date.Format("20060102")
 
 	if indicator == "cpu_usage" {
-		o.Using("cpu_usage")
-		var cpuUsageData []*models.Cpu_usage
-		num, err := o.QueryTable("cpu_usage").Filter("hardware_addr", hardwareAddr).Filter("date", dateStr).OrderBy("time_index").Limit(-1).All(&cpuUsageData, "time_index", "usage")
-		if err == nil && num > 0 {
-			dataContainerLength := cpuUsageData[num - 1].Time_index + 1
+		query := fmt.Sprintf("SELECT time_index, usage FROM cpu_usage WHERE hardware_addr=%s AND date=%s", hardwareAddr, dateStr)
+		series, _ := client.Query(query)
+		if len(series) > 0 && len(series[0].Points) > 0 {
+			dataContainerLength := int(series[0].Points[0][2].(int64)) + 1
 			results := make([]float32, dataContainerLength)
 			for index := 0; index < dataContainerLength; index++ {
 				results[index] = -1
 			}
-			for _, row := range cpuUsageData {
-				results[row.Time_index] = row.Usage
+			for _, point := range series[0].Points {
+				results[int(point[2].(int64))] = point[3].(float32)
 			}
-			this.Data["json"] =  results
-		}else {
+			this.Data["json"] = results
+		} else {
 			this.Data["json"] = nil
 		}
-	}else if indicator == "mem_usage" {
-		o.Using("mem_usage")
-		var memUsageData []*models.Mem_usage
-		num, err := o.QueryTable("mem_usage").Filter("hardware_addr", hardwareAddr).Filter("date", dateStr).OrderBy("time_index").Limit(-1).All(&memUsageData, "time_index", "usage")
-		if err == nil && num > 0 {
-			dataContainerLength := memUsageData[num - 1].Time_index + 1
+	} else if indicator == "mem_usage" {
+		query := fmt.Sprintf("SELECT time_index, usage FROM mem_usage WHERE hardware_addr=%s AND date=%s", hardwareAddr, dateStr)
+		series, _ := client.Query(query)
+		if len(series) > 0 && len(series[0].Points) > 0 {
+			dataContainerLength := int(series[0].Points[0][2].(int64)) + 1
 			results := make([]float32, dataContainerLength)
 			for index := 0; index < dataContainerLength; index++ {
 				results[index] = -1
 			}
-			for _, row := range memUsageData {
-				results[row.Time_index] = row.Usage
+			for _, point := range series[0].Points {
+				results[int(point[2].(int64))] = point[3].(float32)
 			}
-			this.Data["json"] =  results
-		}else {
+			this.Data["json"] = results
+		} else {
 			this.Data["json"] = nil
 		}
-	}else {
-		o.Using("net_flow")
-		var netFlowData []*models.Net_flow
-		num, err := o.QueryTable("net_flow").Filter("hardware_addr", hardwareAddr).Filter("date", dateStr).OrderBy("time_index").Limit(-1).All(&netFlowData, "time_index", "out_bytes", "in_bytes", "out_packets", "in_packets")
-		if err == nil && num > 0 {
-			dataContainerLength := netFlowData[num - 1].Time_index + 1
+	} else {
+		query := fmt.Sprintf("SELECT time_index, out_bytes, in_bytes, out_packets, in_packets FROM net_flow WHERE hardware_addr=%s AND date=%s", hardwareAddr, dateStr)
+		series, _ := client.Query(query)
+		if len(series) > 0 && len(series[0].Points) > 0 {
+			dataContainerLength := int(series[0].Points[0][2].(int64)) + 1
 			type ResultType struct {
-				Out_bytes     []int
-				In_bytes      []int
-				Out_packets   []int
-				In_packets    []int
+				Out_bytes   []int
+				In_bytes    []int
+				Out_packets []int
+				In_packets  []int
 			}
 			outBytes := make([]int, dataContainerLength)
 			inBytes := make([]int, dataContainerLength)
@@ -256,14 +251,15 @@ func (this *ApiController) GetMachineIndicatorData() {
 				inPackets[index] = -1
 			}
 			results := ResultType{Out_bytes: outBytes, In_bytes: inBytes, Out_packets: outPackets, In_packets: inPackets}
-			for _, row := range netFlowData {
-				results.Out_bytes[row.Time_index] = row.Out_bytes
-				results.In_bytes[row.Time_index] = row.In_bytes
-				results.Out_packets[row.Time_index] = row.Out_packets
-				results.In_packets[row.Time_index] = row.In_packets
+			for _, point := range series[0].Points {
+				time_index := int(point[2].(int64))
+				results.Out_bytes[time_index] = int(point[3].(int64))
+				results.In_bytes[time_index] = int(point[4].(int64))
+				results.Out_packets[time_index] = int(point[5].(int64))
+				results.In_packets[time_index] = int(point[6].(int64))
 			}
 			this.Data["json"] = results
-		}else {
+		} else {
 			this.Data["json"] = nil
 		}
 	}
@@ -286,7 +282,7 @@ func (this *ApiController) GetMachineAccessibilityData() {
 		Status     string
 	}
 
-	type ResultType struct{
+	type ResultType struct {
 		Hardware_addr     string
 		Date              string
 		Ping_time_index   int
@@ -295,36 +291,34 @@ func (this *ApiController) GetMachineAccessibilityData() {
 		Telnet_results    []TelnetResultType
 	}
 
-	pingResults := make([]PingResultType,0, 100)
-	telnetResults := make([]TelnetResultType,0, 100)
+	pingResults := make([]PingResultType, 0, 100)
+	telnetResults := make([]TelnetResultType, 0, 100)
 	var pingTimeIndex int
 	var telnetTimeIndex int
-	o.Using("accessibility")
-	var pingItems []*models.Ping_accessibility
-	// 这里使用的Limit(20)是假设最多有20个服务
-	num, err := o.QueryTable("ping_accessibility").Filter("hardware_addr", hardwareAddr).Filter("date", dateStr).OrderBy("-time_index").Limit(100).All(&pingItems)
-	if err == nil && num > 0 {
-		newestTimeIndex := pingItems[0].Time_index
+	query := fmt.Sprintf("SELECT time_index, target_ip, response_time FROM ping_accessibility WHERE hardware_addr=%s AND date=%s", hardwareAddr, dateStr)
+	series, _ := client.Query(query)
+	if len(series) > 0 && len(series[0].Points) > 0 {
+		newestTimeIndex := int(series[0].Points[0][2].(int64))
 		pingTimeIndex = newestTimeIndex
-		for _, item := range pingItems {
-			if item.Time_index < newestTimeIndex {
+		for _, point := range series[0].Points {
+			if int(point[2].(int64)) < newestTimeIndex {
 				break
-			}else {
-				pingResults = append(pingResults, PingResultType{Target_ip: item.Target_ip, Response_time: item.Response_time})
+			} else {
+				pingResults = append(pingResults, PingResultType{Target_ip: point[3].(string), Response_time: int(point[4].(int64))})
 			}
 		}
 	}
 
-	var telnetItems []*models.Telnet_accessibility
-	num, err = o.QueryTable("telnet_accessibility").Filter("hardware_addr", hardwareAddr).Filter("date", dateStr).OrderBy("-time_index").Limit(100).All(&telnetItems)
-	if err == nil && num > 0 {
-		newestTimeIndex := telnetItems[0].Time_index
+	query = fmt.Sprintf("SELECT time_index, target_url, status FROM telnet_accessibility WHERE hardware_addr=%s AND date=%s", hardwareAddr, dateStr)
+	series, _ = client.Query(query)
+	if len(series) > 0 && len(series[0].Points) > 0 {
+		newestTimeIndex := int(series[0].Points[0][2].(int64))
 		telnetTimeIndex = newestTimeIndex
-		for _, item := range telnetItems {
-			if item.Time_index < newestTimeIndex {
+		for _, point := range series[0].Points {
+			if int(point[2].(int64)) < newestTimeIndex {
 				break
-			}else {
-				telnetResults = append(telnetResults, TelnetResultType{Target_url: item.Target_url, Status: item.Status})
+			} else {
+				telnetResults = append(telnetResults, TelnetResultType{Target_url: point[3].(string), Status: point[4].(string)})
 			}
 		}
 	}
