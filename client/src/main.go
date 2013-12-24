@@ -57,7 +57,7 @@ func getDBLink(dbDriver string, dbSourceName string) (link *sql.DB, err error) {
 }
 
 func runCpuUsageClient(cuh *cpu_usage.CPUUsageHandler) (cuTodb *nsq.Reader, err error) {
-	cuTodb, err = nsq.NewReader("cpu_usage", "todb")
+	cuTodb, err = nsq.NewReader("cpu_usage", "toinfluxdb")
 	if err != nil {
 		log.Fatalf(err.Error())
 	}
@@ -84,7 +84,7 @@ func runCpuUsageClient(cuh *cpu_usage.CPUUsageHandler) (cuTodb *nsq.Reader, err 
 }
 
 func runMemUsageClient(muh *mem_usage.MemUsageHandler) (muTodb *nsq.Reader, err error) {
-	muTodb, err = nsq.NewReader("mem_usage", "todb")
+	muTodb, err = nsq.NewReader("mem_usage", "toinfluxdb")
 	if err != nil {
 		log.Fatalf(err.Error())
 	}
@@ -112,7 +112,7 @@ func runMemUsageClient(muh *mem_usage.MemUsageHandler) (muTodb *nsq.Reader, err 
 }
 
 func runNetFlowClient(nfh *net_flow.NetFlowHandler) (nfTodb *nsq.Reader, err error) {
-	nfTodb, err = nsq.NewReader("net_flow", "todb")
+	nfTodb, err = nsq.NewReader("net_flow", "toinfluxdb")
 	if err != nil {
 		log.Fatalf(err.Error())
 	}
@@ -140,7 +140,7 @@ func runNetFlowClient(nfh *net_flow.NetFlowHandler) (nfTodb *nsq.Reader, err err
 }
 
 func runHeartBeatClient(hbh *heartbeat.HeartBeatHandler) (hbTodb *nsq.Reader, err error) {
-	hbTodb, err = nsq.NewReader("heartbeat", "todb")
+	hbTodb, err = nsq.NewReader("heartbeat", "toinfluxdb")
 	if err != nil {
 		log.Fatalf(err.Error())
 	}
@@ -168,7 +168,7 @@ func runHeartBeatClient(hbh *heartbeat.HeartBeatHandler) (hbTodb *nsq.Reader, er
 }
 
 func runAccessibilityToDBClient(ath *accessibility.AccessibilityToDBHandler) (aTodb *nsq.Reader, err error) {
-	aTodb, err = nsq.NewReader("accessibility", "todb")
+	aTodb, err = nsq.NewReader("accessibility", "toinfluxdb")
 	if err != nil {
 		log.Fatalf(err.Error())
 	}
@@ -196,7 +196,7 @@ func runAccessibilityToDBClient(ath *accessibility.AccessibilityToDBHandler) (aT
 }
 
 func runAccessibilityCheckClient(ach *accessibility.AccessibilityCheckHandler) (aCheck *nsq.Reader, err error) {
-	aCheck, err = nsq.NewReader("accessibility", "check_exception")
+	aCheck, err = nsq.NewReader("accessibility", "ce_influxdb")
 	if err != nil {
 		log.Fatalf(err.Error())
 	}
@@ -224,7 +224,7 @@ func runAccessibilityCheckClient(ach *accessibility.AccessibilityCheckHandler) (
 }
 
 func runRegisterToDBClient(rh *register.RegisterToDBHandler) (registerTodb *nsq.Reader, err error) {
-	registerTodb, err = nsq.NewReader("register", "todb")
+	registerTodb, err = nsq.NewReader("register", "db_influxdb")
 	if err != nil {
 		log.Fatalf(err.Error())
 	}
