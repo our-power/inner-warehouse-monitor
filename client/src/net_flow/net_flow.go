@@ -14,7 +14,7 @@ type NetFlowHandler struct {
 	table_name string
 }
 
-var column_names = []string{"time", "ip", "host_name", "hardware_addr", "out_bytes", "in_bytes", "out_packets", "in_packets"}
+var column_names = []string{"time", "date", "time_index", "ip", "host_name", "hardware_addr", "out_bytes", "in_bytes", "out_packets", "in_packets"}
 
 func (h *NetFlowHandler) HandleMessage(m *nsq.Message) (err error) {
 	/*
@@ -63,7 +63,7 @@ func (h *NetFlowHandler) HandleMessage(m *nsq.Message) (err error) {
 		}
 
 		ps := make([][]interface{}, 0, 1)
-		ps = append(ps, []interface{}{time_int, bodyParts[2], bodyParts[3], bodyParts[4], outBytes, inBytes, outPackets, inPackets})
+		ps = append(ps, []interface{}{time_int, bodyParts[0], time_index, bodyParts[2], bodyParts[3], bodyParts[4], outBytes, inBytes, outPackets, inPackets})
 		netflow_msg := influxdb.Series{
 			Name:    h.table_name,
 			Columns: column_names,

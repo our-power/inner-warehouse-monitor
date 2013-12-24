@@ -1,6 +1,7 @@
 package util
 
 import (
+	"strconv"
 	"time"
 )
 
@@ -10,15 +11,15 @@ func FormatTime(date string, time_index int) (timestamp int64) {
 	minute := seconds % 3600 / 60
 	second := seconds % 60
 
-	hour_str := string(hour)
+	hour_str, := strconv.Itoa(hour)
 	if hour < 10 {
 		hour_str = "0" + hour_str
 	}
-	minute_str := string(minute)
+	minute_str := strconv.Itoa(minute)
 	if minute < 10 {
 		minute_str = "0" + minute_str
 	}
-	second_str := string(second)
+	second_str := strconv.Itoa(second)
 	if second < 10 {
 		second_str = "0" + second_str
 	}
