@@ -11,7 +11,7 @@ func FormatTime(date string, time_index int) (timestamp int64) {
 	minute := seconds % 3600 / 60
 	second := seconds % 60
 
-	hour_str, := strconv.Itoa(hour)
+	hour_str := strconv.Itoa(hour)
 	if hour < 10 {
 		hour_str = "0" + hour_str
 	}
