@@ -327,7 +327,7 @@ func (this *ApiController) GetMachineAccessibilityData() {
 		for index, value := range series[0].Columns {
 			column_index_mapper[value] = index
 		}
-		newestTimeIndex := int(series[0].Points[0][column_index_mapper["time_index"]].(float64)) + 1
+		newestTimeIndex := int(series[0].Points[0][column_index_mapper["time_index"]].(float64))
 		pingTimeIndex = newestTimeIndex
 		for _, point := range series[0].Points {
 			if int(point[column_index_mapper["time_index"]].(float64)) < newestTimeIndex {
@@ -345,7 +345,7 @@ func (this *ApiController) GetMachineAccessibilityData() {
 		for index, value := range series[0].Columns {
 			column_index_mapper[value] = index
 		}
-		newestTimeIndex := int(series[0].Points[0][column_index_mapper["time_index"]].(float64)) + 1
+		newestTimeIndex := int(series[0].Points[0][column_index_mapper["time_index"]].(float64))
 		telnetTimeIndex = newestTimeIndex
 		for _, point := range series[0].Points {
 			if int(point[column_index_mapper["time_index"]].(float64)) < newestTimeIndex {
