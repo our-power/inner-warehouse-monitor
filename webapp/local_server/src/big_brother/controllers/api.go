@@ -333,7 +333,7 @@ func (this *ApiController) GetMachineAccessibilityData() {
 			if int(point[column_index_mapper["time_index"]].(float64)) < newestTimeIndex {
 				break
 			} else {
-				pingResults = append(pingResults, PingResultType{Target_ip: point[column_index_mapper["target_ip"]].(string), Response_time: int(point[column_index_mapper["response_time"]].(int64))})
+				pingResults = append(pingResults, PingResultType{Target_ip: point[column_index_mapper["target_ip"]].(string), Response_time: int(point[column_index_mapper["response_time"]].(float64))})
 			}
 		}
 	}
