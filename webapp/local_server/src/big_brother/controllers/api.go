@@ -320,7 +320,7 @@ func (this *ApiController) GetMachineAccessibilityData() {
 	telnetResults := make([]TelnetResultType, 0, 100)
 	var pingTimeIndex int
 	var telnetTimeIndex int
-	query := fmt.Sprintf("SELECT time_index, target_ip, response_time FROM ping_accessibility WHERE hardware_addr='%s' AND date='%s'", hardwareAddr, dateStr)
+	query := fmt.Sprintf("SELECT time_index, target_ip, response_time FROM ping_accessibility WHERE hardware_addr='%s' AND date='%s' LIMIT 100", hardwareAddr, dateStr)
 	series, _ := client.Query(query)
 	if len(series) > 0 && len(series[0].Points) > 0 {
 		column_index_mapper := make(map[string]int)
@@ -338,7 +338,7 @@ func (this *ApiController) GetMachineAccessibilityData() {
 		}
 	}
 
-	query = fmt.Sprintf("SELECT time_index, target_url, status FROM telnet_accessibility WHERE hardware_addr='%s' AND date='%s'", hardwareAddr, dateStr)
+	query = fmt.Sprintf("SELECT time_index, target_url, status FROM telnet_accessibility WHERE hardware_addr='%s' AND date='%s' LIMIT 100", hardwareAddr, dateStr)
 	series, _ = client.Query(query)
 	if len(series) > 0 && len(series[0].Points) > 0 {
 		column_index_mapper := make(map[string]int)
