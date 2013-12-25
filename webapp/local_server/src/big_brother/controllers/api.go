@@ -178,10 +178,10 @@ func (this *ApiController) GetStepIndicatorData() {
 						}
 						for _, point := range series[0].Points {
 							time_index := int(point[column_index_mapper["time_index"]].(float64))
-							ncData.Out_bytes[time_index] = int(point[column_index_mapper["out_bytes"]].(int64))
-							ncData.In_bytes[time_index] = int(point[column_index_mapper["in_bytes"]].(int64))
-							ncData.Out_packets[time_index] = int(point[column_index_mapper["out_packets"]].(int64))
-							ncData.In_packets[time_index] = int(point[column_index_mapper["in_packets"]].(int64))
+							ncData.Out_bytes[time_index] = int(point[column_index_mapper["out_bytes"]].(float64))
+							ncData.In_bytes[time_index] = int(point[column_index_mapper["in_bytes"]].(float64))
+							ncData.Out_packets[time_index] = int(point[column_index_mapper["out_packets"]].(float64))
+							ncData.In_packets[time_index] = int(point[column_index_mapper["in_packets"]].(float64))
 						}
 						results = append(results, ResultType{Host_name: machine["Host_name"].(string), Data: ncData})
 					}
@@ -278,10 +278,10 @@ func (this *ApiController) GetMachineIndicatorData() {
 			results := ResultType{Out_bytes: outBytes, In_bytes: inBytes, Out_packets: outPackets, In_packets: inPackets}
 			for _, point := range series[0].Points {
 				time_index := int(point[column_index_mapper["time_index"]].(float64))
-				results.Out_bytes[time_index] = int(point[column_index_mapper["out_bytes"]].(int64))
-				results.In_bytes[time_index] = int(point[column_index_mapper["in_bytes"]].(int64))
-				results.Out_packets[time_index] = int(point[column_index_mapper["out_packets"]].(int64))
-				results.In_packets[time_index] = int(point[column_index_mapper["in_packets"]].(int64))
+				results.Out_bytes[time_index] = int(point[column_index_mapper["out_bytes"]].(float64))
+				results.In_bytes[time_index] = int(point[column_index_mapper["in_bytes"]].(float64))
+				results.Out_packets[time_index] = int(point[column_index_mapper["out_packets"]].(float64))
+				results.In_packets[time_index] = int(point[column_index_mapper["in_packets"]].(float64))
 			}
 			this.Data["json"] = results
 		} else {
