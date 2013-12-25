@@ -123,7 +123,7 @@ func (this *ApiController) GetStepIndicatorData() {
 							column_index_mapper[value] = index
 						}
 						//By default, InfluxDB returns data in time descending order.
-						dataContainerLength := int(series[0].Points[0][column_index_mapper["time_index"]].(int64)) + 1
+						dataContainerLength := int(series[0].Points[0][column_index_mapper["time_index"]].(float64)) + 1
 
 						usageData := make([]float32, dataContainerLength)
 						for index := 0; index < dataContainerLength; index++ {
@@ -177,7 +177,7 @@ func (this *ApiController) GetStepIndicatorData() {
 							In_packets:  inPackets,
 						}
 						for _, point := range series[0].Points {
-							time_index := int(point[column_index_mapper["time_index"]].(int64))
+							time_index := int(point[column_index_mapper["time_index"]].(float64))
 							ncData.Out_bytes[time_index] = int(point[column_index_mapper["out_bytes"]].(int64))
 							ncData.In_bytes[time_index] = int(point[column_index_mapper["in_bytes"]].(int64))
 							ncData.Out_packets[time_index] = int(point[column_index_mapper["out_packets"]].(int64))
@@ -215,7 +215,7 @@ func (this *ApiController) GetMachineIndicatorData() {
 			for index, value := range series[0].Columns {
 				column_index_mapper[value] = index
 			}
-			dataContainerLength := int(series[0].Points[0][column_index_mapper["time_index"]].(int64)) + 1
+			dataContainerLength := int(series[0].Points[0][column_index_mapper["time_index"]].(float64)) + 1
 			results := make([]float32, dataContainerLength)
 			for index := 0; index < dataContainerLength; index++ {
 				results[index] = -1
@@ -236,7 +236,7 @@ func (this *ApiController) GetMachineIndicatorData() {
 			for index, value := range series[0].Columns {
 				column_index_mapper[value] = index
 			}
-			dataContainerLength := int(series[0].Points[0][column_index_mapper["time_index"]].(int64)) + 1
+			dataContainerLength := int(series[0].Points[0][column_index_mapper["time_index"]].(float64)) + 1
 			results := make([]float32, dataContainerLength)
 			for index := 0; index < dataContainerLength; index++ {
 				results[index] = -1
@@ -257,7 +257,7 @@ func (this *ApiController) GetMachineIndicatorData() {
 			for index, value := range series[0].Columns {
 				column_index_mapper[value] = index
 			}
-			dataContainerLength := int(series[0].Points[0][column_index_mapper["time_index"]].(int64)) + 1
+			dataContainerLength := int(series[0].Points[0][column_index_mapper["time_index"]].(float64)) + 1
 
 			type ResultType struct {
 				Out_bytes   []int
@@ -277,7 +277,7 @@ func (this *ApiController) GetMachineIndicatorData() {
 			}
 			results := ResultType{Out_bytes: outBytes, In_bytes: inBytes, Out_packets: outPackets, In_packets: inPackets}
 			for _, point := range series[0].Points {
-				time_index := int(point[column_index_mapper["time_index"]].(int64))
+				time_index := int(point[column_index_mapper["time_index"]].(float64))
 				results.Out_bytes[time_index] = int(point[column_index_mapper["out_bytes"]].(int64))
 				results.In_bytes[time_index] = int(point[column_index_mapper["in_bytes"]].(int64))
 				results.Out_packets[time_index] = int(point[column_index_mapper["out_packets"]].(int64))
@@ -327,7 +327,7 @@ func (this *ApiController) GetMachineAccessibilityData() {
 		for index, value := range series[0].Columns {
 			column_index_mapper[value] = index
 		}
-		newestTimeIndex := int(series[0].Points[0][column_index_mapper["time_index"]].(int64)) + 1
+		newestTimeIndex := int(series[0].Points[0][column_index_mapper["time_index"]].(float64)) + 1
 		pingTimeIndex = newestTimeIndex
 		for _, point := range series[0].Points {
 			if int(point[column_index_mapper["time_index"]].(int64)) < newestTimeIndex {
@@ -345,7 +345,7 @@ func (this *ApiController) GetMachineAccessibilityData() {
 		for index, value := range series[0].Columns {
 			column_index_mapper[value] = index
 		}
-		newestTimeIndex := int(series[0].Points[0][column_index_mapper["time_index"]].(int64)) + 1
+		newestTimeIndex := int(series[0].Points[0][column_index_mapper["time_index"]].(float64)) + 1
 		telnetTimeIndex = newestTimeIndex
 		for _, point := range series[0].Points {
 			if int(point[column_index_mapper["time_index"]].(int64)) < newestTimeIndex {
