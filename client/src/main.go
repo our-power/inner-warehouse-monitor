@@ -332,7 +332,7 @@ func main() {
 	   心跳数据定期检测，根据检测的结果修改register数据表中机器（正常运行、不正常运行两类）的当前状态
 	   检测条件：3分钟内是否收到心跳数据
 	*/
-	//heartBeatHandler.CheckPeriodically(register_db_link)
+	heartBeatHandler.CheckPeriodically(register_db_link)
 
 	// 注册各种指标的处理类，各自连接到NSQ的某个channel
 	cuTodb, err := runCpuUsageClient(cpuUsageHandler)
