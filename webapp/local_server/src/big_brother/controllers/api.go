@@ -131,7 +131,7 @@ func (this *ApiController) GetStepIndicatorData() {
 						}
 						for _, point := range series[0].Points {
 							usage, _ := strconv.ParseFloat(point[column_index_mapper["usage"]].(string), 32)
-							time_index := int(point[column_index_mapper["time_index"]].(int64))
+							time_index := int(point[column_index_mapper["time_index"]].(float64))
 							usageData[time_index] = float32(usage)
 						}
 						host_name, _ := machine["Host_name"].(string)
@@ -159,7 +159,7 @@ func (this *ApiController) GetStepIndicatorData() {
 						for index, value := range series[0].Columns {
 							column_index_mapper[value] = index
 						}
-						dataContainerLength := int(series[0].Points[0][column_index_mapper["time_index"]].(int64)) + 1
+						dataContainerLength := int(series[0].Points[0][column_index_mapper["time_index"]].(float64)) + 1
 						outBytes := make([]int, dataContainerLength)
 						inBytes := make([]int, dataContainerLength)
 						outPackets := make([]int, dataContainerLength)
@@ -222,7 +222,7 @@ func (this *ApiController) GetMachineIndicatorData() {
 			}
 			for _, point := range series[0].Points {
 				usage, _ := strconv.ParseFloat(point[column_index_mapper["usage"]].(string), 32)
-				results[int(point[column_index_mapper["time_index"]].(int64))] = float32(usage)
+				results[int(point[column_index_mapper["time_index"]].(float64))] = float32(usage)
 			}
 			this.Data["json"] = results
 		} else {
@@ -243,7 +243,7 @@ func (this *ApiController) GetMachineIndicatorData() {
 			}
 			for _, point := range series[0].Points {
 				usage, _ := strconv.ParseFloat(point[column_index_mapper["usage"]].(string), 32)
-				results[int(point[column_index_mapper["time_index"]].(int64))] = float32(usage)
+				results[int(point[column_index_mapper["time_index"]].(float64))] = float32(usage)
 			}
 			this.Data["json"] = results
 		} else {
@@ -330,7 +330,7 @@ func (this *ApiController) GetMachineAccessibilityData() {
 		newestTimeIndex := int(series[0].Points[0][column_index_mapper["time_index"]].(float64)) + 1
 		pingTimeIndex = newestTimeIndex
 		for _, point := range series[0].Points {
-			if int(point[column_index_mapper["time_index"]].(int64)) < newestTimeIndex {
+			if int(point[column_index_mapper["time_index"]].(float64)) < newestTimeIndex {
 				break
 			} else {
 				pingResults = append(pingResults, PingResultType{Target_ip: point[column_index_mapper["target_ip"]].(string), Response_time: int(point[column_index_mapper["response_time"]].(int64))})
@@ -348,7 +348,7 @@ func (this *ApiController) GetMachineAccessibilityData() {
 		newestTimeIndex := int(series[0].Points[0][column_index_mapper["time_index"]].(float64)) + 1
 		telnetTimeIndex = newestTimeIndex
 		for _, point := range series[0].Points {
-			if int(point[column_index_mapper["time_index"]].(int64)) < newestTimeIndex {
+			if int(point[column_index_mapper["time_index"]].(float64)) < newestTimeIndex {
 				break
 			} else {
 				telnetResults = append(telnetResults, TelnetResultType{Target_url: point[column_index_mapper["target_url"]].(string), Status: point[column_index_mapper["status"]].(string)})
