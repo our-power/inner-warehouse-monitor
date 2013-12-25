@@ -1,14 +1,13 @@
 package controllers
 
 import (
-	"fmt"
-	"time"
-
-	"runtime"
-
 	"big_brother/models"
+	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
+	"runtime"
+	"strconv"
+	"time"
 )
 
 type ApiController struct {
@@ -111,22 +110,29 @@ func (this *ApiController) GetStepIndicatorData() {
 			if dataTable == "cpu_usage" || dataTable == "mem_usage" {
 				type ResultType struct {
 					Host_name string
-					Data      []float64
+					Data      []float32
 				}
 				results := make([]ResultType, 0, 50)
 				for _, machine := range maps {
-					query := fmt.Sprintf("SELECT time_index, usage FROM %s WHERE hardware_addr=%s AND date=%s", dataTable, machine["Hardware_addr"], dateStr)
+					query := fmt.Sprintf("SELECT time_index, usage FROM %s WHERE hardware_addr='%s' AND date='%s'", dataTable, machine["Hardware_addr"], dateStr)
 					series, _ := client.Query(query)
 					if len(series) > 0 && len(series[0].Points) > 0 {
+
+						column_index_mapper := make(map[string]int)
+						for index, value := range series[0].Columns {
+							column_index_mapper[value] = index
+						}
 						//By default, InfluxDB returns data in time descending order.
-						dataContainerLength := int(series[0].Points[0][2].(int64)) + 1
-						usageData := make([]float64, dataContainerLength)
+						dataContainerLength := int(series[0].Points[0][column_index_mapper["time_index"]].(int64)) + 1
+
+						usageData := make([]float32, dataContainerLength)
 						for index := 0; index < dataContainerLength; index++ {
 							usageData[index] = -1
 						}
 						for _, point := range series[0].Points {
-							time_index := int(point[2].(int64))
-							usageData[time_index] = point[3].(float64)
+							usage, _ := strconv.ParseFloat(point[column_index_mapper["usage"]].(string), 32)
+							time_index := int(point[column_index_mapper["time_index"]].(int64))
+							usageData[time_index] = float32(usage)
 						}
 						host_name, _ := machine["Host_name"].(string)
 						results = append(results, ResultType{Host_name: host_name, Data: usageData})
@@ -146,10 +152,14 @@ func (this *ApiController) GetStepIndicatorData() {
 				}
 				results := make([]ResultType, 0, 50)
 				for _, machine := range maps {
-					query := fmt.Sprintf("SELECT time_index, out_bytes, in_bytes, out_packets, in_packets FROM net_flow WHERE hardware_addr=%s AND date=%s", machine["Hardware_addr"], dateStr)
+					query := fmt.Sprintf("SELECT time_index, out_bytes, in_bytes, out_packets, in_packets FROM net_flow WHERE hardware_addr='%s' AND date='%s'", machine["Hardware_addr"], dateStr)
 					series, _ := client.Query(query)
 					if len(series) > 0 && len(series[0].Points) > 0 {
-						dataContainerLength := int(series[0].Points[0][2].(int64)) + 1
+						column_index_mapper := make(map[string]int)
+						for index, value := range series[0].Columns {
+							column_index_mapper[value] = index
+						}
+						dataContainerLength := int(series[0].Points[0][column_index_mapper["time_index"]].(int64)) + 1
 						outBytes := make([]int, dataContainerLength)
 						inBytes := make([]int, dataContainerLength)
 						outPackets := make([]int, dataContainerLength)
@@ -167,11 +177,11 @@ func (this *ApiController) GetStepIndicatorData() {
 							In_packets:  inPackets,
 						}
 						for _, point := range series[0].Points {
-							time_index := int(point[2].(int64))
-							ncData.Out_bytes[time_index] = int(point[3].(int64))
-							ncData.In_bytes[time_index] = int(point[4].(int64))
-							ncData.Out_packets[time_index] = int(point[5].(int64))
-							ncData.In_packets[time_index] = int(point[6].(int64))
+							time_index := int(point[column_index_mapper["time_index"]].(int64))
+							ncData.Out_bytes[time_index] = int(point[column_index_mapper["out_bytes"]].(int64))
+							ncData.In_bytes[time_index] = int(point[column_index_mapper["in_bytes"]].(int64))
+							ncData.Out_packets[time_index] = int(point[column_index_mapper["out_packets"]].(int64))
+							ncData.In_packets[time_index] = int(point[column_index_mapper["in_packets"]].(int64))
 						}
 						results = append(results, ResultType{Host_name: machine["Host_name"].(string), Data: ncData})
 					}
@@ -198,42 +208,57 @@ func (this *ApiController) GetMachineIndicatorData() {
 	dateStr := date.Format("20060102")
 
 	if indicator == "cpu_usage" {
-		query := fmt.Sprintf("SELECT time_index, usage FROM cpu_usage WHERE hardware_addr=%s AND date=%s", hardwareAddr, dateStr)
+		query := fmt.Sprintf("SELECT time_index, usage FROM cpu_usage WHERE hardware_addr='%s' AND date='%s'", hardwareAddr, dateStr)
 		series, _ := client.Query(query)
 		if len(series) > 0 && len(series[0].Points) > 0 {
-			dataContainerLength := int(series[0].Points[0][2].(int64)) + 1
+			column_index_mapper := make(map[string]int)
+			for index, value := range series[0].Columns {
+				column_index_mapper[value] = index
+			}
+			dataContainerLength := int(series[0].Points[0][column_index_mapper["time_index"]].(int64)) + 1
 			results := make([]float32, dataContainerLength)
 			for index := 0; index < dataContainerLength; index++ {
 				results[index] = -1
 			}
 			for _, point := range series[0].Points {
-				results[int(point[2].(int64))] = point[3].(float32)
+				usage, _ := strconv.ParseFloat(point[column_index_mapper["usage"]].(string), 32)
+				results[int(point[column_index_mapper["time_index"]].(int64))] = float32(usage)
 			}
 			this.Data["json"] = results
 		} else {
 			this.Data["json"] = nil
 		}
 	} else if indicator == "mem_usage" {
-		query := fmt.Sprintf("SELECT time_index, usage FROM mem_usage WHERE hardware_addr=%s AND date=%s", hardwareAddr, dateStr)
+		query := fmt.Sprintf("SELECT time_index, usage FROM mem_usage WHERE hardware_addr='%s' AND date='%s'", hardwareAddr, dateStr)
 		series, _ := client.Query(query)
 		if len(series) > 0 && len(series[0].Points) > 0 {
-			dataContainerLength := int(series[0].Points[0][2].(int64)) + 1
+			column_index_mapper := make(map[string]int)
+			for index, value := range series[0].Columns {
+				column_index_mapper[value] = index
+			}
+			dataContainerLength := int(series[0].Points[0][column_index_mapper["time_index"]].(int64)) + 1
 			results := make([]float32, dataContainerLength)
 			for index := 0; index < dataContainerLength; index++ {
 				results[index] = -1
 			}
 			for _, point := range series[0].Points {
-				results[int(point[2].(int64))] = point[3].(float32)
+				usage, _ := strconv.ParseFloat(point[column_index_mapper["usage"]].(string), 32)
+				results[int(point[column_index_mapper["time_index"]].(int64))] = float32(usage)
 			}
 			this.Data["json"] = results
 		} else {
 			this.Data["json"] = nil
 		}
 	} else {
-		query := fmt.Sprintf("SELECT time_index, out_bytes, in_bytes, out_packets, in_packets FROM net_flow WHERE hardware_addr=%s AND date=%s", hardwareAddr, dateStr)
+		query := fmt.Sprintf("SELECT time_index, out_bytes, in_bytes, out_packets, in_packets FROM net_flow WHERE hardware_addr='%s' AND date='%s'", hardwareAddr, dateStr)
 		series, _ := client.Query(query)
 		if len(series) > 0 && len(series[0].Points) > 0 {
-			dataContainerLength := int(series[0].Points[0][2].(int64)) + 1
+			column_index_mapper := make(map[string]int)
+			for index, value := range series[0].Columns {
+				column_index_mapper[value] = index
+			}
+			dataContainerLength := int(series[0].Points[0][column_index_mapper["time_index"]].(int64)) + 1
+
 			type ResultType struct {
 				Out_bytes   []int
 				In_bytes    []int
@@ -252,11 +277,11 @@ func (this *ApiController) GetMachineIndicatorData() {
 			}
 			results := ResultType{Out_bytes: outBytes, In_bytes: inBytes, Out_packets: outPackets, In_packets: inPackets}
 			for _, point := range series[0].Points {
-				time_index := int(point[2].(int64))
-				results.Out_bytes[time_index] = int(point[3].(int64))
-				results.In_bytes[time_index] = int(point[4].(int64))
-				results.Out_packets[time_index] = int(point[5].(int64))
-				results.In_packets[time_index] = int(point[6].(int64))
+				time_index := int(point[column_index_mapper["time_index"]].(int64))
+				results.Out_bytes[time_index] = int(point[column_index_mapper["out_bytes"]].(int64))
+				results.In_bytes[time_index] = int(point[column_index_mapper["in_bytes"]].(int64))
+				results.Out_packets[time_index] = int(point[column_index_mapper["out_packets"]].(int64))
+				results.In_packets[time_index] = int(point[column_index_mapper["in_packets"]].(int64))
 			}
 			this.Data["json"] = results
 		} else {
@@ -295,30 +320,38 @@ func (this *ApiController) GetMachineAccessibilityData() {
 	telnetResults := make([]TelnetResultType, 0, 100)
 	var pingTimeIndex int
 	var telnetTimeIndex int
-	query := fmt.Sprintf("SELECT time_index, target_ip, response_time FROM ping_accessibility WHERE hardware_addr=%s AND date=%s", hardwareAddr, dateStr)
+	query := fmt.Sprintf("SELECT time_index, target_ip, response_time FROM ping_accessibility WHERE hardware_addr='%s' AND date='%s'", hardwareAddr, dateStr)
 	series, _ := client.Query(query)
 	if len(series) > 0 && len(series[0].Points) > 0 {
-		newestTimeIndex := int(series[0].Points[0][2].(int64))
+		column_index_mapper := make(map[string]int)
+		for index, value := range series[0].Columns {
+			column_index_mapper[value] = index
+		}
+		newestTimeIndex := int(series[0].Points[0][column_index_mapper["time_index"]].(int64)) + 1
 		pingTimeIndex = newestTimeIndex
 		for _, point := range series[0].Points {
-			if int(point[2].(int64)) < newestTimeIndex {
+			if int(point[column_index_mapper["time_index"]].(int64)) < newestTimeIndex {
 				break
 			} else {
-				pingResults = append(pingResults, PingResultType{Target_ip: point[3].(string), Response_time: int(point[4].(int64))})
+				pingResults = append(pingResults, PingResultType{Target_ip: point[column_index_mapper["target_ip"]].(string), Response_time: int(point[column_index_mapper["response_time"]].(int64))})
 			}
 		}
 	}
 
-	query = fmt.Sprintf("SELECT time_index, target_url, status FROM telnet_accessibility WHERE hardware_addr=%s AND date=%s", hardwareAddr, dateStr)
+	query = fmt.Sprintf("SELECT time_index, target_url, status FROM telnet_accessibility WHERE hardware_addr='%s' AND date='%s'", hardwareAddr, dateStr)
 	series, _ = client.Query(query)
 	if len(series) > 0 && len(series[0].Points) > 0 {
-		newestTimeIndex := int(series[0].Points[0][2].(int64))
+		column_index_mapper := make(map[string]int)
+		for index, value := range series[0].Columns {
+			column_index_mapper[value] = index
+		}
+		newestTimeIndex := int(series[0].Points[0][column_index_mapper["time_index"]].(int64)) + 1
 		telnetTimeIndex = newestTimeIndex
 		for _, point := range series[0].Points {
-			if int(point[2].(int64)) < newestTimeIndex {
+			if int(point[column_index_mapper["time_index"]].(int64)) < newestTimeIndex {
 				break
 			} else {
-				telnetResults = append(telnetResults, TelnetResultType{Target_url: point[3].(string), Status: point[4].(string)})
+				telnetResults = append(telnetResults, TelnetResultType{Target_url: point[column_index_mapper["target_url"]].(string), Status: point[column_index_mapper["status"]].(string)})
 			}
 		}
 	}
