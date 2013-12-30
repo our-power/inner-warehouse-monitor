@@ -48,7 +48,7 @@ func NewCPUUsageHandler(client *influxdb.Client) (cpuUsageHandler *CPUUsageHandl
 	l := log.New(fh, "cpu_usage_logger", LstdFlags)
 
 	eh := &util.ExceptionHandler {
-		Logger: l
+		Logger: l,
 	}
 
 	cpuUsageHandler = &CPUUsageHandler{
