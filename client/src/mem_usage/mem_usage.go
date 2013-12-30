@@ -17,7 +17,7 @@ type MemUsageHandler struct {
 
 var column_names = []string{"time", "date", "time_index", "ip", "host_name", "hardware_addr", "usage"}
 
-func (h *MemUsageHandler) tryHandleIt(m. *nsq.Message)([][]interface{}){
+func (h *MemUsageHandler) tryHandleIt(m *nsq.Message)([][]interface{}){
 	bodyParts := strings.Split(string(m.Body), "\r\n")
 	time_index, err := strconv.Atoi(bodyParts[1])
 	time_int := util.FormatTime(bodyParts[0], time_index)

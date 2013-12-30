@@ -140,6 +140,7 @@ func (h *AccessibilityCheckHandler) tryHandleIt(m *nsq.Message) (err error) {
 			}
 		}
 	}
+	return
 }
 
 func (h *AccessibilityCheckHandler) HandleMessage(m *nsq.Message) (err error) {
