@@ -6,16 +6,15 @@ import (
 	"strconv"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/bitly/go-nsq"
+	"util"
+	"path"
 )
 
 type CPUUsageHandler struct {
 	db *sql.DB
 }
 
-func (h *CPUUsageHandler) HandleMessage(m *nsq.Message) (err error) {
-	/*
-	实现队列消息处理功能
-	*/
+func (h *CPUUsageHandler) tryHandleIt(m *nsq.Message) (err error) {
 	bodyParts := strings.Split(string(m.Body), "\r\n")
 	if len(bodyParts) == 6 {
 		time_index, err := strconv.Atoi(bodyParts[1])
@@ -26,6 +25,15 @@ func (h *CPUUsageHandler) HandleMessage(m *nsq.Message) (err error) {
 		return err
 	}
 	return nil
+}
+
+func (h *CPUUsageHandler) HandleMessage(m *nsq.Message) (err error) {
+	/*
+	实现队列消息处理功能
+	*/
+	defer util.HandleException(path.Join(util.LogRoot, "cpu_usage.log"), string(m.Body))
+	err = h.tryHandleIt(m)
+	return err
 }
 
 func NewCPUUsageHandler(dbLink *sql.DB) (cpuUsageHandler *CPUUsageHandler, err error) {

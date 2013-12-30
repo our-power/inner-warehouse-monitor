@@ -7,20 +7,16 @@ import (
 	"strconv"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/bitly/go-nsq"
+	"util"
+	"path"
 )
 
 type NetFlowHandler struct {
 	db *sql.DB
 }
 
-func (h *NetFlowHandler) HandleMessage(m *nsq.Message) (err error) {
-	/*
-	实现队列消息处理功能
-
-	按指标叠加所有网卡的数据
-	*/
-
-	bodyParts := strings.Split(string(m.Body), "\r\n")
+func (h *NetFlowHandler) tryHandleIt(m *nsq.Message) (err error) {
+		bodyParts := strings.Split(string(m.Body), "\r\n")
 	if len(bodyParts) == 6 {
 		time_index, err := strconv.Atoi(bodyParts[1])
 		netFlowDataParts := strings.Split(bodyParts[5], ",")[1:]
@@ -64,6 +60,17 @@ func (h *NetFlowHandler) HandleMessage(m *nsq.Message) (err error) {
 		return err
 	}
 	return nil
+}
+
+func (h *NetFlowHandler) HandleMessage(m *nsq.Message) (err error) {
+	/*
+	实现队列消息处理功能
+
+	按指标叠加所有网卡的数据
+	*/
+	defer util.HandleException(path.Join(util.LogRoot, "net_flow.log"), string(m.Body))
+	err = h.tryHandleIt(m)
+	return err
 }
 
 func NewNetFlowHandler(dbLink *sql.DB) (netFlowHandler *NetFlowHandler, err error) {
