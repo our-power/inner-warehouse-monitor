@@ -6,15 +6,14 @@ import (
 	"strconv"
 	"strings"
 	"util"
-	"regexp"
-	"log"
 	"os"
+	"log"
 )
 
 type CPUUsageHandler struct {
 	db_client  *influxdb.Client
+	exception_handler *util.ExceptionHandler
 	table_name string
-	logger *log.Logger
 }
 
 var column_names = []string{"time", "date", "time_index", "ip", "host_name", "hardware_addr", "usage"}
@@ -23,15 +22,8 @@ func (h *CPUUsageHandler) HandleMessage(m *nsq.Message) (err error) {
 	/*
 		实现队列消息处理功能
 	*/
-	regexPattern := `\A\d{8}\r\n\d{1,4}\r\n(?:(?:25[0-5]|2[0-4]\d|[01]?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d?\d)\r\n.+\r\n[:alnum:]{2}(:[:alnum:]{2})5\r\n\d{2}/\d{2}/\d{4}\s\d{2}:\d{2}:\d{2}\.\d{1,},.+\z`
-	regex := regexp.MustCompile(regexPattern)
-	matched := regex.MatchString(string(m.Body))
-	if matched == false {
-		h.logger.Println("***************************************************")
-		h.logger.Println(m.Body)
-		h.logger.Println("###################################################")
-		return
-	}
+
+	defer h.exception_handler.HandleException(string(m.Body))
 
 	bodyParts := strings.Split(string(m.Body), "\r\n")
 
@@ -50,18 +42,19 @@ func (h *CPUUsageHandler) HandleMessage(m *nsq.Message) (err error) {
 }
 
 func NewCPUUsageHandler(client *influxdb.Client) (cpuUsageHandler *CPUUsageHandler, err error) {
-	fh, err := os.OpenFile("cpu_usage.log", os.O_WRONLY | os.O_CREATE, 0666)
-	if err != nil {
-		panic(err)
-	}
-	defer fh.Close()
+	fh, _ := os.OpenFile("/var/log/cpu_usage.log", os.O_RDWR | os.O_APPEND | os.O_CREATE, 0777)
+	defer file.Close()
 
-	logger:= log.New(fh, "cpu_usage_logger", log.LstdFlags)
+	l := log.New(fh, "cpu_usage_logger", LstdFlags)
+
+	eh := &util.ExceptionHandler {
+		Logger: l
+	}
 
 	cpuUsageHandler = &CPUUsageHandler{
 		db_client:  client,
+		exception_handler: eh,
 		table_name: "cpu_usage",
-		logger: logger,
 	}
 	return cpuUsageHandler, err
 }
