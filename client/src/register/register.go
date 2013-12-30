@@ -14,16 +14,9 @@ type RegisterToDBHandler struct {
 	exception_handler *util.ExceptionHandler
 }
 
-func (h *RegisterToDBHandler) HandleMessage(m *nsq.Message) (err error) {
-	/*
-		实现队列消息处理功能
-	*/
-
-	defer h.exception_handler.HandleException(string(m.Body))
-
+func (h *RegisterToDBHandler) tryHandleIt(m *nsq.Message)(err error){
 	bodyParts := strings.Split(string(m.Body), "\r\n")
 	time_index, err := strconv.Atoi(bodyParts[1])
-
 	/*
 		0:机器正常关闭
 		1:机器正在运行
@@ -37,6 +30,7 @@ func (h *RegisterToDBHandler) HandleMessage(m *nsq.Message) (err error) {
 		UPDATE register SET date=?, time_index=?, ip=?, host_name=?, status=? WHERE hardware_addr=?;
 		`
 		_, err = h.db.Exec(sql, bodyParts[0], time_index, bodyParts[2], bodyParts[3], status, bodyParts[4])
+		return err
 	} else {
 		status = 1
 		version_role := strings.Split(bodyParts[5], ",")
@@ -44,7 +38,20 @@ func (h *RegisterToDBHandler) HandleMessage(m *nsq.Message) (err error) {
 		REPLACE INTO register (date, time_index, ip, host_name, hardware_addr, agent_version, machine_role, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
 		`
 		_, err = h.db.Exec(sql, bodyParts[0], time_index, bodyParts[2], bodyParts[3], bodyParts[4], version_role[0], version_role[1], status)
+		return err
 	}
+	return
+}
+
+func (h *RegisterToDBHandler) HandleMessage(m *nsq.Message) (err error) {
+	/*
+		实现队列消息处理功能
+	*/
+
+	defer h.exception_handler.HandleException(string(m.Body))
+
+	err = h.tryHandleIt(m)
+
 	return err
 }
 

@@ -17,6 +17,15 @@ type MemUsageHandler struct {
 
 var column_names = []string{"time", "date", "time_index", "ip", "host_name", "hardware_addr", "usage"}
 
+func (h *MemUsageHandler) tryHandleIt(m. *nsq.Message)([][]interface{}){
+	bodyParts := strings.Split(string(m.Body), "\r\n")
+	time_index, err := strconv.Atoi(bodyParts[1])
+	time_int := util.FormatTime(bodyParts[0], time_index)
+	ps := make([][]interface{}, 0, 1)
+	ps = append(ps, []interface{}{time_int, bodyParts[0], time_index, bodyParts[2], bodyParts[3], bodyParts[4], strings.Split(bodyParts[5], ",")[1]})
+	return ps
+}
+
 func (h *MemUsageHandler) HandleMessage(m *nsq.Message) (err error) {
 	/*
 		实现队列消息处理功能
@@ -24,11 +33,8 @@ func (h *MemUsageHandler) HandleMessage(m *nsq.Message) (err error) {
 
 	defer h.exception_handler.HandleException(string(m.Body))
 
-	bodyParts := strings.Split(string(m.Body), "\r\n")
-	time_index, err := strconv.Atoi(bodyParts[1])
-	time_int := util.FormatTime(bodyParts[0], time_index)
-	ps := make([][]interface{}, 0, 1)
-	ps = append(ps, []interface{}{time_int, bodyParts[0], time_index, bodyParts[2], bodyParts[3], bodyParts[4], strings.Split(bodyParts[5], ",")[1]})
+	ps := h.tryHandleIt(m)
+
 	mem_msg := influxdb.Series{
 		Name:    h.table_name,
 		Columns: column_names,

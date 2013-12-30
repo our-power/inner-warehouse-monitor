@@ -24,14 +24,7 @@ type AccessibilityToDBHandler struct {
 var ping_column_names = []string{"time", "date", "time_index", "ip", "host_name", "hardware_addr", "target_ip", "response_time"}
 var telnet_column_names = []string{"time", "date", "time_index", "ip", "host_name", "hardware_addr", "target_url", "status"}
 
-func (h *AccessibilityToDBHandler) HandleMessage(m *nsq.Message) (err error) {
-	/*
-		实现队列消息处理功能
-	*/
-	//fmt.Printf("%s\n", m.Body)
-
-	defer h.exception_handler.HandleException(string(m.Body))
-
+func (h *AccessibilityToDBHandler) tryHandleIt(m *nsq.Message) (err error){
 	bodyParts := strings.Split(string(m.Body), "\r\n")
 
 	time_index, err := strconv.Atoi(bodyParts[1])
@@ -55,6 +48,7 @@ func (h *AccessibilityToDBHandler) HandleMessage(m *nsq.Message) (err error) {
 			Points:  series,
 		}
 		err = h.db_client.WriteSeries([]*influxdb.Series{&ping_msg})
+		return err
 	}
 	if bodyParts[5] == "2" {
 		validData := bodyParts[6 : len(bodyParts)-1]
@@ -73,7 +67,21 @@ func (h *AccessibilityToDBHandler) HandleMessage(m *nsq.Message) (err error) {
 			Points:  series,
 		}
 		err = h.db_client.WriteSeries([]*influxdb.Series{&telnet_msg})
+		return err
 	}
+	return
+}
+
+func (h *AccessibilityToDBHandler) HandleMessage(m *nsq.Message) (err error) {
+	/*
+		实现队列消息处理功能
+	*/
+	//fmt.Printf("%s\n", m.Body)
+
+	defer h.exception_handler.HandleException(string(m.Body))
+
+	err = h.tryHandleIt(m)
+
 	return err
 }
 
@@ -95,14 +103,7 @@ type AccessibilityCheckHandler struct{
 	exception_handler *util.ExceptionHandler
 }
 
-func (h *AccessibilityCheckHandler) HandleMessage(m *nsq.Message) (err error) {
-	/*
-		实现队列消息处理功能
-	*/
-	//fmt.Printf("%s\n", m.Body)
-
-	defer h.exception_handler.HandleException(string(m.Body))
-
+func (h *AccessibilityCheckHandler) tryHandleIt(m *nsq.Message) (err error) {
 	bodyParts := strings.Split(string(m.Body), "\r\n")
 	time_index, err := strconv.Atoi(bodyParts[1])
 
@@ -139,6 +140,18 @@ func (h *AccessibilityCheckHandler) HandleMessage(m *nsq.Message) (err error) {
 			}
 		}
 	}
+}
+
+func (h *AccessibilityCheckHandler) HandleMessage(m *nsq.Message) (err error) {
+	/*
+		实现队列消息处理功能
+	*/
+	//fmt.Printf("%s\n", m.Body)
+
+	defer h.exception_handler.HandleException(string(m.Body))
+
+	err = h.tryHandleIt(m)
+
 	return err
 }
 
