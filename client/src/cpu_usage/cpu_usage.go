@@ -45,7 +45,7 @@ func NewCPUUsageHandler(client *influxdb.Client) (cpuUsageHandler *CPUUsageHandl
 	fh, _ := os.OpenFile("/var/log/cpu_usage.log", os.O_RDWR | os.O_APPEND | os.O_CREATE, 0777)
 	defer fh.Close()
 
-	l := log.New(fh, "cpu_usage_logger", LstdFlags)
+	l := log.New(fh, "cpu_usage_logger", log.LstdFlags)
 
 	eh := &util.ExceptionHandler {
 		Logger: l,
