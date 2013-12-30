@@ -454,7 +454,7 @@ $(function () {
             telnetCircleCenterY = 180;
             notOk = "fail to connect"
         } else {
-            svgWidth = 1000;
+            svgWidth = 1100;
             radius = 200;
             pingCircleCenterX = 240;
             pingCircleCenterY = 240;
