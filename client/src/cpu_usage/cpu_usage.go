@@ -23,9 +23,9 @@ func (h *CPUUsageHandler) HandleMessage(m *nsq.Message) (err error) {
 	/*
 		实现队列消息处理功能
 	*/
-	regexPattern = `\A\d{8}\r\n\d{1,4}\r\n(?:(?:25[0-5]|2[0-4]\d|[01]?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d?\d)\r\n.+\r\n[:alnum:]{2}(:[:alnum:]{2})5\r\n\d{2}/\d{2}/\d{4}\s\d{2}:\d{2}:\d{2}\.\d{1,},.+\z`
+	regexPattern := `\A\d{8}\r\n\d{1,4}\r\n(?:(?:25[0-5]|2[0-4]\d|[01]?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d?\d)\r\n.+\r\n[:alnum:]{2}(:[:alnum:]{2})5\r\n\d{2}/\d{2}/\d{4}\s\d{2}:\d{2}:\d{2}\.\d{1,},.+\z`
 	regex := regexp.MustCompile(regexPattern)
-	matched := regex.MatchString(m.Body)
+	matched := regex.MatchString(string(m.Body))
 	if matched == false {
 		h.logger.Println("***************************************************")
 		h.logger.Println(m.Body)
