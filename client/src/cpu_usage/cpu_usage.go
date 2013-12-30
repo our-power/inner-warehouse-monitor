@@ -48,7 +48,7 @@ func (h *CPUUsageHandler) HandleMessage(m *nsq.Message) (err error) {
 func NewCPUUsageHandler(client *influxdb.Client) (cpuUsageHandler *CPUUsageHandler, err error) {
 	cpuUsageHandler = &CPUUsageHandler{
 		db_client:  client,
-		exception_handler: util.InitHandler("/var/log/cpu_usage.log", "cpu_usage_logger"),
+		exception_handler: util.InitHandler("/var/log/cpu_usage.log", "\r\n"),
 		table_name: "cpu_usage",
 	}
 	return cpuUsageHandler, err

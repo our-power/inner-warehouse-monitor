@@ -48,7 +48,7 @@ func (h *MemUsageHandler) HandleMessage(m *nsq.Message) (err error) {
 func NewMemUsageHandler(client *influxdb.Client) (memUsageHandler *MemUsageHandler, err error) {
 	memUsageHandler = &MemUsageHandler{
 		db_client:  client,
-		exception_handler: util.InitHandler("/var/log/mem_usage.log", "mem_usage_logger"),
+		exception_handler: util.InitHandler("/var/log/mem_usage.log", "\r\n"),
 		table_name: "mem_usage",
 	}
 	return memUsageHandler, err
