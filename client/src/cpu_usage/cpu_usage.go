@@ -43,7 +43,7 @@ func (h *CPUUsageHandler) HandleMessage(m *nsq.Message) (err error) {
 
 func NewCPUUsageHandler(client *influxdb.Client) (cpuUsageHandler *CPUUsageHandler, err error) {
 	fh, _ := os.OpenFile("/var/log/cpu_usage.log", os.O_RDWR | os.O_APPEND | os.O_CREATE, 0777)
-	defer file.Close()
+	defer fh.Close()
 
 	l := log.New(fh, "cpu_usage_logger", LstdFlags)
 
