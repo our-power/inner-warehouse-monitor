@@ -50,7 +50,7 @@ func (h *CPUUsageHandler) HandleMessage(m *nsq.Message) (err error) {
 }
 
 func NewCPUUsageHandler(client *influxdb.Client) (cpuUsageHandler *CPUUsageHandler, err error) {
-	fh, err := os.OpenFile("cpu_usage.log", os.O_WRONLY, 0666)
+	fh, err := os.OpenFile("cpu_usage.log", os.O_WRONLY | os.O_CREATE, 0666)
 	if err != nil {
 		panic(err)
 	}
