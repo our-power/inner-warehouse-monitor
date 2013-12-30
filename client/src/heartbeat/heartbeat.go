@@ -13,7 +13,6 @@ import (
 
 type HeartBeatHandler struct {
 	db *sql.DB
-	exception_handler *util.ExceptionHandler
 }
 
 func (h *HeartBeatHandler) tryHandleIt(m *nsq.Message) (err error){
@@ -32,7 +31,7 @@ func (h *HeartBeatHandler) HandleMessage(m *nsq.Message) (err error) {
 	*/
 	//fmt.Printf("%s\n", m.Body)
 
-	defer h.exception_handler.HandleException(string(m.Body))
+	defer util.HandleException("/var/log/heartbeat.log", string(m.Body))
 
 	err = h.tryHandleIt(m)
 
@@ -42,7 +41,6 @@ func (h *HeartBeatHandler) HandleMessage(m *nsq.Message) (err error) {
 func NewHeartBeatHandler(dbLink *sql.DB) (heartBeatHandler *HeartBeatHandler, err error) {
 	heartBeatHandler = &HeartBeatHandler{
 		db: dbLink,
-		exception_handler: util.InitHandler("/var/log/heartbeat.log", "heartbeat_logger"),
 	}
 	return heartBeatHandler, err
 }
