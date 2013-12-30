@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 	"util"
+	"path"
 )
 
 type MemUsageHandler struct {
@@ -16,24 +17,12 @@ type MemUsageHandler struct {
 
 var column_names = []string{"time", "date", "time_index", "ip", "host_name", "hardware_addr", "usage"}
 
-func (h *MemUsageHandler) tryHandleIt(m *nsq.Message)([][]interface{}){
+func (h *MemUsageHandler) tryHandleIt(m *nsq.Message)(err error){
 	bodyParts := strings.Split(string(m.Body), "\r\n")
 	time_index, _ := strconv.Atoi(bodyParts[1])
 	time_int := util.FormatTime(bodyParts[0], time_index)
 	ps := make([][]interface{}, 0, 1)
 	ps = append(ps, []interface{}{time_int, bodyParts[0], time_index, bodyParts[2], bodyParts[3], bodyParts[4], strings.Split(bodyParts[5], ",")[1]})
-	return ps
-}
-
-func (h *MemUsageHandler) HandleMessage(m *nsq.Message) (err error) {
-	/*
-		实现队列消息处理功能
-	*/
-
-	defer util.HandleException("/var/log/mem_usage.log", string(m.Body))
-
-	ps := h.tryHandleIt(m)
-
 	mem_msg := influxdb.Series{
 		Name:    h.table_name,
 		Columns: column_names,
@@ -41,6 +30,17 @@ func (h *MemUsageHandler) HandleMessage(m *nsq.Message) (err error) {
 	}
 
 	err = h.db_client.WriteSeries([]*influxdb.Series{&mem_msg})
+	return err
+}
+
+func (h *MemUsageHandler) HandleMessage(m *nsq.Message) (err error) {
+	/*
+		实现队列消息处理功能
+	*/
+
+	defer util.HandleException(path.Join(util.LogRoot, "mem_usage.log"), string(m.Body))
+
+	err = h.tryHandleIt(m)
 	return err
 }
 

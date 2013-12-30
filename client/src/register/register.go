@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 	"util"
+	"path"
 )
 
 type RegisterToDBHandler struct {
@@ -47,7 +48,7 @@ func (h *RegisterToDBHandler) HandleMessage(m *nsq.Message) (err error) {
 		实现队列消息处理功能
 	*/
 
-	defer util.HandleException("/var/log/register.log", string(m.Body))
+	defer util.HandleException(path.Join(util.LogRoot, "register.log"), string(m.Body))
 
 	err = h.tryHandleIt(m)
 

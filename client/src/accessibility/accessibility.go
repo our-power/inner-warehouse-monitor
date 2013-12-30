@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 	"util"
+	"path"
 )
 
 /*
@@ -77,7 +78,7 @@ func (h *AccessibilityToDBHandler) HandleMessage(m *nsq.Message) (err error) {
 	*/
 	//fmt.Printf("%s\n", m.Body)
 
-	defer util.HandleException("var/log/accessibility.log", string(m.Body))
+	defer util.HandleException(path.Join(util.LogRoot, "db_accessibility.log"), string(m.Body))
 
 	err = h.tryHandleIt(m)
 
@@ -145,7 +146,7 @@ func (h *AccessibilityCheckHandler) HandleMessage(m *nsq.Message) (err error) {
 	*/
 	//fmt.Printf("%s\n", m.Body)
 
-	defer util.HandleException("/var/log/accessibility.log", string(m.Body))
+	defer util.HandleException(path.Join(util.LogRoot, "check_accessibility.log"), string(m.Body))
 
 	err = h.tryHandleIt(m)
 

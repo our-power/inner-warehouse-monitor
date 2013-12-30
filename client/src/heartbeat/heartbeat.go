@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 	"util"
+	"path"
 )
 
 type HeartBeatHandler struct {
@@ -31,7 +32,7 @@ func (h *HeartBeatHandler) HandleMessage(m *nsq.Message) (err error) {
 	*/
 	//fmt.Printf("%s\n", m.Body)
 
-	defer util.HandleException("/var/log/heartbeat.log", string(m.Body))
+	defer util.HandleException(path.Join(util.LogRoot, "heartbeat.log"), string(m.Body))
 
 	err = h.tryHandleIt(m)
 

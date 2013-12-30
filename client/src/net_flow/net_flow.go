@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 	"util"
+	"path"
 )
 
 type NetFlowHandler struct {
@@ -16,7 +17,7 @@ type NetFlowHandler struct {
 
 var column_names = []string{"time", "date", "time_index", "ip", "host_name", "hardware_addr", "out_bytes", "in_bytes", "out_packets", "in_packets"}
 
-func (h *NetFlowHandler) tryHandleIt(m *nsq.Message) ([][]interface{}) {
+func (h *NetFlowHandler) tryHandleIt(m *nsq.Message) (err error) {
 	bodyParts := strings.Split(string(m.Body), "\r\n")
 
 	time_index, _ := strconv.Atoi(bodyParts[1])
@@ -58,7 +59,13 @@ func (h *NetFlowHandler) tryHandleIt(m *nsq.Message) ([][]interface{}) {
 
 	ps := make([][]interface{}, 0, 1)
 	ps = append(ps, []interface{}{time_int, bodyParts[0], time_index, bodyParts[2], bodyParts[3], bodyParts[4], outBytes, inBytes, outPackets, inPackets})
-	return ps
+	netflow_msg := influxdb.Series{
+		Name:    h.table_name,
+		Columns: column_names,
+		Points:  ps,
+	}
+	err = h.db_client.WriteSeries([]*influxdb.Series{&netflow_msg})
+	return err
 }
 
 func (h *NetFlowHandler) HandleMessage(m *nsq.Message) (err error) {
@@ -68,16 +75,9 @@ func (h *NetFlowHandler) HandleMessage(m *nsq.Message) (err error) {
 		按指标叠加所有网卡的数据
 	*/
 
-	defer util.HandleException("/var/log/net_flow.log", string(m.Body))
+	defer util.HandleException(path.Join(util.LogRoot, "net_flow.log"), string(m.Body))
 
-	ps := h.tryHandleIt(m)
-
-	netflow_msg := influxdb.Series{
-		Name:    h.table_name,
-		Columns: column_names,
-		Points:  ps,
-	}
-	err = h.db_client.WriteSeries([]*influxdb.Series{&netflow_msg})
+	err = h.tryHandleIt(m)
 	return err
 }
 
