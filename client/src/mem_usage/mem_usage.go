@@ -11,7 +11,6 @@ import (
 
 type MemUsageHandler struct {
 	db_client  *influxdb.Client
-	exception_handler *util.ExceptionHandler
 	table_name string
 }
 
@@ -31,7 +30,7 @@ func (h *MemUsageHandler) HandleMessage(m *nsq.Message) (err error) {
 		实现队列消息处理功能
 	*/
 
-	defer h.exception_handler.HandleException(string(m.Body))
+	defer util.HandleException("/var/log/mem_usage.log", string(m.Body))
 
 	ps := h.tryHandleIt(m)
 
@@ -48,7 +47,6 @@ func (h *MemUsageHandler) HandleMessage(m *nsq.Message) (err error) {
 func NewMemUsageHandler(client *influxdb.Client) (memUsageHandler *MemUsageHandler, err error) {
 	memUsageHandler = &MemUsageHandler{
 		db_client:  client,
-		exception_handler: util.InitHandler("/var/log/mem_usage.log", "\r\n"),
 		table_name: "mem_usage",
 	}
 	return memUsageHandler, err

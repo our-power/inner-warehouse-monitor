@@ -18,7 +18,6 @@ type AccessibilityToDBHandler struct {
 	db_client         *influxdb.Client
 	ping_table_name   string
 	telnet_table_name string
-	exception_handler *util.ExceptionHandler
 }
 
 var ping_column_names = []string{"time", "date", "time_index", "ip", "host_name", "hardware_addr", "target_ip", "response_time"}
@@ -78,7 +77,7 @@ func (h *AccessibilityToDBHandler) HandleMessage(m *nsq.Message) (err error) {
 	*/
 	//fmt.Printf("%s\n", m.Body)
 
-	defer h.exception_handler.HandleException(string(m.Body))
+	defer util.HandleException("var/log/accessibility.log", string(m.Body))
 
 	err = h.tryHandleIt(m)
 
@@ -90,7 +89,6 @@ func NewAccessibilityToDBHandler(client *influxdb.Client) (accessibilityToDBHand
 		db_client:         client,
 		ping_table_name:   "ping_accessibility",
 		telnet_table_name: "telnet_accessibility",
-		exception_handler: util.InitHandler("/var/log/accessibility.log", "accessibility_logger"),
 	}
 	return accessibilityToDBHandler, err
 }
@@ -99,9 +97,7 @@ func NewAccessibilityToDBHandler(client *influxdb.Client) (accessibilityToDBHand
  *	检测可达性是否异常的类
  */
 
-type AccessibilityCheckHandler struct{
-	exception_handler *util.ExceptionHandler
-}
+type AccessibilityCheckHandler struct{}
 
 func (h *AccessibilityCheckHandler) tryHandleIt(m *nsq.Message) (err error) {
 	bodyParts := strings.Split(string(m.Body), "\r\n")
@@ -149,7 +145,7 @@ func (h *AccessibilityCheckHandler) HandleMessage(m *nsq.Message) (err error) {
 	*/
 	//fmt.Printf("%s\n", m.Body)
 
-	defer h.exception_handler.HandleException(string(m.Body))
+	defer util.HandleException("/var/log/accessibility.log", string(m.Body))
 
 	err = h.tryHandleIt(m)
 
@@ -157,8 +153,6 @@ func (h *AccessibilityCheckHandler) HandleMessage(m *nsq.Message) (err error) {
 }
 
 func NewAccessibilityCheckHandler() (accessibilityCheckHandler *AccessibilityCheckHandler, err error) {
-	accessibilityCheckHandler = &AccessibilityCheckHandler{
-		exception_handler: util.InitHandler("/var/log/check_accessibility.log", "check_accessibility_logger"),
-	}
+	accessibilityCheckHandler = &AccessibilityCheckHandler{}
 	return accessibilityCheckHandler, err
 }

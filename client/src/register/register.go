@@ -11,7 +11,6 @@ import (
 
 type RegisterToDBHandler struct {
 	db *sql.DB
-	exception_handler *util.ExceptionHandler
 }
 
 func (h *RegisterToDBHandler) tryHandleIt(m *nsq.Message)(err error){
@@ -48,7 +47,7 @@ func (h *RegisterToDBHandler) HandleMessage(m *nsq.Message) (err error) {
 		实现队列消息处理功能
 	*/
 
-	defer h.exception_handler.HandleException(string(m.Body))
+	defer util.HandleException("/var/log/register.log", string(m.Body))
 
 	err = h.tryHandleIt(m)
 
@@ -58,7 +57,6 @@ func (h *RegisterToDBHandler) HandleMessage(m *nsq.Message) (err error) {
 func NewRegisterToDBHandler(dbLink *sql.DB) (registerToDBHandler *RegisterToDBHandler, err error) {
 	registerToDBHandler = &RegisterToDBHandler{
 		db: dbLink,
-		exception_handler: util.InitHandler("/var/log/register.log", "register_logger"),
 	}
 	return registerToDBHandler, err
 }

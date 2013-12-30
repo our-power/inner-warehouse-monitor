@@ -10,7 +10,6 @@ import (
 
 type CPUUsageHandler struct {
 	db_client  *influxdb.Client
-	exception_handler *util.ExceptionHandler
 	table_name string
 }
 
@@ -31,7 +30,7 @@ func (h *CPUUsageHandler) HandleMessage(m *nsq.Message) (err error) {
 		实现队列消息处理功能
 	*/
 
-	defer h.exception_handler.HandleException(string(m.Body))
+	defer util.HandleException("/var/log/cpu_usage.log", string(m.Body))
 
 	ps := h.tryHandleIt(m)
 
@@ -48,7 +47,6 @@ func (h *CPUUsageHandler) HandleMessage(m *nsq.Message) (err error) {
 func NewCPUUsageHandler(client *influxdb.Client) (cpuUsageHandler *CPUUsageHandler, err error) {
 	cpuUsageHandler = &CPUUsageHandler{
 		db_client:  client,
-		exception_handler: util.InitHandler("/var/log/cpu_usage.log", "\r\n"),
 		table_name: "cpu_usage",
 	}
 	return cpuUsageHandler, err

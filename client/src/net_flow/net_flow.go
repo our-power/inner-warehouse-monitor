@@ -11,7 +11,6 @@ import (
 
 type NetFlowHandler struct {
 	db_client  *influxdb.Client
-	exception_handler *util.ExceptionHandler
 	table_name string
 }
 
@@ -69,7 +68,7 @@ func (h *NetFlowHandler) HandleMessage(m *nsq.Message) (err error) {
 		按指标叠加所有网卡的数据
 	*/
 
-	defer h.exception_handler.HandleException(string(m.Body))
+	defer util.HandleException("/var/log/net_flow.log", string(m.Body))
 
 	ps := h.tryHandleIt(m)
 
@@ -85,7 +84,6 @@ func (h *NetFlowHandler) HandleMessage(m *nsq.Message) (err error) {
 func NewNetFlowHandler(client *influxdb.Client) (netFlowHandler *NetFlowHandler, err error) {
 	netFlowHandler = &NetFlowHandler{
 		db_client:  client,
-		exception_handler: util.InitHandler("/var/log/net_flow.log", "net_flow_logger"),
 		table_name: "net_flow",
 	}
 	return netFlowHandler, err
