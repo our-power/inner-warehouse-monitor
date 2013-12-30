@@ -6,8 +6,6 @@ import (
 	"strconv"
 	"strings"
 	"util"
-	"os"
-	"log"
 )
 
 type CPUUsageHandler struct {
