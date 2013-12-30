@@ -16,15 +16,12 @@ type CPUUsageHandler struct {
 
 func (h *CPUUsageHandler) tryHandleIt(m *nsq.Message) (err error) {
 	bodyParts := strings.Split(string(m.Body), "\r\n")
-	if len(bodyParts) == 6 {
-		time_index, err := strconv.Atoi(bodyParts[1])
-		sql := `
+	time_index, err := strconv.Atoi(bodyParts[1])
+	sql := `
 	INSERT INTO cpu_usage (date, time_index, ip, host_name, hardware_addr, usage) VALUES (?, ?, ?, ?, ?, ?);
 	`
-		_, err = h.db.Exec(sql, bodyParts[0], time_index, bodyParts[2], bodyParts[3], bodyParts[4], strings.Split(bodyParts[5], ",")[1])
-		return err
-	}
-	return nil
+	_, err = h.db.Exec(sql, bodyParts[0], time_index, bodyParts[2], bodyParts[3], bodyParts[4], strings.Split(bodyParts[5], ",")[1])
+	return err
 }
 
 func (h *CPUUsageHandler) HandleMessage(m *nsq.Message) (err error) {
