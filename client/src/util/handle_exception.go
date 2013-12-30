@@ -17,3 +17,15 @@ func (h *ExceptionHandler)HandleException(msg string){
         h.Logger.Println("#####################################################")
     }
 }
+
+func InitHandler(logFileName string, prefix string)(exceptionHandler *ExceptionHandler) {
+    fh, _ := os.OpenFile(logFileName, os.O_RDWR | os.O_APPEND | os.O_CREATE, 0777)
+    defer fh.Close()
+
+    l := log.New(fh, prefix, log.LstdFlags)
+
+    exceptionHandler = &ExceptionHandler {
+        Logger: l,
+    }
+    return
+}
