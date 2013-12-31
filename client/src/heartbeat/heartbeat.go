@@ -55,6 +55,7 @@ func updateMachineStatus(h *HeartBeatHandler, registerDB *sql.DB) {
 			rows, err := registerDB.Query(sql)
 			if err != nil {
 				fmt.Println(err)
+				continue
 			}
 			type machineStatus struct {
 				Hardware_addr string
@@ -78,6 +79,7 @@ func updateMachineStatus(h *HeartBeatHandler, registerDB *sql.DB) {
 					db, err := h.db.GetLink(dateStr, item.Hardware_addr, "heartbeat")
 					if err != nil {
 						fmt.Println(err)
+						continue
 					}
 					var count int
 					sql = "SELECT count(*) FROM heartbeat WHERE time_index > ?"
