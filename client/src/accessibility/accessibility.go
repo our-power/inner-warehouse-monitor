@@ -8,6 +8,7 @@ import (
 	"github.com/bitly/go-nsq"
 	"fmt"
 	"time"
+	"path"
 )
 
 /*
@@ -18,12 +19,7 @@ type AccessibilityToDBHandler struct {
 	db *util.DbLink
 }
 
-func (h *AccessibilityToDBHandler) HandleMessage(m *nsq.Message) (err error) {
-	/*
-	实现队列消息处理功能
-	*/
-	//fmt.Printf("%s\n", m.Body)
-
+func (h *AccessibilityToDBHandler) tryHandleIt(m *nsq.Message) (err error) {
 	bodyParts := strings.Split(string(m.Body), "\r\n")
 	if len(bodyParts) >= 6 {
 		time_index, err := strconv.Atoi(bodyParts[1])
@@ -81,6 +77,16 @@ func (h *AccessibilityToDBHandler) HandleMessage(m *nsq.Message) (err error) {
 	return nil
 }
 
+func (h *AccessibilityToDBHandler) HandleMessage(m *nsq.Message) (err error) {
+	/*
+	实现队列消息处理功能
+	*/
+	//fmt.Printf("%s\n", m.Body)
+	defer util.HandleException(path.Join(util.LogRoot, "db_accessibility.log"), string(m.Body))
+	err = h.tryHandleIt(m)
+	return err
+}
+
 func NewAccessibilityToDBHandler(dbLink *util.DbLink) (accessibilityToDBHandler *AccessibilityToDBHandler, err error) {
 	accessibilityToDBHandler = &AccessibilityToDBHandler {
 		db: dbLink,
@@ -94,12 +100,7 @@ func NewAccessibilityToDBHandler(dbLink *util.DbLink) (accessibilityToDBHandler 
 
 type AccessibilityCheckHandler struct {}
 
-func (h *AccessibilityCheckHandler) HandleMessage(m *nsq.Message) (err error) {
-	/*
-	实现队列消息处理功能
-	*/
-	//fmt.Printf("%s\n", m.Body)
-
+func (h *AccessibilityCheckHandler) tryHandleIt(m *nsq.Message) (err error) {
 	bodyParts := strings.Split(string(m.Body), "\r\n")
 	if len(bodyParts) >= 6 {
 		time_index, err := strconv.Atoi(bodyParts[1])
@@ -140,6 +141,17 @@ func (h *AccessibilityCheckHandler) HandleMessage(m *nsq.Message) (err error) {
 		return err
 	}
 	return nil
+}
+
+func (h *AccessibilityCheckHandler) HandleMessage(m *nsq.Message) (err error) {
+	/*
+	实现队列消息处理功能
+	*/
+	//fmt.Printf("%s\n", m.Body)
+
+	defer util.HandleException(path.Join(util.LogRoot, "check_accessibility.log"), string(m.Body))
+	err = h.tryHandleIt(m)
+	return err
 }
 
 func NewAccessibilityCheckHandler() (accessibilityCheckHandler *AccessibilityCheckHandler, err error) {

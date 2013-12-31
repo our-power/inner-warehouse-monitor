@@ -59,7 +59,6 @@ type Heart_beat struct {
 	Alive int
 }
 */
-
 type Register struct {
 	Id            int
 	Date          string
@@ -74,28 +73,27 @@ type Register struct {
 
 /*
 type Ping_accessibility struct {
-	Id int
-	Date string
-	Time_index int
-	Ip string
-	Host_name string
+	Id            int
+	Date          string
+	Time_index    int
+	Ip            string
+	Host_name     string
 	Hardware_addr string
-	Target_ip string
+	Target_ip     string
 	Response_time int
 }
 
 type Telnet_accessibility struct {
-	Id int
-	Date string
-	Time_index int
-	Ip string
-	Host_name string
+	Id            int
+	Date          string
+	Time_index    int
+	Ip            string
+	Host_name     string
 	Hardware_addr string
-	Target_url string
-	Status string
+	Target_url    string
+	Status        string
 }
 */
-
 func InitModels() {
 	//orm.RegisterModel(new(Cpu_usage), new(Mem_usage), new(Net_flow), new(Heart_beat), new(Register), new(Ping_accessibility), new(Telnet_accessibility))
 	orm.RegisterModel(new(Register))

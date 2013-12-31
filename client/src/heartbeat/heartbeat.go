@@ -9,30 +9,35 @@ import (
 	"database/sql"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/bitly/go-nsq"
+	"path"
 )
 
 type HeartBeatHandler struct {
 	db *util.DbLink
 }
 
+func (h *HeartBeatHandler) tryHandleIt(m *nsq.Message)(err error) {
+	bodyParts := strings.Split(string(m.Body), "\r\n")
+	time_index, err := strconv.Atoi(bodyParts[1])
+	db, err := h.db.GetLink(bodyParts[0], bodyParts[4], "heartbeat")
+	if err != nil {
+		return err
+	}
+	sql := `
+	INSERT INTO heartbeat (date, time_index, ip, host_name, hardware_addr, alive) VALUES (?, ?, ?, ?, ?, ?);
+	`
+	_, err = db.Exec(sql, bodyParts[0], time_index, bodyParts[2], bodyParts[3], bodyParts[4], 1)
+
+	return err
+}
+
 func (h *HeartBeatHandler) HandleMessage(m *nsq.Message) (err error) {
 	/*
 	实现队列消息处理功能
 	*/
-	bodyParts := strings.Split(string(m.Body), "\r\n")
-	if len(bodyParts) == 6 {
-		time_index, err := strconv.Atoi(bodyParts[1])
-		db, err := h.db.GetLink(bodyParts[0], bodyParts[4], "heartbeat")
-		if err != nil {
-			return err
-		}
-		sql := `
-        INSERT INTO heartbeat (date, time_index, ip, host_name, hardware_addr, alive) VALUES (?, ?, ?, ?, ?, ?);
-        `
-        _, err = db.Exec(sql, bodyParts[0], time_index, bodyParts[2], bodyParts[3], bodyParts[4], 1)
-        return err
-	}
-	return nil
+	defer util.HandleException(path.Join(util.LogRoot, "heartbeat.log"), string(m.Body))
+	err = h.tryHandleIt(m)
+	return err
 }
 
 func NewHeartBeatHandler(dbLink *util.DbLink) (heartBeatHandler *HeartBeatHandler, err error) {
@@ -44,7 +49,7 @@ func NewHeartBeatHandler(dbLink *util.DbLink) (heartBeatHandler *HeartBeatHandle
 
 func updateMachineStatus(h *HeartBeatHandler, registerDB *sql.DB) {
 	for {
-		c := time.Tick(3*time.Minute)
+		c := time.Tick(1*time.Minute)
 		for _ = range c {
 			sql := "SELECT hardware_addr, status FROM register"
 			rows, err := registerDB.Query(sql)
