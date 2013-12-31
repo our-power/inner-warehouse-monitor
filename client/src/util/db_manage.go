@@ -8,6 +8,7 @@ import (
 	"strings"
 	"database/sql"
 	_ "github.com/mattn/go-sqlite3"
+	"path"
 )
 
 type DbLink struct {
@@ -38,8 +39,8 @@ func (link *DbLink) GetLink(date string, hardware_addr string, indicator string)
 	} else {
 		// 否则为新的日期打开新的数据库连接，并延时关闭原有日期对应的数据库连接，且删除其在本结构体中的注册条目
 		var dbPath, dbSourceName string
-		dbPath = link.DbPath + "/" + date + "/" + strings.Replace(hardware_addr, ":", "_", -1) + "/"
-		dbSourceName = dbPath + indicator + ".db"
+		dbPath = path.Join(link.DbPath, date, strings.Replace(hardware_addr, ":", "_", -1))
+		dbSourceName = path.Join(dbPath, indicator + ".db")
 		os.MkdirAll(dbPath, 0666)
 		link.Changing = true
 		inComingDate, _ := strconv.Atoi(date)
