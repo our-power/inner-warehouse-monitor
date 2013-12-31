@@ -13,14 +13,16 @@ import (
 type DbLink struct {
 	Today    string
 	Changing bool
+	DbPath string
 	Links map[string]*sql.DB
 }
 
-func NewDbLink(date string) (link *DbLink) {
+func NewDbLink(dbPath string, date string) (link *DbLink) {
 	links := make(map[string]*sql.DB)
 	link = &DbLink{
 		date,
 		false,
+		dbPath,
 		links,
 	}
 	return
@@ -36,7 +38,7 @@ func (link *DbLink) GetLink(date string, hardware_addr string, indicator string)
 	} else {
 		// 否则为新的日期打开新的数据库连接，并延时关闭原有日期对应的数据库连接，且删除其在本结构体中的注册条目
 		var dbPath, dbSourceName string
-		dbPath = "../db/" + date + "/" + strings.Replace(hardware_addr, ":", "_", -1) + "/"
+		dbPath = link.DbPath + "/" + date + "/" + strings.Replace(hardware_addr, ":", "_", -1) + "/"
 		dbSourceName = dbPath + indicator + ".db"
 		os.MkdirAll(dbPath, 0666)
 		link.Changing = true
@@ -51,7 +53,7 @@ func (link *DbLink) GetLink(date string, hardware_addr string, indicator string)
 		if err != nil {
 			return nil, err
 		}
-		createTable(indicator, newLink)
+		CreateTable(indicator, newLink)
 		go func() {
 			c := time.Tick(5*time.Minute)
 			for _ = range c {
@@ -71,7 +73,7 @@ func (link *DbLink) GetLink(date string, hardware_addr string, indicator string)
 	return nil, nil
 }
 
-func createTable(indicator string, link *sql.DB) {
+func CreateTable(indicator string, link *sql.DB) {
 	var sql string
 	switch indicator {
 	case "cpu_usage":

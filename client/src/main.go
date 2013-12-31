@@ -28,6 +28,7 @@ var (
 	verbose            = flag.Bool("verbose", false, "enable verbose logging")
 	maxBackoffDuration = flag.Duration("max-backoff-duration", 120*time.Second, "the maximum backoff duration")
 	termChan chan os.Signal
+	dbPath = flag.String("db-path", "../db/", "absolute or relative path for db.")
 )
 
 func init() {
@@ -256,31 +257,31 @@ func main() {
 
 	date := time.Now().Format("20060102")
 	// 初始化各种指标的处理类
-	cpu_usage_db_link := util.NewDbLink(date)
+	cpu_usage_db_link := util.NewDbLink(*dbPath, date)
 	cpuUsageHandler, err := cpu_usage.NewCPUUsageHandler(cpu_usage_db_link)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	mem_usage_db_link := util.NewDbLink(date)
+	mem_usage_db_link := util.NewDbLink(*dbPath, date)
 	memUsageHandler, err := mem_usage.NewMemUsageHandler(mem_usage_db_link)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	net_flow_db_link := util.NewDbLink(date)
+	net_flow_db_link := util.NewDbLink(*dbPath, date)
 	netFlowHandler, err := net_flow.NewNetFlowHandler(net_flow_db_link)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	heartbeat_db_link := util.NewDbLink(date)
+	heartbeat_db_link := util.NewDbLink(*dbPath, date)
 	heartBeatHandler, err := heartbeat.NewHeartBeatHandler(heartbeat_db_link)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	accessibility_db_link := util.NewDbLink(date)
+	accessibility_db_link := util.NewDbLink(*dbPath, date)
 	accessibilityToDBHandler, err := accessibility.NewAccessibilityToDBHandler(accessibility_db_link)
 	if err != nil {
 		fmt.Println(err)
@@ -297,6 +298,7 @@ func main() {
 		fmt.Println(err)
 		return
 	}
+	util.CreateTable("register", register_db_link)
 	registerToDBHandler, err := register.NewRegisterToDBHandler(register_db_link)
 	if err != nil {
 		fmt.Println(err)
