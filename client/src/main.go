@@ -293,7 +293,7 @@ func main() {
 		fmt.Println(err)
 	}
 
-	register_db_link, err := sql.Open("sqlite3", "../db/register.db")
+	register_db_link, err := sql.Open("sqlite3", *dbPath + "/register.db")
 	if err != nil {
 		fmt.Println(err)
 		return
