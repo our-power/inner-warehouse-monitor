@@ -47,7 +47,7 @@
 			</thead>
 			{{range $key, $val := .machine_list}}
 			<tr>
-			<td class="sequence-number">{{$key+1}}</td>
+			<td class="sequence-number">{{add $key 1}}</td>
 			<td class="ip">{{$val.Ip}}</td>
 			<td class="host-name">{{$val.Host_name}}</td>
 			<td class="hardware-addr">{{$val.Hardware_addr}}</td>
