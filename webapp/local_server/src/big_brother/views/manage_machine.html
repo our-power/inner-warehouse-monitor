@@ -6,10 +6,13 @@
     <link href="/static/css/bootstrap.css" rel="stylesheet">
     <link href="/static/css/bootstrap-responsive.css" rel="stylesheet">
     <link href="/static/css/jquery-ui.css" rel="stylesheet">
-    <link href="/static/css/font-awesome.css" rel="stylesheet">
     <link href="/static/alertify/themes/alertify.core.css" rel="stylesheet" type="text/css"/>
     <link href="/static/alertify/themes/alertify.default.css" rel="stylesheet" type="text/css"/>
-    <link href="/static/css/search_machine/style.css" rel="stylesheet">
+    <style type="text/css">
+    .id {
+        display: none;
+    }
+    </style>
     <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
     <script src="/static/js/html5shiv.js"></script>
@@ -24,7 +27,7 @@
             <a class="brand" href="/">易迅内仓监控系统</a>
             <ul class="nav">
                 <li class=""><a href="/search_machine">搜索机器</a>
-				<li class="active"><a href="/manage_machine">机器管理</a>
+				<li class="active"><a href="/manage/list_machine">机器管理</a>
                 </li>
             </ul>
         </div>
@@ -37,12 +40,14 @@
 			<thead>
 			<tr>
 			<th>序号</th>
+            <th class="id">ID</th>
 			<th>IP</th>
 			<th>主机名</th>
 			<th>MAC地址</th>
 			<th>Agent版本</th>
 			<th>角色</th>
 			<th>状态</th>
+			<th></th>
 			</tr>
 			</thead>
 			<tbody>
@@ -52,12 +57,14 @@
 			{{range $key, $val := .machine_list}}
 			<tr>
 			<td class="sequence-number">{{add $key 1}}</td>
+            <td class="id">{{$val.Id}}</td>
 			<td class="ip">{{$val.Ip}}</td>
 			<td class="host-name">{{$val.Host_name}}</td>
 			<td class="hardware-addr">{{$val.Hardware_addr}}</td>
 			<td class="agent-version">{{$val.Agent_version}}</td>
 			<td class="machine-role">{{index $role_mapper $val.Machine_role}}</td>
 			<td class="status"><span class="{{index $status_labels $val.Hardware_addr}}">{{index $status_mapper $val.Status}}</td>
+			<td class="operation"><button class="btn btn-danger del-machine">删除</button></td>
 			</tr>
 			{{end}}
 			</tbody>
@@ -73,11 +80,7 @@
     </div>
 </div>
 <script src="/static/js/jquery.min.js" type="text/javascript"></script>
-<script src="/static/js/jquery-ui.js" type="text/javascript"></script>
-<script src="/static/js/bootstrap.js" type="text/javascript"></script>
-<script src="/static/js/highcharts.min.js" type="text/javascript"></script>
 <script src="/static/alertify/alertify.min.js" type="text/javascript"></script>
-<script src="/static/js/raphael.js" type="text/javascript"></script>
-<script src="/static/js/search_machine/main.js" type="text/javascript"></script>
+<script src="/static/js/manage_machine/main.js" type="text/javascript"></script>
 </body>
 </html>

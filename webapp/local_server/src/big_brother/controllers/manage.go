@@ -12,7 +12,7 @@ type ManageController struct {
 func (this *ManageController) GetManagePage() {
 	var machineList []*models.Register
 	o.Using("default")
-	_, err := o.QueryTable("register").Limit(-1).All(&machineList, "ip", "host_name", "hardware_addr", "agent_version", "machine_role", "status")
+	_, err := o.QueryTable("register").Limit(-1).All(&machineList, "id", "ip", "host_name", "hardware_addr", "agent_version", "machine_role", "status")
 	if err != nil {
 		this.Data["machine_list"] = nil
 	} else {
@@ -43,4 +43,18 @@ func (this *ManageController) GetManagePage() {
 	}
 	this.Data["status_labels"] = machineStatusLabels
 	this.TplNames = "manage_machine.html"
+}
+
+func (this *ManageController) DelMachine() {
+	id := this.GetString("id")
+	if ip == "" || mac == "" {
+		this.Data["json"] = map[string]string{
+			"Status": "failure",
+			"Msg": "参数不全，未能删除机器！",
+		}
+	}else{
+		o.Using("default")
+		num, err := o.Delete(&models.Register{Id: id})
+	}
+	this.ServeJson()
 }

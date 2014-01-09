@@ -33,7 +33,8 @@ func main() {
 	beego.Router("/search_machine", &controllers.SearchController{}, "GET:GetSearchPage")
 	beego.Router("/filter_machine_list", &controllers.SearchController{}, "GET:FilterMachineList")
 
-	beego.Router("/manage_machine", &controllers.ManageController{}, "GET:GetManagePage")
+	beego.Router("/manage/list_machine", &controllers.ManageController{}, "GET:GetManagePage")
+	beego.Router("/manage/del_machine", &controllers.ManageController{}, "POST:DelMachine")
 
 	beego.Router("/api/get_machine_indicator_data", &controllers.ApiController{}, "GET:GetMachineIndicatorData")
 	beego.Router("/api/get_machine_accessibility_data", &controllers.ApiController{}, "GET:GetMachineAccessibilityData")
