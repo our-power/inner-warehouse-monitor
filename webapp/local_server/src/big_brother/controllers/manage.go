@@ -30,5 +30,17 @@ func (this *ManageController) GetManagePage() {
 		-1: "运行异常",
 		-2: "不再使用",
 	}
+
+	statusLabelMapper := map[int]string{
+		0:  "label",
+		1:  "label label-success",
+		-1: "label label-important",
+		-2: "label label-inverse",
+	}
+	machineStatusLabels := make(map[string]string)
+	for _, machine := range machineList {
+		machineStatusLabels[machine.Hardware_addr] = statusLabelMapper[machine.Status]
+	}
+	this.Data["status_labels"] = machineStatusLabels
 	this.TplNames = "manage_machine.html"
 }

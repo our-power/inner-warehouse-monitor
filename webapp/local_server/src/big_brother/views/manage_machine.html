@@ -48,18 +48,8 @@
 			<tbody>
 			{{$role_mapper := .role_mapper}}
 			{{$status_mapper := .status_mapper}}
+			{{$status_labels := .status_labels}}
 			{{range $key, $val := .machine_list}}
-			{{if $val.Status == 0}}
-				{{$span_class="label"}}
-			{{else if $val.Status == 1}}
-				{{$span_class="label label-success"}}
-			{{else if $val.Status == -1}}
-				{{$span_class="label label-important"}}
-			{{else if $val.Status == -2}}
-				{{$span_class="label label-inverse"}}
-			{{else}}
-				{{$span_class="label label-warning"}}
-			{{end}}
 			<tr>
 			<td class="sequence-number">{{add $key 1}}</td>
 			<td class="ip">{{$val.Ip}}</td>
@@ -67,7 +57,7 @@
 			<td class="hardware-addr">{{$val.Hardware_addr}}</td>
 			<td class="agent-version">{{$val.Agent_version}}</td>
 			<td class="machine-role">{{index $role_mapper $val.Machine_role}}</td>
-			<td class="status"><span class="{{$span_class}}">{{index $status_mapper $val.Status}}</td>
+			<td class="status"><span class="{{index $status_labels $val.Hardware_addr}}">{{index $status_mapper $val.Status}}</td>
 			</tr>
 			{{end}}
 			</tbody>
