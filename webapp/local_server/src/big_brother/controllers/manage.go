@@ -18,5 +18,17 @@ func (this *ManageController) GetManagePage() {
 	} else {
 		this.Data["machine_list"] = machineList
 	}
+	this.Data["role_mapper"] = map[string]string{
+		"ercifenjian": "二次分拣",
+		"kaipiao":     "财务开票",
+		"dabao":       "打包",
+		"fenbo":       "分拨",
+	}
+	this.Data["status_mapper"] = map[int]string{
+		0:  "已正常关机",
+		1:  "正常运行中",
+		-1: "运行异常",
+		-2: "不再使用",
+	}
 	this.TplNames = "manage_machine.html"
 }

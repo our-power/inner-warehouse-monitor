@@ -47,13 +47,13 @@
 			</thead>
 			{{range $key, $val := .machine_list}}
 			<tr>
-			<td class="sequence-number">{{$key}}</td>
+			<td class="sequence-number">{{$key+1}}</td>
 			<td class="ip">{{$val.Ip}}</td>
 			<td class="host-name">{{$val.Host_name}}</td>
 			<td class="hardware-addr">{{$val.Hardware_addr}}</td>
 			<td class="agent-version">{{$val.Agent_version}}</td>
-			<td class="machine-role">{{$val.Machine_role}}</td>
-			<td class="status">{{$val.Status}}</td>
+			<td class="machine-role">{{.Role_mapper[$val.Machine_role]}}</td>
+			<td class="status">{{.Status_mapper[$val.Status]}}</td>
 			</tr>
 			{{end}}
 		</table>
