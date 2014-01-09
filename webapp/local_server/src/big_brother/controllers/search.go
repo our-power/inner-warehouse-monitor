@@ -2,9 +2,9 @@ package controllers
 
 import (
 	//"fmt"
-	"strings"
-	"github.com/astaxie/beego"
 	"big_brother/models"
+	"github.com/astaxie/beego"
+	"strings"
 )
 
 type SearchController struct {
@@ -12,7 +12,6 @@ type SearchController struct {
 }
 
 func (this *SearchController) GetSearchPage() {
-	this.Data["nav_now"] = "search_machine"
 	this.TplNames = "search_machine.html"
 }
 
@@ -33,7 +32,7 @@ func queryMachine(col string, items string) (partialResults []ResultType) {
 		itemNum := len(item_s)
 		for index := 0; index < itemNum; index++ {
 			var rows []*models.Register
-			num, err := o.QueryTable("register").Filter(col, item_s[index]).All(&rows, "ip", "host_name", "hardware_addr", "machine_role", "status")
+			num, err := o.QueryTable("register").Filter(col, item_s[index]).Limit(-1).All(&rows, "ip", "host_name", "hardware_addr", "machine_role", "status")
 			if err == nil {
 				if num == 0 {
 					partialResults = append(partialResults, ResultType{IsExisted: false, SearchItem: item_s[index], Ip: "", Host_name: "", Hardware_addr: "", Machine_role: "", Status: ""})
@@ -41,7 +40,7 @@ func queryMachine(col string, items string) (partialResults []ResultType) {
 				if num > 0 {
 					for _, row := range rows {
 						var machineRole string
-						switch row.Machine_role{
+						switch row.Machine_role {
 						case "kaipiao":
 							machineRole = "财务开票"
 						case "ercifenjian":
@@ -54,7 +53,7 @@ func queryMachine(col string, items string) (partialResults []ResultType) {
 							machineRole = "其它"
 						}
 						var status string
-						switch row.Status{
+						switch row.Status {
 						case 0:
 							status = "已正常关机"
 						case 1:
@@ -66,7 +65,7 @@ func queryMachine(col string, items string) (partialResults []ResultType) {
 						default:
 							status = "未知状态"
 						}
-						partialResults = append(partialResults, ResultType{IsExisted: true, SearchItem: item_s[index], Ip: row.Ip, Host_name: row.Host_name, Hardware_addr: row.Hardware_addr, Machine_role: machineRole, Status: status })
+						partialResults = append(partialResults, ResultType{IsExisted: true, SearchItem: item_s[index], Ip: row.Ip, Host_name: row.Host_name, Hardware_addr: row.Hardware_addr, Machine_role: machineRole, Status: status})
 					}
 				}
 			}
@@ -79,7 +78,7 @@ func (this *SearchController) FilterMachineList() {
 	ipList := this.GetString("iplist")
 	hostNameList := this.GetString("hostnamelist")
 	hardwareAddrList := this.GetString("hardwareaddrlist")
-	results := make([]ResultType,0, 10)
+	results := make([]ResultType, 0, 10)
 	results = append(results, queryMachine("ip", ipList)...)
 	results = append(results, queryMachine("host_name", hostNameList)...)
 	results = append(results, queryMachine("hardware_addr", hardwareAddrList)...)

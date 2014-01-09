@@ -1,9 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"big_brother/controllers"
 	"big_brother/models"
+	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	_ "github.com/mattn/go-sqlite3"
@@ -28,6 +28,8 @@ func main() {
 	beego.Router("/", &controllers.HomeController{})
 	beego.Router("/search_machine", &controllers.SearchController{}, "GET:GetSearchPage")
 	beego.Router("/filter_machine_list", &controllers.SearchController{}, "GET:FilterMachineList")
+
+	beego.Router("/manage_machine", &controllers.ManageController{}, "GET:GetManagePage")
 
 	beego.Router("/api/get_machine_indicator_data", &controllers.ApiController{}, "GET:GetMachineIndicatorData")
 	beego.Router("/api/get_machine_accessibility_data", &controllers.ApiController{}, "GET:GetMachineAccessibilityData")

@@ -23,50 +23,43 @@
         <div class="container">
             <a class="brand" href="/">易迅内仓监控系统</a>
             <ul class="nav">
-                <li class="active"><a href="/search_machine">搜索机器</a>
-				<li class=""><a href="/manage_machine">机器管理</a>
+                <li class=""><a href="/search_machine">搜索机器</a>
+				<li class="active"><a href="/manage_machine">机器管理</a>
                 </li>
             </ul>
         </div>
     </div>
 </div>
-<div class="container" id="below-navbar">
-    <form class="form-inline">
-        <span id="form-machine-list">机器列表：<textarea rows="1" id="machine-list" placeholder="一行一个机器"></textarea></span>
-        <span id="form-date">查询日期：<input type="text" class="input-medium hasDatePicker" id="query_date_input"/></span>
-        <button class="btn btn-primary" type="button" id="search">查询</button>
-    </form>
-    <ul class="nav nav-tabs" id="data-tab">
-        <li class="active"><a href="#machine_list" data-toggle="tab">机器列表</a></li>
-        <li><a href="#cpu_view" data-toggle="tab">CPU</a></li>
-        <li><a href="#memory_view" data-toggle="tab">内存</a></li>
-        <li><a href="#netflow_view" data-toggle="tab">网络流量</a></li>
-        <li><a href="#accessibility" data-toggle="tab">服务连通</a></li>
-    </ul>
-    <div class="tab-content">
-        <div class="tab-pane active" id="machine_list">
-            <table class="table table-hover table-condensed">
-                <thead>
-                <tr>
-                    <th>序号</th>
-                    <th>查询目标</th>
-                    <th>主机名</th>
-                    <th>MAC地址</th>
-                    <th>IP地址</th>
-                    <th>归属</th>
-                    <th>状态</th>
-                </tr>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
-        </div>
-        <div class="tab-pane" id="cpu_view"></div>
-        <div class="tab-pane" id="memory_view"></div>
-        <div class="tab-pane" id="netflow_view"></div>
-        <div class="tab-pane" id="accessibility"></div>
-    </div>
+
+<div class="container">
+	<div class="row-fluid">
+		<table class="table table-bordered">
+			<thead>
+			<tr>
+			<th>序号</th>
+			<th>IP</th>
+			<th>主机名</th>
+			<th>MAC地址</th>
+			<th>Agent版本</th>
+			<th>角色</th>
+			<th>状态</th>
+			</tr>
+			</thead>
+			{{range $key, $val := .machine_list}}
+			<tr>
+			<td class="sequence-number">{{$key}}</td>
+			<td class="ip">{{$val.Ip}}</td>
+			<td class="host-name">{{$val.Host_name}}</td>
+			<td class="hardware-addr">{{$val.Hardware_addr}}</td>
+			<td class="agent-version">{{$val.Agent_version}}</td>
+			<td class="machine-role">{{$val.Machine_role}}</td>
+			<td class="status">{{$val.Status}}</td>
+			</tr>
+			{{end}}
+		</table>
+	</div>
 </div>
+
 <div class="footer">
     <div class="container">
         <p>推荐使用Firefox或Chrome浏览器，体验更佳</p>

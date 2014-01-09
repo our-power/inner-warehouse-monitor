@@ -1,13 +1,13 @@
 package controllers
 
 import (
-	"time"
-	"runtime"
-	"strings"
+	"database/sql"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
-	"database/sql"
 	_ "github.com/mattn/go-sqlite3"
+	"runtime"
+	"strings"
+	"time"
 )
 
 type ApiController struct {
@@ -17,19 +17,19 @@ type ApiController struct {
 /*
 	GET /api/status_overview?role=xxx
 */
-func (this * ApiController) GetStatusOverview() {
+func (this *ApiController) GetStatusOverview() {
 	machineRole := this.GetString("role")
-	var serverList []orm.Params
+	var machineList []orm.Params
 	var available, shutdown, exception int
 	var one, zero int64
 	one = 1
 	zero = 0
 	o.Using("default")
-	_, err := o.QueryTable("register").Filter("machine_role", machineRole).Limit(-1).Values(&serverList, "ip", "host_name", "hardware_addr", "status")
+	_, err := o.QueryTable("register").Filter("machine_role", machineRole).Limit(-1).Values(&machineList, "ip", "host_name", "hardware_addr", "status")
 	if err != nil {
 		this.Data["json"] = nil
 	} else {
-		for _, item := range serverList {
+		for _, item := range machineList {
 			switch item["Status"] {
 			case one:
 				available++
@@ -39,7 +39,7 @@ func (this * ApiController) GetStatusOverview() {
 				exception++
 			}
 		}
-		statistics := []interface {}{available, shutdown, exception, &serverList}
+		statistics := []interface{}{available, shutdown, exception, &machineList}
 		this.Data["json"] = statistics
 	}
 	this.ServeJson()
@@ -139,10 +139,10 @@ func (this *ApiController) GetMachineIndicatorData() {
 	} else if indicator == "net_flow" {
 		if dataContainerLength > 0 {
 			type ResultType struct {
-				Out_bytes     []int
-				In_bytes      []int
-				Out_packets   []int
-				In_packets    []int
+				Out_bytes   []int
+				In_bytes    []int
+				Out_packets []int
+				In_packets  []int
 			}
 			outBytes := make([]int, dataContainerLength)
 			inBytes := make([]int, dataContainerLength)
@@ -196,7 +196,7 @@ func (this *ApiController) GetMachineAccessibilityData() {
 		Status     string
 	}
 
-	type ResultType struct{
+	type ResultType struct {
 		Hardware_addr     string
 		Date              string
 		Ping_time_index   int
@@ -205,8 +205,8 @@ func (this *ApiController) GetMachineAccessibilityData() {
 		Telnet_results    []TelnetResultType
 	}
 
-	pingResults := make([]PingResultType,0, 100)
-	telnetResults := make([]TelnetResultType,0, 100)
+	pingResults := make([]PingResultType, 0, 100)
+	telnetResults := make([]TelnetResultType, 0, 100)
 	var pingTimeIndex int
 	var telnetTimeIndex int
 
