@@ -47,14 +47,30 @@ func (this *ManageController) GetManagePage() {
 
 func (this *ManageController) DelMachine() {
 	id := this.GetString("id")
-	if ip == "" || mac == "" {
+	if id == "" {
 		this.Data["json"] = map[string]string{
 			"Status": "failure",
-			"Msg": "参数不全，未能删除机器！",
+			"Msg": "为提供作业机器的数据库ID，未能删除机器！",
 		}
 	}else{
 		o.Using("default")
 		num, err := o.Delete(&models.Register{Id: id})
+		if err != nil {
+			this.Data["json"] = map[string]string{
+				"Status": "failure",
+				"Msg": "数据库操作出错！",
+			}
+		}else if num == 0 {
+			this.Data["json"] = map[string]string{
+				"Status": "failure",
+				"Msg": "未能删除该机器，可能数据库中不存在该机器。",
+			}
+		}else{
+			this.Data["json"] = map[string]string{
+				"Status": " success",
+				"Msg": "成功删除该机器！",
+			}
+		}
 	}
 	this.ServeJson()
 }
