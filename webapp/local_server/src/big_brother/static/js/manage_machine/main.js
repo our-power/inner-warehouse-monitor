@@ -15,7 +15,8 @@ $(function() {
 
         alertify.confirm('确定删除该机器吗？', function(e) {
             if (e) {
-                var id = $.trim($(this).parents('.operation').siblings('.id').text());
+                var parent = $(this).parent('.operation'),
+                    id = $.trim(parent.children('.id').text());
                 var req = $.ajax({
                     "type": "post",
                     "url": "/manage/del_machine",
