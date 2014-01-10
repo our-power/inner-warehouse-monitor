@@ -15,7 +15,7 @@ $(function() {
 
         alertify.confirm('确定删除该机器吗？', function(e) {
             if (e) {
-                var id = $.trim($(this).parent().siblings('.id').text());
+                var id = $.trim($(this).parents('.operation').siblings('.id').text());
                 var req = $.ajax({
                     "type": "post",
                     "url": "/manage/del_machine",
@@ -25,8 +25,8 @@ $(function() {
                     "dataType": "json"
                 });
                 req.done(function(resp) {
-                    if (resp.status === "failure") {
-                        alertify.log(resp.msg, "error", 5000);
+                    if (resp.Status === "failure") {
+                        alertify.log(resp.Msg, "error", 5000);
                         return false;
                     }
                     alertify.log("已成功删除！", "success", 1000);
