@@ -19,7 +19,7 @@ $(function(){
         if(! sure_to_del) {
             return false;
         }
-        var id = $.trim($(this).parent().siblings('.id').text()),
+        var id = $.trim($(this).parent().siblings('.id').text());
         var req = $.ajax({
             "type": "post",
             "url": "/manage/del_machine",
