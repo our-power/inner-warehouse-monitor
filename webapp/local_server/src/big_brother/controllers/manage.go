@@ -3,6 +3,7 @@ package controllers
 import (
 	"big_brother/models"
 	"github.com/astaxie/beego"
+	"strconv"
 )
 
 type ManageController struct {
@@ -50,11 +51,12 @@ func (this *ManageController) DelMachine() {
 	if id == "" {
 		this.Data["json"] = map[string]string{
 			"Status": "failure",
-			"Msg": "为提供作业机器的数据库ID，未能删除机器！",
+			"Msg": "未提供作业机器的数据库ID，未能删除机器！",
 		}
 	}else{
+		id_int, _ := strconv.Atoi(id)
 		o.Using("default")
-		num, err := o.Delete(&models.Register{Id: id})
+		num, err := o.Delete(&models.Register{Id: id_int})
 		if err != nil {
 			this.Data["json"] = map[string]string{
 				"Status": "failure",
