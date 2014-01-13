@@ -44,7 +44,7 @@ func main() {
 	beego.Router("/api/indicators_shortcut", &controllers.ApiController{}, "GET:GetIndicatorsByMac")
 
 	beego.Router("/login", &controllers.AdminController{}, "GET,POST:Login")
-	beego.Router("/logout", &controllers.AdminController{}, "POST:Logout")
+	beego.Router("/logout", &controllers.AdminController{}, "GET:Logout")
 
 	beego.AddFuncMap("add", addInTpl)
 	beego.Run()

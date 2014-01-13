@@ -13,7 +13,7 @@ func validateUser(userName, passwd string) (bool) {
 }
 
 func (this *AdminController) Login() {
-	if this.Ctr.Request.Method == "GET" {
+	if this.Ctx.Request.Method == "GET" {
 		this.TplNames = "login.html"
 	}else {
 		userName := this.GetString("user_name")
