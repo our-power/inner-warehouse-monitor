@@ -85,7 +85,7 @@ $(document).ready(function () {
                                 bgc = "#FF6347";
                             }
                             var data_row = $("<tr></tr>")
-                                .append($("<td><a class='reference' href='/indicators_shortcut?mac="+ data[3][m]["Hardware_addr"] +"' target='_blank'>" + data[3][m]["Hardware_addr"] + "</a></td>"))
+                                .append($("<td><a href='/indicators_shortcut?mac="+ data[3][m]["Hardware_addr"] +"' target='_blank'>" + data[3][m]["Hardware_addr"] + "</a><i class='fa fa-external-link'></i></td>"))
                                 .append($("<td>" + data[3][m]["Host_name"] + "</td>"))
                                 .append($("<td>" + desc + "</td>"));
                             data_row.attr("style", "BACKGROUND-COLOR: " + bgc)
