@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"database/sql"
-	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	_ "github.com/mattn/go-sqlite3"
 	"runtime"
@@ -11,7 +10,7 @@ import (
 )
 
 type ApiController struct {
-	beego.Controller
+	BaseController
 }
 
 /*

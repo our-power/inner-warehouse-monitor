@@ -2,12 +2,11 @@ package controllers
 
 import (
 	"big_brother/models"
-	"github.com/astaxie/beego"
 	"strconv"
 )
 
 type ManageController struct {
-	beego.Controller
+	BaseController
 }
 
 func (this *ManageController) GetManagePage() {

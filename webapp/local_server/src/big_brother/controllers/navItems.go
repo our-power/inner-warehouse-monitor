@@ -1,12 +1,11 @@
 package controllers
 
 import (
-	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 )
 
 type NavItemsController struct {
-	beego.Controller
+	BaseController
 }
 
 func (this *NavItemsController) GetMachineDataGroupByStep() {

@@ -3,12 +3,11 @@ package controllers
 import (
 	//"fmt"
 	"big_brother/models"
-	"github.com/astaxie/beego"
 	"strings"
 )
 
 type SearchController struct {
-	beego.Controller
+	BaseController
 }
 
 func (this *SearchController) GetSearchPage() {
