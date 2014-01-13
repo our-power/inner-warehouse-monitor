@@ -11,3 +11,11 @@
 body {
     padding-top: 60px;
 }
+
+a.reference:after {
+    font-family: fontawesome-webfont;
+    content: " \f08e ";
+    color: #b3b3b3;
+    vertical-align: super;
+    font-size: 60%;
+}
