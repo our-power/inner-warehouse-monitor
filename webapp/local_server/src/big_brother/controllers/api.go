@@ -275,6 +275,6 @@ func (this *ApiController)GetIndicatorsByMac() {
 	if mac == "" {
 		this.Abort("404")
 	}
-	this.Data['machine_mac'] = mac
-	this.TplNames = "indicators_shortcut.html"
+	this.Data["targets"] = mac
+	this.TplNames = "search_machine.html"
 }
