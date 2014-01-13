@@ -603,5 +603,10 @@ $(function () {
             getMachineIndicatorData(that);
         }
     });
+
+    var machine_list = $.trim($("#machine-list").val());
+    if(machine_list != ''){
+        $('#search').click();
+    }
 })
 ;
