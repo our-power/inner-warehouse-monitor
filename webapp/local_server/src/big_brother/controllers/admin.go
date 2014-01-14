@@ -29,6 +29,6 @@ func (this *AdminController) Login() {
 }
 
 func (this *AdminController) Logout() {
-	this.DelSession("user_name")
+	this.DelSession("login_name")
 	this.Redirect("/login", 302)
 }

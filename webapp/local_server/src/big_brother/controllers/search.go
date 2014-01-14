@@ -11,7 +11,7 @@ type SearchController struct {
 }
 
 func (this *SearchController) GetSearchPage() {
-	this.Data["user_name"] = this.GetSession("user_name")
+	this.Data["login_name"] = this.GetSession("login_name")
 	this.TplNames = "search_machine.html"
 }
 
