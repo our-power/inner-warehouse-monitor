@@ -71,6 +71,29 @@ type Register struct {
 	Status        int
 }
 
+type User struct {
+	Id int
+	Name string
+	Passwd string
+	Email string
+	RegisterTime string
+	LastLogin string
+	Role string
+}
+
+type Role struct {
+	Id int
+	RoleType string
+	Permission string
+}
+
+type Trace struct {
+	Id int
+	User string
+	DoWhat string
+	ThatTime string
+}
+
 /*
 type Ping_accessibility struct {
 	Id            int
@@ -96,5 +119,5 @@ type Telnet_accessibility struct {
 */
 func InitModels() {
 	//orm.RegisterModel(new(Cpu_usage), new(Mem_usage), new(Net_flow), new(Heart_beat), new(Register), new(Ping_accessibility), new(Telnet_accessibility))
-	orm.RegisterModel(new(Register))
+	orm.RegisterModel(new(Register), new(User), new(Role), new(Trace))
 }

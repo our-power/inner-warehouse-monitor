@@ -11,7 +11,9 @@ import (
 
 func init() {
 	registerDB := beego.AppConfig.String("multidb") + "register.db"
+	adminDB := beego.AppConfig.String("admindb")
 	orm.RegisterDataBase("default", beego.AppConfig.String("dbdriver"), registerDB)
+	orm.RegisterDataBase("admin", beego.AppConfig.String("dbdriver"), adminDB)
 	models.InitModels()
 	controllers.InitControllers()
 }
