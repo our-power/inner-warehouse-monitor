@@ -49,47 +49,39 @@
             text-align: center;
         }
 
-        .ui-box-header > h4 {
-            font-size: 17px;
-            color: lightcoral;
-        }
-
         .ui-box-container {
             padding: 0 10px;
             line-height: 1.6;
+            margin: 0 auto;
         }
     </style>
     <link rel="shortcut icon" href="/static/img/favicon.jpg">
     <title>老大哥 - 易迅内仓监控系统</title>
 </head>
 <body>
-<div class="container">
-    <div class="ui-box">
-        <div class="ui-box-header">
-            <h3>易迅内仓核心路径监控</h3>
-        </div>
-        <div class="ui-box-container">
-            <form class="form-horizontal" action="/login" method="post">
-                <div class="control-group">
-                    <label class="control-label" for="user-name">用户名</label>
-
-                    <div class="controls">
-                        <input type="text" id="user-name" name="user_name"/>
-                    </div>
-                </div>
-                <div class="control-group">
-                    <label class="control-label" for="passwd">密码</label>
-
-                    <div class="controls">
-                        <input type="text" id="passwd" name="password"/>
-                    </div>
-                </div>
-                <div class="control-group">
-                    <div class="controls">
-                        <button type="submit" class="btn btn-primary">登录</button>
-                    </div>
-                </div>
-            </form>
+<div class="container-fluid">
+    <div class="row-fluid">
+        <div class="ui-box">
+            <div class="ui-box-header">
+                <h3>易迅内仓核心路径监控</h3>
+            </div>
+            <div class="ui-box-container">
+                <form action="/login" method="post">
+                    <fieldset>
+                        <div class="username-block">
+                            <span>用户名</span>
+                            <input type="text" id="user-name" name="user_name"/>
+                        </div>
+                        <div class="password-block">
+                            <span>密码</span>
+                            <input type="password" id="passwd" name="password"/>
+                        </div>
+                        <div class="submit-block">
+                            <button type="submit" class="btn btn-primary">登录</button>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
         </div>
     </div>
 </div>
