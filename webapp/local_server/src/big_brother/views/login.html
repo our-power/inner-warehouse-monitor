@@ -76,12 +76,17 @@
                 <form action="/login" method="post">
                     <fieldset>
                         <div class="username-block">
-                            <span>账户名</span>
+                            <span>账户</span>
                             <input type="text" id="user-name" name="user_name"/>
                         </div>
                         <div class="password-block">
                             <span>密码</span>
                             <input type="password" id="passwd" name="password"/>
+                            <span>
+                                <label class="checkbox">
+                                    <input type="checkbox" id="show-passwd"> 显示密码
+                                </label>
+                            </span>
                         </div>
                         <div class="submit-block">
                             <button type="submit" class="btn btn-primary">登录</button>
