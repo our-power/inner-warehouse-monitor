@@ -34,6 +34,7 @@ func main() {
 	beego.Router("/", &controllers.HomeController{})
 	beego.Router("/search_machine", &controllers.SearchController{}, "GET:GetSearchPage")
 	beego.Router("/filter_machine_list", &controllers.SearchController{}, "GET:FilterMachineList")
+	beego.Router("/indicators_shortcut", &controllers.SearchController{}, "GET:GetIndicatorsByMac")
 
 	beego.Router("/manage/list_machine", &controllers.ManageController{}, "GET:GetManagePage")
 	beego.Router("/manage/del_machine", &controllers.ManageController{}, "POST:DelMachine")
@@ -41,7 +42,6 @@ func main() {
 	beego.Router("/api/get_machine_indicator_data", &controllers.ApiController{}, "GET:GetMachineIndicatorData")
 	beego.Router("/api/get_machine_accessibility_data", &controllers.ApiController{}, "GET:GetMachineAccessibilityData")
 	beego.Router("/api/status_overview", &controllers.ApiController{}, "GET:GetStatusOverview")
-	beego.Router("/api/indicators_shortcut", &controllers.ApiController{}, "GET:GetIndicatorsByMac")
 
 	beego.Router("/login", &controllers.AdminController{}, "GET,POST:Login")
 	beego.Router("/logout", &controllers.AdminController{}, "GET:Logout")

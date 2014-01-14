@@ -86,3 +86,13 @@ func (this *SearchController) FilterMachineList() {
 	this.Data["json"] = results
 	this.ServeJson()
 }
+
+func (this *SearchController)GetIndicatorsByMac() {
+	mac := this.GetString("mac")
+	if mac == "" {
+		this.Abort("404")
+	}
+	this.Data["targets"] = mac
+	this.Data["login_name"] = this.GetSession("login_name")
+	this.TplNames = "search_machine.html"
+}

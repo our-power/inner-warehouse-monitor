@@ -267,13 +267,3 @@ func (this *ApiController) GetMachineAccessibilityData() {
 	this.Data["json"] = ResultType{Hardware_addr: hardwareAddr, Date: now.Format("2006-01-02"), Ping_time_index: pingTimeIndex, Ping_results: pingResults, Telnet_time_index: telnetTimeIndex, Telnet_results: telnetResults}
 	this.ServeJson()
 }
-
-
-func (this *ApiController)GetIndicatorsByMac() {
-	mac := this.GetString("mac")
-	if mac == "" {
-		this.Abort("404")
-	}
-	this.Data["targets"] = mac
-	this.TplNames = "search_machine.html"
-}
