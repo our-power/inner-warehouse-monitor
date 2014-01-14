@@ -20,8 +20,13 @@
             left: 0;
             width: 100%;
         }
+
         body {
             padding-top: 80px;
+        }
+
+        #login_form {
+            text-align: center;
         }
     </style>
     <link rel="shortcut icon" href="/static/img/favicon.jpg">
@@ -30,18 +35,21 @@
 <body>
 <div class="container">
     <h2>易迅内仓核心路径监控</h2>
+
     <div id="login_form">
         <form class="form-horizontal" action="/login" method="post">
             <div class="control-group">
                 <label class="control-label" for="user-name">用户名</label>
+
                 <div class="controls">
-                    <input type="text" id="user-name" name="user_name" />
+                    <input type="text" id="user-name" name="user_name"/>
                 </div>
             </div>
             <div class="control-group">
                 <label class="control-label" for="passwd">密码</label>
+
                 <div class="controls">
-                    <input type="text" id="passwd" name="password" />
+                    <input type="text" id="passwd" name="password"/>
                 </div>
             </div>
             <div class="control-group">

@@ -5,5 +5,6 @@ type HomeController struct {
 }
 
 func (this *HomeController) Get() {
+	this.Data["user_name"] = this.GetSession("user_name")
 	this.TplNames = "index.html"
 }

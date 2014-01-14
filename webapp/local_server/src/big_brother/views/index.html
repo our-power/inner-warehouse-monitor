@@ -23,6 +23,19 @@
                 <li class=""><a href="/search_machine">搜索机器</a></li>
 				<li class=""><a href="/manage/list_machine">机器管理</a></li>
             </ul>
+            <ul class="nav pull-right">
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                        {{.user_name}}
+                        <b class="caret"></b>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a href="/logout">退出</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
         </div>
     </div>
 </div>
