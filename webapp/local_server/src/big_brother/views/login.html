@@ -52,7 +52,14 @@
         .ui-box-container {
             padding: 0 10px;
             line-height: 1.6;
-            margin: 0 auto;
+        }
+
+        fieldset {
+            text-align: center;
+        }
+
+        fieldset span {
+            margin-right: 10px;
         }
     </style>
     <link rel="shortcut icon" href="/static/img/favicon.jpg">
@@ -69,7 +76,7 @@
                 <form action="/login" method="post">
                     <fieldset>
                         <div class="username-block">
-                            <span>用户名</span>
+                            <span>账户名</span>
                             <input type="text" id="user-name" name="user_name"/>
                         </div>
                         <div class="password-block">
