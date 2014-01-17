@@ -122,7 +122,7 @@
                 </thead>
                 <tbody>
                 {{if .trace_list}}
-                {{range $key, $value := .trace_list}}
+                {{range $key, $val := .trace_list}}
                 <tr>
                     <td class="sequence-number">{{add $key 1}}</td>
                     <td class="id">{{$val.Id}}</td>
