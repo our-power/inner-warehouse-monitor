@@ -49,6 +49,7 @@ func main() {
 
 	beego.Router("/login", &controllers.AdminController{}, "GET,POST:Login")
 	beego.Router("/logout", &controllers.AdminController{}, "GET:Logout")
+	beego.Router("/admin", &controllers.AdminController{}, "GET:GetAdminPage;POST:AdminOperation")
 
 	beego.AddFuncMap("add", addInTpl)
 	beego.Run()

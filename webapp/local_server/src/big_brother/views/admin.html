@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/static/css/bootstrap.css" rel="stylesheet">
+    <link href="/static/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="/static/css/jquery-ui.css" rel="stylesheet">
+    <link href="/static/css/font-awesome.css" rel="stylesheet">
+    <link href="/static/alertify/themes/alertify.core.css" rel="stylesheet" type="text/css"/>
+    <link href="/static/alertify/themes/alertify.default.css" rel="stylesheet" type="text/css"/>
+    <link href="/static/css/admin/style.css" rel="stylesheet">
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+    <script src="/static/js/html5shiv.js"></script>
+    <![endif]-->
+    <link rel="shortcut icon" href="/static/img/favicon.jpg">
+    <title>老大哥 - 易迅内仓监控系统</title>
+</head>
+<body>
+<div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="brand" href="/">易迅内仓监控系统</a>
+            <ul class="nav">
+                <li class="active"><a href="/search_machine">搜索机器</a>
+                <li class=""><a href="/manage/list_machine">机器管理</a>
+                </li>
+            </ul>
+            <ul class="nav pull-right">
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                        {{.login_name}}
+                        <b class="caret"></b>
+                    </a>
+                    <ul class="dropdown-menu">
+                        {{ if .admin }}
+                        <li>
+                            <a href="/admin">管理</a>
+                        </li>
+                        {{end}}
+                        <li>
+                            <a href="/logout">退出登录</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="container">
+    <ul class="nav nav-tabs" id="data-tab">
+        <li class="active"><a href="#user_list" data-toggle="tab">用户列表</a></li>
+        <li><a href="#role_list" data-toggle="tab">角色列表</a></li>
+        <li><a href="#trace_list" data-toggle="tab">使用记录</a></li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane active" id="user_list">
+            <table class="table table-hover table-condensed">
+                <thead>
+                <tr>
+                    <th class="sequence-number">序号</th>
+                    <th class="id">ID</th>
+                    <th class="user-name">用户名</th>
+                    <th class="email">邮箱</th>
+                    <th class="register-time">注册时间</th>
+                    <th class="last-login">最后登录时间</th>
+                    <th class="role-id">角色ID</th>
+                </tr>
+                </thead>
+                <tbody>
+                {{ if .user_list }}
+                {{range $key, $val := .user_list}}
+                <tr>
+                    <td class="sequence-number">{{add $key 1}}</td>
+                    <td class="id">{{$val.Id}}</td>
+                    <td class="user-name">{{$val.User}}</td>
+                    <td class="email">{{$val.Email}}</td>
+                    <td class="register-time">{{$val.Register_time}}</td>
+                    <td class="last-login">{{$val.Last_login}}</td>
+                    <td class="role-id">{{$val.Role_id}}</td>
+                </tr>
+                {{ end }}
+                {{ end }}
+                </tbody>
+            </table>
+        </div>
+        <div class="tab-pane" id="role_list">
+            <table class="table table-hover table-condensed">
+                <thead>
+                <tr>
+                    <th class="sequence-number">序号</th>
+                    <th class="id">ID</th>
+                    <th class="role-type">角色类别</th>
+                    <th class="permission">权限</th>
+                </tr>
+                </thead>
+                <tbody>
+                {{if .role_list}}
+                {{range $key, $val := .role_list}}
+                <tr>
+                    <td class="sequence-number">{{add $key 1}}</td>
+                    <td class="id">{{$val.Id}}</td>
+                    <td class="role-type">{{$val.Role_type}}</td>
+                    <td class="permission">{{$val.Permission}}</td>
+                </tr>
+                {{end}}
+                {{end}}
+                </tbody>
+            </table>
+        </div>
+        <div class="tab-pane" id="trace_list">
+            <table class="table table-hover table-condensed">
+                <thead>
+                <tr>
+                    <th class="sequence-number">序号</th>
+                    <th class="id">ID</th>
+                    <th class="user-name">用户名</th>
+                    <th class="do-what">操作</th>
+                    <th class="that-time">操作时间</th>
+                </tr>
+                </thead>
+                <tbody>
+                {{if .trace_list}}
+                {{range $key, $value := .trace_list}}
+                <tr>
+                    <td class="sequence-number">{{add $key 1}}</td>
+                    <td class="id">{{$val.Id}}</td>
+                    <td class="user-name">{{$val.User}}</td>
+                    <td class="do-what">{{$val.Do_what}}</td>
+                    <td class="that-time">{{$val.That_time}}</td>
+                </tr>
+                {{end}}
+                {{end}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="footer">
+    <div class="container">
+        <p>推荐使用Firefox或Chrome浏览器，体验更佳</p>
+
+        <p>&copy;2013-2013 电商运维部 易迅运维组</p>
+    </div>
+</div>
+<script src="/static/js/jquery.min.js" type="text/javascript"></script>
+<script src="/static/js/jquery-ui.js" type="text/javascript"></script>
+<script src="/static/js/bootstrap.js" type="text/javascript"></script>
+<script src="/static/js/highcharts.min.js" type="text/javascript"></script>
+<script src="/static/alertify/alertify.min.js" type="text/javascript"></script>
+<script src="/static/js/raphael.js" type="text/javascript"></script>
+<script src="/static/js/admin/main.js" type="text/javascript"></script>
+</body>
+</html>

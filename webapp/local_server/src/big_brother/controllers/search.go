@@ -12,6 +12,9 @@ type SearchController struct {
 
 func (this *SearchController) GetSearchPage() {
 	this.Data["login_name"] = this.GetSession("login_name")
+	if this.GetSession("role_type") == "admin_user" {
+		this.Data["admin"] = true
+	}
 	this.TplNames = "search_machine.html"
 }
 
@@ -94,5 +97,8 @@ func (this *SearchController)GetIndicatorsByMac() {
 	}
 	this.Data["targets"] = mac
 	this.Data["login_name"] = this.GetSession("login_name")
+	if this.GetSession("role_type") == "admin_user" {
+		this.Data["admin"] = true
+	}
 	this.TplNames = "search_machine.html"
 }

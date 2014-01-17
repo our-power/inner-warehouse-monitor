@@ -30,6 +30,11 @@
                         <b class="caret"></b>
                     </a>
                     <ul class="dropdown-menu">
+                        {{ if .admin }}
+                        <li>
+                            <a href="/admin">管理</a>
+                        </li>
+                        {{end}}
                         <li>
                             <a href="/logout">退出登录</a>
                         </li>
