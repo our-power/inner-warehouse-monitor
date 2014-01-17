@@ -46,35 +46,59 @@ func (this *ManageController) GetManagePage() {
 	if this.GetSession("role_type") == "admin_user" {
 		this.Data["admin"] = true
 	}
+	del_permission := false
+	permissions, _ := this.GetSession("permission").([]string)
+	for _, value := range permissions {
+		if value == "del" {
+			del_permission = true
+			break
+		}
+	}
+	this.Data["del_permission"] = del_permission
 	this.TplNames = "manage_machine.html"
 }
 
 func (this *ManageController) DelMachine() {
-	id := this.GetString("id")
-	if id == "" {
-		this.Data["json"] = map[string]string{
-			"Status": "failure",
-			"Msg": "未提供作业机器的数据库ID，未能删除机器！",
+	del_permission := false
+	permissions, _ := this.GetSession("permission").([]string)
+	for _, value := range permissions {
+		if value == "del" {
+			del_permission = true
+			break
 		}
-	}else{
-		id_int, _ := strconv.Atoi(id)
-		o.Using("default")
-		num, err := o.Delete(&models.Register{Id: id_int})
-		if err != nil {
+	}
+	if del_permission {
+		id := this.GetString("id")
+		if id == "" {
 			this.Data["json"] = map[string]string{
 				"Status": "failure",
-				"Msg": "数据库操作出错！",
+				"Msg": "未提供作业机器的数据库ID，未能删除机器！",
 			}
-		}else if num == 0 {
-			this.Data["json"] = map[string]string{
-				"Status": "failure",
-				"Msg": "未能删除该机器，可能数据库中不存在该机器。",
+		}else {
+			id_int, _ := strconv.Atoi(id)
+			o.Using("default")
+			num, err := o.Delete(&models.Register{Id: id_int})
+			if err != nil {
+				this.Data["json"] = map[string]string{
+					"Status": "failure",
+					"Msg": "数据库操作出错！",
+				}
+			}else if num == 0 {
+				this.Data["json"] = map[string]string{
+					"Status": "failure",
+					"Msg": "未能删除该机器，可能数据库中不存在该机器。",
+				}
+			}else {
+				this.Data["json"] = map[string]string{
+					"Status": " success",
+					"Msg": "成功删除该机器！",
+				}
 			}
-		}else{
-			this.Data["json"] = map[string]string{
-				"Status": " success",
-				"Msg": "成功删除该机器！",
-			}
+		}
+	} else {
+		this.Data["json"] = map[string]string{
+			"Status": " failure",
+			"Msg": "没有删除操作的权限！",
 		}
 	}
 	this.ServeJson()

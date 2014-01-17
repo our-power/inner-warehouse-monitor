@@ -22,6 +22,23 @@ func addInTpl(x, y int) int {
 	return x + y
 }
 
+/*
+func inForTpl(item interface{}, item_array interface{}) bool {
+	val := reflect.ValueOf(item_array)
+	exist := false
+	if val.Kind() == reflect.Slice {
+		slice_len := val.Len()
+		for index := 0; index < slice_len; index++ {
+			if item.(string) == val.Index(index).Interface().(string) {
+				exist = true
+				break
+			}
+		}
+	}
+	return exist
+}
+*/
+
 func main() {
 	run_mode := beego.AppConfig.String("runmode")
 	addr := beego.AppConfig.String("httpaddr")

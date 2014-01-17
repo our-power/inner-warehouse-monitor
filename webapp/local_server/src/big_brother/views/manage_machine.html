@@ -80,7 +80,9 @@
 			<th>Agent版本</th>
 			<th>角色</th>
 			<th>状态</th>
+            {{if .del_permission}}
 			<th></th>
+            {{end}}
 			</tr>
 			</thead>
 			<tbody>
@@ -97,8 +99,10 @@
 			<td class="agent-version">{{$val.Agent_version}}</td>
 			<td class="machine-role">{{index $role_mapper $val.Machine_role}}</td>
 			<td class="status"><span class="{{index $status_labels $val.Hardware_addr}}">{{index $status_mapper $val.Status}}</td>
+            {{if .del_permission}}
 			<td class="operation"><button class="btn btn-danger del-machine">删除</button></td>
-			</tr>
+			{{end}}
+            </tr>
 			{{end}}
 			</tbody>
 		</table>
