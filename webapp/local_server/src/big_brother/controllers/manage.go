@@ -3,6 +3,7 @@ package controllers
 import (
 	"big_brother/models"
 	"strconv"
+	"strings"
 )
 
 type ManageController struct {
@@ -47,7 +48,7 @@ func (this *ManageController) GetManagePage() {
 		this.Data["admin"] = true
 	}
 	del_permission := false
-	permissions, _ := this.GetSession("permission").([]string)
+	permissions := strings.Split(this.GetSession("permission").(string), "|")
 	for _, value := range permissions {
 		if value == "del" {
 			del_permission = true
@@ -60,7 +61,7 @@ func (this *ManageController) GetManagePage() {
 
 func (this *ManageController) DelMachine() {
 	del_permission := false
-	permissions, _ := this.GetSession("permission").([]string)
+	permissions := strings.Split(this.GetSession("permission").(string), "|")
 	for _, value := range permissions {
 		if value == "del" {
 			del_permission = true

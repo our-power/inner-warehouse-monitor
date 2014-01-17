@@ -7,7 +7,6 @@ import (
 	"crypto/md5"
 	"io"
 	"fmt"
-	"strings"
 	"time"
 )
 
@@ -44,7 +43,7 @@ func (this *AdminController) Login() {
 			this.SetSession("login_name", userName)
 			this.SetSession("email", user.Email)
 			this.SetSession("role_type", role.Role_type)
-			this.SetSession("permission", strings.Split(role.Permission, "|"))
+			this.SetSession("permission", role.Permission)
 			this.Redirect("/", 302)
 		}else {
 			this.Data["err_tips"] = "帐号登录错误！"
