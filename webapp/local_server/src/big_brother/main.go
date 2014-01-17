@@ -32,6 +32,8 @@ func main() {
 	fmt.Printf("请访问：%s:%d\n", addr, port)
 
 	beego.SessionOn = true;
+	beego.SessionProvider = "file"
+	beego.SessionSavePath = "./sessions"
 
 	beego.Router("/", &controllers.HomeController{})
 	beego.Router("/search_machine", &controllers.SearchController{}, "GET:GetSearchPage")

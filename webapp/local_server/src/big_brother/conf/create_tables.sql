@@ -1,0 +1,3 @@
+CREATE TABLE user (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT UNIQUE, passwd TEXT, email TEXT, register_time TEXT, last_login TEXT, role_id INTEGER);
+CREATE TABLE role (id INTEGER PRIMARY KEY AUTOINCREMENT, role_type TEXT, permission TEXT);
+CREATE TABLE trace (id INTEGER PRIMARY KEY AUTOINCREMENT, user TEXT, do_what TEXT, that_time TEXT);

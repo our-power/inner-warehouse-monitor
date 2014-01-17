@@ -76,22 +76,22 @@ type User struct {
 	Name string
 	Passwd string
 	Email string
-	RegisterTime string
-	LastLogin string
-	Role string
+	Register_time string
+	Last_login string
+	Role_id int
 }
 
 type Role struct {
 	Id int
-	RoleType string
+	Role_type string
 	Permission string
 }
 
 type Trace struct {
 	Id int
 	User string
-	DoWhat string
-	ThatTime string
+	Do_what string
+	That_time string
 }
 
 /*
