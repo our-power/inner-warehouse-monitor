@@ -99,7 +99,9 @@
             </div>
         </div>
     </div>
+    {{ if .err_tips }}
     <div class="alert alert-error err-tips">{{ .err_tips }}</div>
+    {{ end }}
 </div>
 <div class="footer">
     <div class="container">
