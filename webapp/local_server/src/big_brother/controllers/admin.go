@@ -87,6 +87,6 @@ func (this *AdminController) GetAdminPage() {
 	this.TplNames = "admin.html"
 }
 
-func (this *AdminController) ManageUser() {
+func (this *AdminController) AdminOperation() {
 
 }
