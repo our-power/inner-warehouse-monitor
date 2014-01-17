@@ -4,6 +4,8 @@ import (
 	"big_brother/models"
 	"strconv"
 	"strings"
+	"fmt"
+	"time"
 )
 
 type ManageController struct {
@@ -70,6 +72,7 @@ func (this *ManageController) DelMachine() {
 	}
 	if del_permission {
 		id := this.GetString("id")
+		mac := this.GetString("mac")
 		if id == "" {
 			this.Data["json"] = map[string]string{
 				"Status": "failure",
@@ -94,6 +97,22 @@ func (this *ManageController) DelMachine() {
 					"Status": " success",
 					"Msg": "成功删除该机器！",
 				}
+				o.Using("admin")
+				/*
+				type Trace struct {
+					Id int
+					User string
+					Do_what string
+					That_time string
+				}
+				*/
+				trace := models.Trace{
+					User: this.GetSession("login_name").(string),
+					Do_what: fmt.Sprintf("删除作业机器%s", mac),
+					That_time: time.Now().Format("2006-01-02 15:04:05"),
+				}
+				//id, err := o.Insert(&trace)
+				o.Insert(&trace)
 			}
 		}
 	} else {
