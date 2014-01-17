@@ -83,7 +83,7 @@ func (this *AdminController) GetAdminPage() {
 	if this.GetSession("role_type") == "admin_user" {
 		this.Data["admin"] = true
 	}
-
+	this.Data["login_name"] = this.GetSession("login_name")
 	this.TplNames = "admin.html"
 }
 
