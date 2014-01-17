@@ -3,6 +3,9 @@ package controllers
 import (
 	"github.com/astaxie/beego"
 	"big_brother/models"
+	"crypto/md5"
+	"io"
+	"fmt"
 )
 
 type AdminController struct {
@@ -11,7 +14,9 @@ type AdminController struct {
 
 func validateUser(userName, passwd string) (user *models.User, role *models.Role, exist bool) {
 	o.Using("admin")
-	err := o.QueryTable("user").Filter("name", userName).Filter("passwd", passwd).One(user)
+	h := md5.New()
+	io.WriteString(h, passwd)
+	err := o.QueryTable("user").Filter("name", userName).Filter("passwd", fmt.Sprintf("%x", h.Sum(nil))).One(user)
 	if err != nil {
 		return nil, nil, false
 	}
