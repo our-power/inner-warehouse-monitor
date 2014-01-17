@@ -16,10 +16,12 @@ func validateUser(userName, passwd string) (user *models.User, role *models.Role
 	o.Using("admin")
 	h := md5.New()
 	io.WriteString(h, passwd)
+	user = new(models.User)
 	err := o.QueryTable("user").Filter("name", userName).Filter("passwd", fmt.Sprintf("%x", h.Sum(nil))).One(user)
 	if err != nil {
 		return nil, nil, false
 	}
+	role = new(models.Role)
 	err = o.QueryTable("role").Filter("id", user.Role_id).One(role)
 	if err != nil {
 		return user, nil, true
@@ -41,7 +43,7 @@ func (this *AdminController) Login() {
 			this.SetSession("pemission", role.Permission)
 			this.Redirect("/", 302)
 		}else {
-			this.Data["err_tips"] = "帐号错误！"
+			this.Data["err_tips"] = "帐号登录错误！"
 			this.TplNames = "login.html"
 		}
 	}
