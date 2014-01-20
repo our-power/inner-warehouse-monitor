@@ -16,3 +16,8 @@ body {
 .table th, .table td {
     text-align: center;
 }
+
+button#add-new-user, button#add-new-role{
+    float: right;
+    margin-bottom: 10px;
+}
