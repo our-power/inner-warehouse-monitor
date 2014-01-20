@@ -194,8 +194,11 @@ $(function () {
                 userName = $.trim($("#user-name").val()),
                 email = $.trim($("#email").val()),
                 roleType = $.trim($("#which-role").val());
-            if (newPasswd == "" || newPasswd != reNewPasswd) {
-                $("#new-passwd-error").remove();
+
+            $("#new-passwd-error").remove();
+            if (newPasswd == "") {
+                $("#re-new-passwd").after('<span class="label label-important" id="new-passwd-error">密码不能为空！</span>');
+            } else if (newPasswd != reNewPasswd) {
                 $("#re-new-passwd").after('<span class="label label-important" id="new-passwd-error">密码不一致！</span>');
             } else {
                 var req = $.ajax({
