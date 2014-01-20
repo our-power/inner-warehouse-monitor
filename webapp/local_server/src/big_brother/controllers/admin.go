@@ -86,3 +86,54 @@ func (this *AdminController) GetAdminPage() {
 	this.Data["login_name"] = this.GetSession("login_name")
 	this.TplNames = "admin.html"
 }
+
+
+func (this *AdminController) ChangePasswd() {
+	userId, err := this.GetInt("user_id")
+	if err != nil {
+		this.Data["json"] = map[string]string{
+			"Status": "failure",
+			"Msg": "提供的用户ID不正确！",
+		}
+	}else {
+		newPasswd := this.GetString("new_passwd")
+		h := md5.New()
+		io.WriteString(h, newPasswd)
+		_, err := o.QueryTable("user").Filter("id", userId).Update(orm.Params{"passwd": fmt.Sprintf("%x", h.Sum(nil))})
+		if err != nil {
+			this.Data["json"] = map[string]string{
+				"Status": "failure",
+				"Msg": "数据库更新操作出错！",
+			}
+		}else {
+			this.Data["json"] = map[string]string{
+				"Status": "success",
+			}
+		}
+	}
+	this.ServeJson()
+}
+
+func (this *AdminController) DelUser() {
+
+}
+
+func (this *AdminController) DelRole() {
+
+}
+
+func (this *AdminController) AddUser() {
+
+}
+
+func (this *AdminController) AddRole() {
+
+}
+
+func (this *AdminController) ModifyUser() {
+
+}
+
+func (this *AdminController) ModifyRole() {
+
+}

@@ -66,7 +66,15 @@ func main() {
 
 	beego.Router("/login", &controllers.AdminController{}, "GET,POST:Login")
 	beego.Router("/logout", &controllers.AdminController{}, "GET:Logout")
+
 	beego.Router("/admin", &controllers.AdminController{}, "GET:GetAdminPage")
+	beego.Router("/admin/api/change_passwd", &controllers.AdminController{}, "POST:ChangePasswd")
+	beego.Router("/admin/api/del_user", &controllers.AdminController{}, "POST:DelUser")
+	beego.Router("/admin/api/del_role", &controllers.AdminController{}, "POST:DelRole")
+	beego.Router("/admin/api/add_user", &controllers.AdminController{}, "POST:AddUser")
+	beego.Router("/admin/api/modify_user", &controllers.AdminController{}, "POST:ModifyUser")
+	beego.Router("/admin/api/add_role", &controllers.AdminController{}, "POST:AddRole")
+	beego.Router("/admin/api/modify_role", &controllers.AdminController{}, "POST:ModifyRole")
 
 	beego.AddFuncMap("add", addInTpl)
 	beego.Run()
