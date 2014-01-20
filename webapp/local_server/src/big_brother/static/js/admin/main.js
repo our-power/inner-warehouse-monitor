@@ -65,8 +65,8 @@ $(function () {
         $("label.checkbox").find("input").removeAttr("checked");
         var permission_list = permissions.split("|"),
             permission_num = permission_list.length;
-        for(var index=0; index < permission_num; index++){
-            var target = $("#"+permission_list[index]+"-permission");
+        for (var index = 0; index < permission_num; index++) {
+            var target = $("#" + permission_list[index] + "-permission");
             target.attr("checked", "true");
             target.parent("label.checkbox").addClass("checked");
         }
@@ -93,14 +93,19 @@ $(function () {
         e.preventDefault();
     });
 
-    $("label.checkbox").on("click", function(e){
+    $("label.checkbox").on("click", function (e) {
         e.preventDefault();
 
-        $(this).find("input").toggleClass("checked");
+        if ($(this).hasClass("checked")) {
+            $(this).find("input").removeAttr("checked");
+        } else {
+            $(this).find("input").attr("checked", "true");
+        }
+        $(this).toggleClass("checked");
     });
 
     // 修改用户密码
-    $("button#change-passwd").on("click", function(e){
+    $("button#change-passwd").on("click", function (e) {
         e.preventDefault();
 
         var parent = $(this).parent(),
@@ -108,7 +113,7 @@ $(function () {
             userName = $.trim(parent.siblings('.user-name').text());
 
         $("#userid-change-passwd").remove();
-        $("#modal-for-change-passwd form").prepend('<input type="hidden" id="userid-change-passwd" name="userid-change-passwd" val="'+userId+'"');
+        $("#modal-for-change-passwd form").prepend('<input type="hidden" id="userid-change-passwd" name="userid-change-passwd" val="' + userId + '"');
         $("#username-to-change-passwd").text(userName);
 
         $("#modal-for-change-passwd").modal("show");
