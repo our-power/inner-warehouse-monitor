@@ -38,6 +38,12 @@ $(function () {
     $("button#add-new-role").on("click", function (e) {
         e.preventDefault();
         $("#modal-for-user>.modal-header>h3").text("添加新角色");
+
+        // 清除可能上次修改操作使用modal留下的数据
+        $("#modal-for-role form>#role-id").remove();
+        $("label.checkbox").children("input").removeClass("checked");
+        $("#modal-for-role input[name='role-name']").val("");
+
         $("#modal-for-role").modal("show");
     });
 
@@ -56,11 +62,14 @@ $(function () {
         $("#modal-for-user input[name='email']").val(email);
         $("#modal-for-user input[name='which-role']").val(roleId);
 
+        getPasswd(id);
+
         $("#modal-for-user").modal("show");
     });
 
-    $("button#del-this-user").on("click", function (e) {
+    $("button#modify-this-role").on("click", function (e) {
         e.preventDefault();
+
         $("#modal-for-user>.modal-header>h3").text("修改角色信息");
 
         var parent = $(this).parent(),
@@ -81,10 +90,11 @@ $(function () {
         $("#modal-for-role").modal("show");
     });
 
-    $("button#modify-this-role").on("click", function (e) {
+    $("button#del-this-user").on("click", function (e) {
         e.preventDefault();
 
     });
+
 
     $("button#del-this-role").on("click", function (e) {
         e.preventDefault();
