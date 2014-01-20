@@ -91,7 +91,7 @@ func (this *AdminController) GetAdminPage() {
 
 func (this *AdminController) ChangePasswd() {
 	hasAdminPermission := HasTheRight("admin", this.GetSession("permission"))
-	if (hasAdminPermission) {
+	if (!hasAdminPermission) {
 		this.Data["json"] = hasNoAdminPermissionMsg
 	}else {
 		userId, err := this.GetInt("user_id")
@@ -120,7 +120,7 @@ func (this *AdminController) ChangePasswd() {
 
 func (this *AdminController) DelUser() {
 	hasAdminPermission := HasTheRight("admin", this.GetSession("permission"))
-	if (hasAdminPermission) {
+	if (!hasAdminPermission) {
 		this.Data["json"] = hasNoAdminPermissionMsg
 	}else {
 		user_id, err := strconv.Atoi(this.GetString("user_id"))
@@ -149,7 +149,7 @@ func (this *AdminController) DelUser() {
 
 func (this *AdminController) DelRole() {
 	hasAdminPermission := HasTheRight("admin", this.GetSession("permission"))
-	if (hasAdminPermission) {
+	if (!hasAdminPermission) {
 		this.Data["json"] = hasNoAdminPermissionMsg
 	}else {
 		role_id, err := strconv.Atoi(this.GetString("role_id"))
@@ -186,7 +186,7 @@ func (this *AdminController) AddUser() {
     }
 	*/
 	hasAdminPermission := HasTheRight("admin", this.GetSession("permission"))
-	if (hasAdminPermission) {
+	if (!hasAdminPermission) {
 		this.Data["json"] = hasNoAdminPermissionMsg
 	}else {
 		userName := this.GetString("user_name")
@@ -218,7 +218,7 @@ func (this *AdminController) AddRole() {
 	}
 	*/
 	hasAdminPermission := HasTheRight("admin", this.GetSession("permission"))
-	if (hasAdminPermission) {
+	if (!hasAdminPermission) {
 		this.Data["json"] = hasNoAdminPermissionMsg
 	}else {
 		roleName := this.GetString("role_name")
@@ -249,7 +249,7 @@ func (this *AdminController) ModifyUser() {
 	}
 	*/
 	hasAdminPermission := HasTheRight("admin", this.GetSession("permission"))
-	if (hasAdminPermission) {
+	if (!hasAdminPermission) {
 		this.Data["json"] = hasNoAdminPermissionMsg
 	}else {
 		userId, _ := strconv.Atoi(this.GetString("user_id"))
@@ -281,7 +281,7 @@ func (this *AdminController) ModifyRole() {
 	}
 	*/
 	hasAdminPermission := HasTheRight("admin", this.GetSession("permission"))
-	if (hasAdminPermission) {
+	if (!hasAdminPermission) {
 		this.Data["json"] = hasNoAdminPermissionMsg
 	}else {
 		roleId, _ := strconv.Atoi(this.GetString("role_id"))
