@@ -93,7 +93,7 @@ func (this *AdminController)GetPasswdById() {
 	userId_int, _ := strconv.Atoi(userId)
 	o.Using("admin")
 	var user models.User
-	_, err := o.QueryTable("user").Filter("id", userId_int).One(&user)
+	err := o.QueryTable("user").Filter("id", userId_int).One(&user)
 	if err != nil {
 		this.Data["json"] = map[string]string{
 			"Status": "failure",
