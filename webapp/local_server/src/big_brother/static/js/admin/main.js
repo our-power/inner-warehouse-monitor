@@ -142,7 +142,7 @@ $(function () {
             if (e) {
                 var req = $.ajax({
                     "type": "post",
-                    "url": "/admin/del_role",
+                    "url": "/admin/api/del_role",
                     "data": {
                         "role_id": roleId
                     },
