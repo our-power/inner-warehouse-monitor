@@ -163,7 +163,7 @@ $(function () {
     // 提交修改或新增用户信息
     $("button#save-user").on("click", function (e) {
         e.preventDefault();
-        if ($("#newPasswdControlGroup").length == 0) {
+        if ($("#new-passwd-controlgroup").length == 0) {
             var userId = $.trim($("#user-id").val()),
                 userName = $.trim($("#user-name").val()),
                 email = $.trim($("#email").val()),
@@ -194,7 +194,7 @@ $(function () {
                 userName = $.trim($("#user-name").val()),
                 email = $.trim($("#email").val()),
                 roleType = $.trim($("#which-role").val());
-            if (newPasswd != reNewPasswd) {
+            if (newPasswd == "" || newPasswd != reNewPasswd) {
                 $("#new-passwd-error").remove();
                 $("#re-new-passwd").after('<span class="label label-important" id="new-passwd-error">密码不一致！</span>');
             } else {
@@ -268,8 +268,8 @@ $(function () {
                 },
                 "dataType": "json"
             });
-            req.done(function(resp){
-                if(resp.Status === "failure"){
+            req.done(function (resp) {
+                if (resp.Status === "failure") {
                     alertify.log(resp.Msg, "error", 5000);
                     return false;
                 }
