@@ -27,7 +27,7 @@ $(function () {
         });
         newPasswdControls.append('<input type="password" id="new-passwd" name="new-passwd" />');
         newPasswdControlGroup.append('<label class="control-label" for="new-passwd">密码</label>').append(newPasswdControls);
-        $("#modal-for-user input[name='user-name']").after(newPasswdControlGroup);
+        $("#modal-for-user form").append(newPasswdControlGroup);
 
         var reNewPasswdControlGroup = $("<div></div>", {
             "class": "control-group",
@@ -38,7 +38,7 @@ $(function () {
         });
         reNewPasswdControls.append('<input type="password" id="re-new-passwd" name="re-new-passwd" />');
         reNewPasswdControlGroup.append('<label class="control-label" for="re-new-passwd">密码确认</label>').append(reNewPasswdControls);
-        $("#new-passwd-controlgroup").after(reNewPasswdControlGroup);
+        $("#modal-for-user form").append(reNewPasswdControlGroup);
 
         $("#modal-for-user").modal("show");
     });
