@@ -71,7 +71,7 @@ $(function () {
         $("#new-passwd-controlgroup").remove();
         $("#re-new-passwd-controlgroup").remove();
 
-        $("#modal-for-user form").prepend('<input type="hidden" id="user-id" name="user-id" value="' + id + '"');
+        $("#modal-for-user form").prepend('<input type="hidden" id="user-id" name="user-id" value="' + id + '"/>');
         $("#modal-for-user input[name='user-name']").val(userName);
         $("#modal-for-user input[name='email']").val(email);
         $("#modal-for-user input[name='which-role']").val(roleId);
@@ -90,7 +90,7 @@ $(function () {
             role_type = $.trim(parent.siblings('.role-type').text()),
             permissions = $.trim(parent.siblings('.permission').text());
         $("#modal-for-role form>#role-id").remove();
-        $("#modal-for-role form").prepend('<input type="hidden" id="role-id" name="role-id" value="' + role_id + '"');
+        $("#modal-for-role form").prepend('<input type="hidden" id="role-id" name="role-id" value="' + role_id + '"/>');
         $("#modal-for-role input[name='role-name']").val(role_type);
 
         $("label.checkbox").removeClass("checked");
