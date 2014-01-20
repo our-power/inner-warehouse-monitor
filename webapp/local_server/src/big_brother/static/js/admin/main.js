@@ -127,7 +127,7 @@ $(function () {
                         alertify.log(resp.Msg, "error", 5000);
                         return false;
                     }
-                    setTimeout("window.location.href='/admin'", 1500)
+                    setTimeout("window.location.href='/admin'", 1000)
                 });
             }
         })
@@ -153,7 +153,7 @@ $(function () {
                         alertify.log(resp.Msg, "error", 5000);
                         return false;
                     }
-                    setTimeout("window.location.href='/admin'", 1500);
+                    setTimeout("window.location.href='/admin'", 1000);
                 });
             }
         });
@@ -185,7 +185,7 @@ $(function () {
                     alertify.log(resp.Msg, "error", 5000);
                     return false;
                 }
-                setTimeout("window.location.href='/admin'", 1500);
+                setTimeout("window.location.href='/admin'", 1000);
             });
         } else {
             var userName = $.trim($("#userName").val()),
@@ -220,7 +220,7 @@ $(function () {
                         alertify.log(resp.Msg, "error", 5000);
                         return false;
                     }
-                    setTimeout("window.location.href='/admin'", 1500);
+                    setTimeout("window.location.href='/admin'", 1000);
                 });
             }
         }
@@ -260,7 +260,7 @@ $(function () {
                     alertify.log(resp.Msg, "error", 5000);
                     return false;
                 }
-                setTimeout("window.location.href='/admin'", 1500);
+                setTimeout("window.location.href='/admin'", 1000);
             });
         } else {
             var req = $.ajax({
@@ -278,7 +278,7 @@ $(function () {
                     alertify.log(resp.Msg, "error", 5000);
                     return false;
                 }
-                setTimeout("window.location.href='/admin'", 1500);
+                setTimeout("window.location.href='/admin'", 1000);
             });
         }
 
