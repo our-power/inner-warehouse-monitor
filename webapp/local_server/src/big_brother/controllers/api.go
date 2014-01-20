@@ -241,7 +241,7 @@ func (this *ApiController) GetMachineAccessibilityData() {
 			}
 		}
 	}
-
+	pingTimeIndex = latest
 	rows, err = db.Query("select time_index,target_url,status from telnet_accessibility order by time_index desc limit 100")
 	if err != nil {
 		this.Data["json"] = nil
@@ -264,6 +264,7 @@ func (this *ApiController) GetMachineAccessibilityData() {
 			}
 		}
 	}
+	telnetTimeIndex = latest
 	this.Data["json"] = ResultType{Hardware_addr: hardwareAddr, Date: now.Format("2006-01-02"), Ping_time_index: pingTimeIndex, Ping_results: pingResults, Telnet_time_index: telnetTimeIndex, Telnet_results: telnetResults}
 	this.ServeJson()
 }

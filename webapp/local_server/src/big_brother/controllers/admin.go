@@ -164,7 +164,7 @@ func (this *AdminController) DelRole() {
 			if cnt > 0 {
 				this.Data["json"] = map[string]string{
 					"Status": "failure",
-					"Msg": "不能删除该角色，因为有属于该角色用户",
+					"Msg": "不能删除该角色，因为有属于该角色的用户",
 				}
 			}else {
 				_, err = o.Delete(&models.Role{Id: role_id})
