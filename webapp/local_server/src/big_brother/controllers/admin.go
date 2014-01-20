@@ -287,7 +287,7 @@ func (this *AdminController) ModifyRole() {
 		roleId, _ := strconv.Atoi(this.GetString("role_id"))
 		roleName := this.GetString("role_name")
 		permissions := this.GetString("permissions")
-		_, err := o.QueryTable("role").Filter("id", roleId).Update(orm.Params{"role_type": roleName, "permissions": permissions})
+		_, err := o.QueryTable("role").Filter("id", roleId).Update(orm.Params{"role_type": roleName, "permission": permissions})
 		if err != nil {
 			this.Data["json"] = map[string]string{
 				"Status": "failure",
