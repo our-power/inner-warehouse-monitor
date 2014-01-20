@@ -82,9 +82,9 @@
                     <td class="last-login">{{$val.Last_login}}</td>
                     <td class="role-id">{{$val.Role_id}}</td>
                     <td>
-                        <button class="btn btn-warning" data-toggle="modal" class="modify-this-user">修改</button>
-                        <button class="btn btn-danger" class="del-this-user" data-toggle="modal">删除</button>
-                        <button class="btn btn-danger" class="change-passwd" data-toggle="modal">修改密码</button>
+                        <button class="btn btn-warning modify-this-user" data-toggle="modal">修改</button>
+                        <button class="btn btn-danger del-this-user" data-toggle="modal">删除</button>
+                        <button class="btn btn-danger change-passwd" data-toggle="modal">修改密码</button>
                     </td>
                 </tr>
                 {{ end }}
@@ -113,8 +113,8 @@
                     <td class="role-type">{{$val.Role_type}}</td>
                     <td class="permission">{{$val.Permission}}</td>
                     <td>
-                        <button class="btn btn-warning" class="modify-this-role" data-toggle="modal">修改</button>
-                        <button class="btn btn-danger" class="del-this-role" data-toggle="modal">删除</button>
+                        <button class="btn btn-warning modify-this-role" data-toggle="modal">修改</button>
+                        <button class="btn btn-danger del-this-role" data-toggle="modal">删除</button>
                     </td>
                 </tr>
                 {{end}}
