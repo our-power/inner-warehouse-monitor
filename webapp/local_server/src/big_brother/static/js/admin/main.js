@@ -198,8 +198,10 @@ $(function () {
             $("#new-passwd-error").remove();
             if (newPasswd == "") {
                 $("#re-new-passwd").after('<span class="label label-important" id="new-passwd-error">密码不能为空！</span>');
+                return false;
             } else if (newPasswd != reNewPasswd) {
                 $("#re-new-passwd").after('<span class="label label-important" id="new-passwd-error">密码不一致！</span>');
+                return false;
             } else {
                 var req = $.ajax({
                     "type": "post",
@@ -303,7 +305,7 @@ $(function () {
             userName = $.trim(parent.siblings('.user-name').text());
 
         $("#userid-change-passwd").remove();
-        $("#modal-for-change-passwd form").prepend('<input type="hidden" id="userid-change-passwd" name="userid-change-passwd" val="' + userId + '"');
+        $("#modal-for-change-passwd form").append('<input type="hidden" id="userid-change-passwd" name="userid-change-passwd" val="' + userId + '"');
         $("#username-to-change-passwd").text(userName);
 
         $("#modal-for-change-passwd").modal("show");
@@ -314,8 +316,11 @@ $(function () {
 
         var passwd = $.trim($("#passwd").val()),
             rePasswd = $.trim($("#re-passwd").val());
-        if (passwd != rePasswd) {
-            $("#passwd-error").remove();
+        $("#passwd-error").remove();
+        if (passwd === "" || rePasswd === "") {
+            $("#re-passwd").after('<span class="label label-important" id="passwd-error">密码不能为空！</span>');
+            return false;
+        } else if (passwd != rePasswd) {
             $("#re-passwd").after('<span class="label label-important" id="passwd-error">密码不一致！</span>');
             return false;
         }
