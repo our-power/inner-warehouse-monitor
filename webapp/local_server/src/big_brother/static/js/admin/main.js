@@ -58,7 +58,7 @@ $(function () {
     });
 
     // 点击用户“修改”按钮
-    $("button#modify-this-user").on("click", function (e) {
+    $("button.modify-this-user").on("click", function (e) {
         e.preventDefault();
         $("#modal-for-user>.modal-header>h3").text("修改用户信息");
 
@@ -80,7 +80,7 @@ $(function () {
     });
 
     // 点击角色“修改”按钮
-    $("button#modify-this-role").on("click", function (e) {
+    $("button.modify-this-role").on("click", function (e) {
         e.preventDefault();
 
         $("#modal-for-role>.modal-header>h3").text("修改角色信息");
@@ -107,7 +107,7 @@ $(function () {
     });
 
     // 删除某用户
-    $("button#del-this-user").on("click", function (e) {
+    $("button.del-this-user").on("click", function (e) {
         e.preventDefault();
 
         var userId = $.trim($(this).parent().siblings(".id").text());
@@ -134,7 +134,7 @@ $(function () {
     });
 
     // 删除某角色
-    $("button#del-this-role").on("click", function (e) {
+    $("button.del-this-role").on("click", function (e) {
         e.preventDefault();
 
         var roleId = $.trim($(this).parent().siblings(".id").text());
@@ -297,7 +297,7 @@ $(function () {
     });
 
     // 修改用户密码
-    $("button#change-passwd").on("click", function (e) {
+    $("button.change-passwd").on("click", function (e) {
         e.preventDefault();
 
         var parent = $(this).parent(),
