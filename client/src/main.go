@@ -348,31 +348,42 @@ func main() {
 		fmt.Println(err)
 	}
 
+    finishClients := func(){
+        cuTodb.Stop()
+    	muTodb.Stop()
+		nfTodb.Stop()
+		hbTodb.Stop()
+		aTodb.Stop()
+		aCheck.Stop()
+		rTodb.Stop()
+    }
+
 	for {
 		select {
 		case <-muTodb.ExitChan:
+            finishClients()
 			return
 		case <-cuTodb.ExitChan:
+            finishClients()
 			return
 		case <-nfTodb.ExitChan:
+            finishClients()
 			return
 		case <-hbTodb.ExitChan:
+            finishClients()
 			return
 		case <-aTodb.ExitChan:
+            finishClients()
 			return
 		case <-aCheck.ExitChan:
+            finishClients()
 			return
 		case <-rTodb.ExitChan:
+            finishClients()
 			return
-
 		case <-termChan:
-			cuTodb.Stop()
-			muTodb.Stop()
-			nfTodb.Stop()
-			hbTodb.Stop()
-			aTodb.Stop()
-			aCheck.Stop()
-			rTodb.Stop()
+		    finishClients()
+            return
 		}
 	}
 }
