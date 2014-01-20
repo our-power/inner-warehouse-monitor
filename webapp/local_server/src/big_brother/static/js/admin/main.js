@@ -23,7 +23,8 @@ $(function () {
 
         // 清除可能上次修改操作使用modal留下的数据
         $("#modal-for-role form>#role-id").remove();
-        $("label.checkbox").find("input").removeClass("checked");
+        $("label.checkbox").find("input").removeAttr("checked");
+        $("label.checkbox").removeClass("checked");
         $("#modal-for-role input[name='role-name']").val("");
 
         $("#modal-for-role").modal("show");
@@ -60,11 +61,14 @@ $(function () {
         $("#modal-for-role form").prepend('<input type="hidden" id="role-id" name="role-id" value="' + role_id + '"');
         $("#modal-for-role input[name='role-name']").val(role_type);
 
-        $("label.checkbox").find("input").removeClass("checked");
+        $("label.checkbox").removeClass("checked");
+        $("label.checkbox").find("input").removeAttr("checked");
         var permission_list = permissions.split("|"),
             permission_num = permission_list.length;
         for(var index=0; index < permission_num; index++){
-            $("#"+permission_list[index]+"-permission").addClass("checked");
+            var target = $("#"+permission_list[index]+"-permission");
+            target.attr("checked", "true");
+            target.parent("label.checkbox").addClass("checked");
         }
 
         $("#modal-for-role").modal("show");
@@ -106,5 +110,7 @@ $(function () {
         $("#userid-change-passwd").remove();
         $("#modal-for-change-passwd form").prepend('<input type="hidden" id="userid-change-passwd" name="userid-change-passwd" val="'+userId+'"');
         $("#username-to-change-passwd").text(userName);
+
+        $("#modal-for-change-passwd").modal("show");
     });
 });
