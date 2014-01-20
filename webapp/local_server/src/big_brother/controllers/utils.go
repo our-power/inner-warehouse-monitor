@@ -4,6 +4,9 @@ import (
 	"strings"
 	"big_brother/models"
 	"time"
+	"crypto/md5"
+	"io"
+	"fmt"
 )
 
 func HasTheRight(permission string, permissions interface{}) bool {
@@ -37,4 +40,10 @@ func StoreTrace(operation string, userName interface{}) error {
 	//id, err := o.Insert(&trace)
 	_, err := o.Insert(&trace)
 	return err
+}
+
+func GenMd5Passwd(passwd string) string {
+	h := md5.New()
+	io.WriteString(h, passwd)
+	return fmt.Sprintf("%x", h.Sum(nil))
 }
