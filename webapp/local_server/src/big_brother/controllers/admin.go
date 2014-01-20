@@ -160,15 +160,23 @@ func (this *AdminController) DelRole() {
 			}
 		}else {
 			o.Using("admin")
-			_, err = o.Delete(&models.Role{Id: role_id})
-			if err != nil {
+			cnt, _ := o.QueryTable("user").Filter("role_id", role_id).Count()
+			if cnt > 0 {
 				this.Data["json"] = map[string]string{
 					"Status": "failure",
-					"Msg": "未能从数据库中删除该角色",
+					"Msg": "不能删除该角色，因为有属于该角色用户",
 				}
 			}else {
-				this.Data["json"] = map[string]string{
-					"Status": "success",
+				_, err = o.Delete(&models.Role{Id: role_id})
+				if err != nil {
+					this.Data["json"] = map[string]string{
+						"Status": "failure",
+						"Msg": "未能从数据库中删除该角色",
+					}
+				}else {
+					this.Data["json"] = map[string]string{
+						"Status": "success",
+					}
 				}
 			}
 		}
