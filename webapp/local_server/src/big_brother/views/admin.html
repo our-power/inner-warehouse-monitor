@@ -157,55 +157,51 @@
         <h3></h3>
     </div>
     <div class="modal-body">
-        <div class="row-fluid">
-            <div class="span6">
-                <form class="form-horizontal">
-                    <div class="control-group">
-                        <label class="control-label" for="user-name">用户名</label>
+        <form class="form-horizontal">
+            <div class="control-group">
+                <label class="control-label" for="user-name">用户名</label>
 
-                        <div class="controls">
-                            <input type="text" id="user-name" name="user-name"/>
-                        </div>
-                    </div>
-                    <div class="control-group">
-                        <label class="control-label" for="passwd">密码</label>
-
-                        <div class="controls">
-                            <input type="text" id="passwd" name="passwd"/>
-                        </div>
-                    </div>
-                    <div class="control-group">
-                        <label class="control-label" for="re-passwd">密码确认</label>
-
-                        <div class="controls">
-                            <input type="text" id="re-passwd" name="re-passwd"/>
-                        </div>
-                    </div>
-                    <div class="control-group">
-                        <label class="control-label" for="email">邮箱</label>
-
-                        <div class="controls">
-                            <input type="text" id="email" name="email"/>
-                        </div>
-                    </div>
-                    <div class="control-group">
-                        <label class="control-label" for="which-role">角色</label>
-
-                        <div class="controls">
-                            <select id="which-role" name="which-role">
-                            </select>
-                        </div>
-                    </div>
-                </form>
+                <div class="controls">
+                    <input type="text" id="user-name" name="user-name"/>
+                </div>
             </div>
-        </div>
+            <div class="control-group">
+                <label class="control-label" for="passwd">密码</label>
+
+                <div class="controls">
+                    <input type="text" id="passwd" name="passwd"/>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="re-passwd">密码确认</label>
+
+                <div class="controls">
+                    <input type="text" id="re-passwd" name="re-passwd"/>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="email">邮箱</label>
+
+                <div class="controls">
+                    <input type="text" id="email" name="email"/>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="which-role">角色</label>
+
+                <div class="controls">
+                    <select id="which-role" name="which-role">
+                    </select>
+                </div>
+            </div>
+        </form>
     </div>
     <div class="modal-footer">
         <button type="button" data-dismiss="modal" class="btn">取消</button>
         <button type="button" class="btn btn-primary" id="save-user">提交</button>
     </div>
 </div>
-<div class="modal-for-role" class="modal hide fade" tabindex="-1" data-width="760">
+<div id="modal-for-role" class="modal hide fade" tabindex="-1" data-width="760">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal"
                 aria-hidden="true">×
@@ -213,40 +209,36 @@
         <h3></h3>
     </div>
     <div class="modal-body">
-        <div class="row-fluid">
-            <div class="span6">
-                <form class="form-horizontal">
-                    <div class="control-group">
-                        <label class="control-label" for="role-name">角色名称</label>
+        <form class="form-horizontal">
+            <div class="control-group">
+                <label class="control-label" for="role-name">角色名称</label>
 
-                        <div class="controls">
-                            <input type="text" id="role-name" name="role-name"/>
-                        </div>
-                    </div>
-                    <div class="control-group">
-                        <label class="control-label" for="permissions">权限</label>
-
-                        <div class="controls" id="permissions">
-                            <label class="checkbox inline">
-                                <input type="checkbox" id="view-permission" value="view"> 查看
-                            </label>
-                            <label class="checkbox inline">
-                                <input type="checkbox" id="add-permission" value="add"> 增添
-                            </label>
-                            <label class="checkbox inline">
-                                <input type="checkbox" id="del-permission" value="del"> 删减
-                            </label>
-                            <label class="checkbox inline">
-                                <input type="checkbox" id="modify-permission" value="modify"> 修改
-                            </label>
-                            <label class="checkbox inline">
-                                <input type="checkbox" id="admin-permission" value="admin"> 管理
-                            </label>
-                        </div>
-                    </div>
-                </form>
+                <div class="controls">
+                    <input type="text" id="role-name" name="role-name"/>
+                </div>
             </div>
-        </div>
+            <div class="control-group">
+                <label class="control-label" for="permissions">权限</label>
+
+                <div class="controls" id="permissions">
+                    <label class="checkbox inline">
+                        <input type="checkbox" id="view-permission" value="view"> 查看
+                    </label>
+                    <label class="checkbox inline">
+                        <input type="checkbox" id="add-permission" value="add"> 增添
+                    </label>
+                    <label class="checkbox inline">
+                        <input type="checkbox" id="del-permission" value="del"> 删减
+                    </label>
+                    <label class="checkbox inline">
+                        <input type="checkbox" id="modify-permission" value="modify"> 修改
+                    </label>
+                    <label class="checkbox inline">
+                        <input type="checkbox" id="admin-permission" value="admin"> 管理
+                    </label>
+                </div>
+            </div>
+        </form>
     </div>
     <div class="modal-footer">
         <button type="button" data-dismiss="modal" class="btn">取消</button>
