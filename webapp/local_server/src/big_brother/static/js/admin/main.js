@@ -4,22 +4,6 @@
 
 $(function () {
 
-    function getPasswd(userId) {
-        var req = $.ajax({
-            "type": "get",
-            "url": "/admin/api/get_passwd?id=" + userId,
-            "dataType": "json"
-        })
-        req.done(function (resp) {
-            if (resp.Status === "failure") {
-                alertify.log(resp.Msg, "error", 5000);
-                return false;
-            }
-            $("#modal-for-user input[name='passwd']").val(resp.Passwd);
-            $("#modal-for-user input[name='re-passwd']").val(resp.Passwd);
-        })
-    }
-
     $("button#add-new-user").on("click", function (e) {
         e.preventDefault();
         $("#modal-for-user>.modal-header>h3").text("添加新用户");
@@ -29,19 +13,17 @@ $(function () {
         $("#modal-for-user input[name='user-name']").val("");
         $("#modal-for-user input[name='email']").val("");
         $("#modal-for-user input[name='which-role']").val("");
-        $("#modal-for-user input[name='passwd']").val("");
-        $("#modal-for-user input[name='re-passwd']").val("");
 
         $("#modal-for-user").modal("show");
     });
 
     $("button#add-new-role").on("click", function (e) {
         e.preventDefault();
-        $("#modal-for-user>.modal-header>h3").text("添加新角色");
+        $("#modal-for-role>.modal-header>h3").text("添加新角色");
 
         // 清除可能上次修改操作使用modal留下的数据
         $("#modal-for-role form>#role-id").remove();
-        $("label.checkbox").children("input").removeClass("checked");
+        $("label.checkbox").find("input").removeClass("checked");
         $("#modal-for-role input[name='role-name']").val("");
 
         $("#modal-for-role").modal("show");
@@ -62,15 +44,13 @@ $(function () {
         $("#modal-for-user input[name='email']").val(email);
         $("#modal-for-user input[name='which-role']").val(roleId);
 
-        getPasswd(id);
-
         $("#modal-for-user").modal("show");
     });
 
     $("button#modify-this-role").on("click", function (e) {
         e.preventDefault();
 
-        $("#modal-for-user>.modal-header>h3").text("修改角色信息");
+        $("#modal-for-role>.modal-header>h3").text("修改角色信息");
 
         var parent = $(this).parent(),
             role_id = $.trim(parent.siblings('.id').text()),
@@ -80,7 +60,7 @@ $(function () {
         $("#modal-for-role form").prepend('<input type="hidden" id="role-id" name="role-id" value="' + role_id + '"');
         $("#modal-for-role input[name='role-name']").val(role_type);
 
-        $("label.checkbox").children("input").removeClass("checked");
+        $("label.checkbox").find("input").removeClass("checked");
         var permission_list = permissions.split("|"),
             permission_num = permission_list.length;
         for(var index=0; index < permission_num; index++){
@@ -112,6 +92,19 @@ $(function () {
     $("label.checkbox").on("click", function(e){
         e.preventDefault();
 
-        $(this).children("input").toggleClass("checked");
+        $(this).find("input").toggleClass("checked");
+    });
+
+    // 修改用户密码
+    $("button#change-passwd").on("click", function(e){
+        e.preventDefault();
+
+        var parent = $(this).parent(),
+            userId = $.trim(parent.siblings('.id').text()),
+            userName = $.trim(parent.siblings('.user-name').text());
+
+        $("#userid-change-passwd").remove();
+        $("#modal-for-change-passwd form").prepend('<input type="hidden" id="userid-change-passwd" name="userid-change-passwd" val="'+userId+'"');
+        $("#username-to-change-passwd").text(userName);
     });
 });

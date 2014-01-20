@@ -87,23 +87,3 @@ func (this *AdminController) GetAdminPage() {
 	this.Data["login_name"] = this.GetSession("login_name")
 	this.TplNames = "admin.html"
 }
-
-func (this *AdminController)GetPasswdById() {
-	userId := this.GetString("id")
-	userId_int, _ := strconv.Atoi(userId)
-	o.Using("admin")
-	var user models.User
-	err := o.QueryTable("user").Filter("id", userId_int).One(&user)
-	if err != nil {
-		this.Data["json"] = map[string]string{
-			"Status": "failure",
-			"Msg": "根据该ID无法查到用户",
-		}
-	}else{
-		this.Data["json"] = map[string]string{
-			"Status": "success",
-			"Passwd": user.Passwd,
-		}
-	}
-	this.ServeJson();
-}
