@@ -3,9 +3,7 @@ package controllers
 import (
 	"big_brother/models"
 	"strconv"
-	"strings"
 	"fmt"
-	"time"
 )
 
 type ManageController struct {
@@ -49,27 +47,12 @@ func (this *ManageController) GetManagePage() {
 	if this.GetSession("role_type") == "admin_user" {
 		this.Data["admin"] = true
 	}
-	del_permission := false
-	permissions := strings.Split(this.GetSession("permission").(string), "|")
-	for _, value := range permissions {
-		if value == "del" {
-			del_permission = true
-			break
-		}
-	}
-	this.Data["del_permission"] = del_permission
+	this.Data["del_permission"] = HasTheRight("del", this.GetSession("permission"))
 	this.TplNames = "manage_machine.html"
 }
 
 func (this *ManageController) DelMachine() {
-	del_permission := false
-	permissions := strings.Split(this.GetSession("permission").(string), "|")
-	for _, value := range permissions {
-		if value == "del" {
-			del_permission = true
-			break
-		}
-	}
+	del_permission := HasTheRight("del", this.GetSession("permission"))
 	if del_permission {
 		id := this.GetString("id")
 		mac := this.GetString("mac")
@@ -97,22 +80,8 @@ func (this *ManageController) DelMachine() {
 					"Status": " success",
 					"Msg": "成功删除该机器！",
 				}
-				o.Using("admin")
-				/*
-				type Trace struct {
-					Id int
-					User string
-					Do_what string
-					That_time string
-				}
-				*/
-				trace := models.Trace{
-					User: this.GetSession("login_name").(string),
-					Do_what: fmt.Sprintf("删除作业机器%s", mac),
-					That_time: time.Now().Format("2006-01-02 15:04:05"),
-				}
-				//id, err := o.Insert(&trace)
-				o.Insert(&trace)
+				operation := fmt.Sprintf("删除作业机器%s", mac)
+				_ = StoreTrace(operation, this.GetSession("login_name"))
 			}
 		}
 	} else {

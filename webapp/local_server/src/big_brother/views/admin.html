@@ -56,6 +56,7 @@
     </ul>
     <div class="tab-content">
         <div class="tab-pane active" id="user_list">
+            <button class="btn btn-primary" id="add-new-user" data-toggle="modal">添加新用户</button>
             <table class="table table-hover table-condensed">
                 <thead>
                 <tr>
@@ -66,6 +67,7 @@
                     <th class="register-time">注册时间</th>
                     <th class="last-login">最后登录时间</th>
                     <th class="role-id">角色ID</th>
+                    <th></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -79,6 +81,10 @@
                     <td class="register-time">{{$val.Register_time}}</td>
                     <td class="last-login">{{$val.Last_login}}</td>
                     <td class="role-id">{{$val.Role_id}}</td>
+                    <td>
+                        <button class="btn btn-warning" data-toggle="modal" id="modify-this-user">修改</button>
+                        <button class="btn btn-danger" id="del-this-user" data-toggle="modal">删除</button>
+                    </td>
                 </tr>
                 {{ end }}
                 {{ end }}
@@ -86,13 +92,15 @@
             </table>
         </div>
         <div class="tab-pane" id="role_list">
+            <button class="btn btn-primary" id="add-new-role">添加新角色</button>
             <table class="table table-hover table-condensed">
                 <thead>
                 <tr>
                     <th class="sequence-number">序号</th>
                     <th class="id">ID</th>
-                    <th class="role-type">角色类别</th>
+                    <th class="role-type">角色名称</th>
                     <th class="permission">权限</th>
+                    <th></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -103,6 +111,10 @@
                     <td class="id">{{$val.Id}}</td>
                     <td class="role-type">{{$val.Role_type}}</td>
                     <td class="permission">{{$val.Permission}}</td>
+                    <td>
+                        <button class="btn btn-warning" id="modify-this-role" data-toggle="modal">修改</button>
+                        <button class="btn btn-danger" id="del-this-role" data-toggle="modal">删除</button>
+                    </td>
                 </tr>
                 {{end}}
                 {{end}}
@@ -135,6 +147,110 @@
                 </tbody>
             </table>
         </div>
+    </div>
+</div>
+<div id="modal-for-user" class="modal hide fade" tabindex="-1" data-width="760">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"
+                aria-hidden="true">×
+        </button>
+        <h3></h3>
+    </div>
+    <div class="modal-body">
+        <div class="row-fluid">
+            <div class="span6">
+                <form class="form-horizontal">
+                    <div class="control-group">
+                        <label class="control-label" for="user-name">用户名</label>
+
+                        <div class="controls">
+                            <input type="text" id="user-name" name="user-name"/>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="passwd">密码</label>
+
+                        <div class="controls">
+                            <input type="text" id="passwd" name="passwd"/>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="re-passwd">密码确认</label>
+
+                        <div class="controls">
+                            <input type="text" id="re-passwd" name="re-passwd"/>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="email">邮箱</label>
+
+                        <div class="controls">
+                            <input type="text" id="email" name="email"/>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="which-role">角色</label>
+
+                        <div class="controls">
+                            <select id="which-role" name="which-role">
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" data-dismiss="modal" class="btn">取消</button>
+        <button type="button" class="btn btn-primary" id="save-user">提交</button>
+    </div>
+</div>
+<div class="modal-for-role" class="modal hide fade" tabindex="-1" data-width="760">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"
+                aria-hidden="true">×
+        </button>
+        <h3></h3>
+    </div>
+    <div class="modal-body">
+        <div class="row-fluid">
+            <div class="span6">
+                <form class="form-horizontal">
+                    <div class="control-group">
+                        <label class="control-label" for="role-name">角色名称</label>
+
+                        <div class="controls">
+                            <input type="text" id="role-name" name="role-name"/>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="permissions">权限</label>
+
+                        <div class="controls" id="permissions">
+                            <label class="checkbox inline">
+                                <input type="checkbox" id="view-permission" value="view"> 查看
+                            </label>
+                            <label class="checkbox inline">
+                                <input type="checkbox" id="add-permission" value="add"> 增添
+                            </label>
+                            <label class="checkbox inline">
+                                <input type="checkbox" id="del-permission" value="del"> 删减
+                            </label>
+                            <label class="checkbox inline">
+                                <input type="checkbox" id="modify-permission" value="modify"> 修改
+                            </label>
+                            <label class="checkbox inline">
+                                <input type="checkbox" id="admin-permission" value="admin"> 管理
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" data-dismiss="modal" class="btn">取消</button>
+        <button type="button" class="btn btn-primary" id="save-role">提交</button>
     </div>
 </div>
 <div class="footer">
