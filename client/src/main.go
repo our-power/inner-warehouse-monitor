@@ -11,7 +11,6 @@ import (
 	"time"
 	"util"
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/bitly/go-nsq"
 	"cpu_usage"
 	"mem_usage"
 	"net_flow"
@@ -29,7 +28,7 @@ var (
 	verbose            = flag.Bool("verbose", false, "enable verbose logging")
 	maxBackoffDuration = flag.Duration("max-backoff-duration", 120*time.Second, "the maximum backoff duration")
 	termChan chan os.Signal
-	dbPath = flag.String("db-path", "../db/", "absolute or relative path for db.")
+	dbPath             = flag.String("db-path", "../db/", "absolute or relative path for db.")
 )
 
 func init() {
@@ -348,42 +347,42 @@ func main() {
 		fmt.Println(err)
 	}
 
-    finishClients := func(){
-        cuTodb.Stop()
-    	muTodb.Stop()
+	finishClients := func() {
+		cuTodb.Stop()
+		muTodb.Stop()
 		nfTodb.Stop()
 		hbTodb.Stop()
 		aTodb.Stop()
 		aCheck.Stop()
 		rTodb.Stop()
-    }
+	}
 
 	for {
 		select {
 		case <-muTodb.ExitChan:
-            finishClients()
+			finishClients()
 			return
 		case <-cuTodb.ExitChan:
-            finishClients()
+			finishClients()
 			return
 		case <-nfTodb.ExitChan:
-            finishClients()
+			finishClients()
 			return
 		case <-hbTodb.ExitChan:
-            finishClients()
+			finishClients()
 			return
 		case <-aTodb.ExitChan:
-            finishClients()
+			finishClients()
 			return
 		case <-aCheck.ExitChan:
-            finishClients()
+			finishClients()
 			return
 		case <-rTodb.ExitChan:
-            finishClients()
+			finishClients()
 			return
 		case <-termChan:
-		    finishClients()
-            return
+			finishClients()
+			return
 		}
 	}
 }
