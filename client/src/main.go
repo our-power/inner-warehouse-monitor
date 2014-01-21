@@ -10,6 +10,7 @@ import (
 	"syscall"
 	"time"
 	"util"
+	"github.com/bitly/go-nsq"
 	_ "github.com/mattn/go-sqlite3"
 	"cpu_usage"
 	"mem_usage"
