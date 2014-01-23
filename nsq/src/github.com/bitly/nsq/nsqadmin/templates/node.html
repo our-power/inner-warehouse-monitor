@@ -22,8 +22,7 @@
                 </td>
                 <td>
                     <a href="{{$g.LargeGraph $node " gc_pause_*"}}"><img class="img-polaroid" width="200"
-                                                                         src="{{$g.LargeGraph $node "
-                                                                         gc_pause_*"}}"/></a>
+                                                                         src="{{$g.LargeGraph $node " gc_pause_*"}}"/></a>
                     <h5 style="text-align: center;">GC Pause Percentiles</h5>
                 </td>
                 <td>
@@ -71,16 +70,14 @@
                         class="red">✘</a> {{.TopicName}}
                 </td>
                 <td>
-                    {{if $g.Enabled}}<a href="{{$g.LargeGraph $t " depth"}}"><img width="120" src="{{$g.Sparkline $t "
-                                                                                  depth"}}"></a>{{end}}
+                    {{if $g.Enabled}}<a href="{{$g.LargeGraph $t " depth"}}"><img width="120" src="{{$g.Sparkline $t " depth"}}"></a>{{end}}
                     {{.Depth | commafy}}
                 </td>
                 <td>{{.MemoryDepth | commafy}} + {{.BackendDepth | commafy}}</td>
                 <td colspan="4"></td>
                 <td>
                     {{if $g.Enabled}}<a href="{{$g.LargeGraph $t " message_count"}}"><img width="120"
-                                                                                          src="{{$g.Sparkline $t "
-                                                                                          message_count"}}"></a>{{end}}
+                                                                                          src="{{$g.Sparkline $t " message_count"}}"></a>{{end}}
                     {{.MessageCount | commafy}}
                 </td>
                 <td>{{.ChannelCount}}</td>
@@ -113,8 +110,7 @@
                 </td>
                 <td>
                     {{if $g.Enabled}}<a href="{{$g.LargeGraph $c " depth"}}"><img width="120" height="20"
-                                                                                  src="{{$g.Sparkline $c "
-                                                                                  depth"}}"></a>{{end}}
+                                                                                  src="{{$g.Sparkline $c " depth"}}"></a>{{end}}
                     {{$c.Depth | commafy}}
                 </td>
                 <td>{{$c.MemoryDepth | commafy}} + {{$c.BackendDepth | commafy}}</td>

@@ -31,8 +31,7 @@
             <td>{{.Version}}</td>
             {{if $ld}}
             <td>
-                <a href="#" class="conn-counts btn btn-small {{$p | getNodeConsistencyClass}}">{{.RemoteAddresses |
-                    len}}</a>
+                <a href="#" class="conn-counts btn btn-small {{$p | getNodeConsistencyClass}}">{{.RemoteAddresses | len}}</a>
 
                 <div style="display: none;">
                     {{range .RemoteAddresses}}{{.}}<br/>{{end}}
