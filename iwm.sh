@@ -87,7 +87,7 @@ function start_all()
         if [ ! -d "$LOCAL_SERVER_WEBAPP_LOG_DIR" ]; then
             mkdir -p $LOCAL_SERVER_WEBAPP_LOG_DIR
         fi
-        cd $(LOCAL_SERVER_WEBAPP_DIR)/src/big_brother && ./big_brother > $LOCAL_SERVER_WEBAPP_LOG_DIR/webapp.log 2>&1 &
+        cd $LOCAL_SERVER_WEBAPP_DIR/src/big_brother && ./big_brother > $LOCAL_SERVER_WEBAPP_LOG_DIR/webapp.log 2>&1 &
     else
         echo "I can't run up local server webapp!"
         exit 1
