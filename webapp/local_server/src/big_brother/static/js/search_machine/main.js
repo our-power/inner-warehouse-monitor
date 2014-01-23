@@ -387,7 +387,8 @@ $(function () {
                     "dataType": "json"
                 });
 
-                $("#machine_list tr").remove();
+                // 先清除上一次的查询结果
+                $("#machine_list tbody").empty();
                 // 加载等待提示
                 loadWaitTips("#machine_list tbody", "");
 
