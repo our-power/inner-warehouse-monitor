@@ -34,7 +34,7 @@ function start_all()
         fi
         $NSQLOOKUPD_BIN > $NSQ_LOG_DIR/nsqlookupd.log 2>&1 &
         $NSQD_BIN --lookupd-tcp-address=127.0.0.1:4160 > $NSQ_LOG_DIR/nsqd.log 2>&1 &
-        $NSQADMIN_BIN --lookupd-http-address=127.0.0.1:4161 --template-dir=$NSQ_DIR/src/github.com/bitly/nsq/nsqadmin/templates > $NSQ_LOG_DIR/nsqadmin.log 2>&1 &
+        $NSQADMIN_BIN --nsqd-http-address=127.0.0.1:4151 --template-dir=$NSQ_DIR/src/github.com/bitly/nsq/nsqadmin/templates > $NSQ_LOG_DIR/nsqadmin.log 2>&1 &
     else
         echo "I can't run up *nsq*!"
         exit 1
