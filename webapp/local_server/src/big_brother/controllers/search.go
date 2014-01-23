@@ -37,9 +37,11 @@ func queryMachine(col string, items string) (partialResults []ResultType) {
 			var rows []*models.Register
 			num, err := o.QueryTable("register").Filter(col, item_s[index]).Limit(-1).All(&rows, "ip", "host_name", "hardware_addr", "machine_role", "status")
 			if err == nil {
+				/*
 				if num == 0 {
 					partialResults = append(partialResults, ResultType{IsExisted: false, SearchItem: item_s[index], Ip: "", Host_name: "", Hardware_addr: "", Machine_role: "", Status: ""})
 				}
+				*/
 				if num > 0 {
 					for _, row := range rows {
 						var machineRole string
