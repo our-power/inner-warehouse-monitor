@@ -124,11 +124,9 @@
                 </td>
                 <td></td>
                 <td><a href="{{$g.LargeGraph $c " in_flight_count"}}"><img width="120" height="20"
-                                                                           src="{{$g.Sparkline $c "
-                                                                           in_flight_count"}}"></a></td>
+                                                                           src="{{$g.Sparkline $c " in_flight_count"}}"></a></td>
                 <td><a href="{{$g.LargeGraph $c " deferred_count"}}"><img width="120" height="20"
-                                                                          src="{{$g.Sparkline $c "
-                                                                          deferred_count"}}"></a></td>
+                                                                          src="{{$g.Sparkline $c " deferred_count"}}"></a></td>
                 <td><a href="{{$g.LargeGraph $c " requeue_count"}}"><img width="120" height="20"
                                                                          src="{{$g.Sparkline $c " requeue_count"}}"></a>
                 </td>
@@ -139,14 +137,12 @@
                                                                          src="{{$g.Sparkline $c " message_count"}}"></a>
                 </td>
                 <td></td>
-                <td><a href="{{$g.LargeGraph $c " clients"}}"><img width="120" height="20" src="{{$g.Sparkline $c "
-                                                                   clients"}}"></a></td>
+                <td><a href="{{$g.LargeGraph $c " clients"}}"><img width="120" height="20" src="{{$g.Sparkline $c " clients"}}"></a></td>
                 {{if $c.E2eProcessingLatency.Percentiles}}
                 <td colspan="{{len $c.E2eProcessingLatency.Percentiles}}">
                     <a href="{{$g.LargeGraph $c.E2eProcessingLatency " e2e_processing_latency"}}"><img width="120"
                                                                                                        height="20"
-                                                                                                       src="{{$g.Sparkline $c.E2eProcessingLatency "
-                                                                                                       e2e_processing_latency"}}"></a>
+                                                                                                       src="{{$g.Sparkline $c.E2eProcessingLatency " e2e_processing_latency"}}"></a>
                 </td>
                 {{end}}
             </tr>
@@ -182,11 +178,9 @@
                 </td>
                 <td></td>
                 <td><a href="{{$g.LargeGraph $c " in_flight_count"}}"><img width="120" height="20"
-                                                                           src="{{$g.Sparkline $c "
-                                                                           in_flight_count"}}"></a></td>
+                                                                           src="{{$g.Sparkline $c " in_flight_count"}}"></a></td>
                 <td><a href="{{$g.LargeGraph $c " deferred_count"}}"><img width="120" height="20"
-                                                                          src="{{$g.Sparkline $c "
-                                                                          deferred_count"}}"></a></td>
+                                                                          src="{{$g.Sparkline $c " deferred_count"}}"></a></td>
                 <td><a href="{{$g.LargeGraph $c " requeue_count"}}"><img width="120" height="20"
                                                                          src="{{$g.Sparkline $c " requeue_count"}}"></a>
                 </td>
@@ -197,14 +191,12 @@
                                                                          src="{{$g.Sparkline $c " message_count"}}"></a>
                 </td>
                 <td></td>
-                <td><a href="{{$g.LargeGraph $c " clients"}}"><img width="120" height="20" src="{{$g.Sparkline $c "
-                                                                   clients"}}"></a></td>
+                <td><a href="{{$g.LargeGraph $c " clients"}}"><img width="120" height="20" src="{{$g.Sparkline $c " clients"}}"></a></td>
                 {{if $c.E2eProcessingLatency.Percentiles}}
                 <td colspan="{{len $c.E2eProcessingLatency.Percentiles}}">
                     <a href="{{$g.LargeGraph $c.E2eProcessingLatency " e2e_processing_latency"}}"><img width="120"
                                                                                                        height="20"
-                                                                                                       src="{{$g.Sparkline $c.E2eProcessingLatency "
-                                                                                                       e2e_processing_latency"}}"></a>
+                                                                                                       src="{{$g.Sparkline $c.E2eProcessingLatency " e2e_processing_latency"}}"></a>
                 </td>
                 {{end}}
             </tr>
