@@ -19,7 +19,9 @@ function start_all()
     if [ ! -f "$NSQLOOKUPD_BIN" ] || [ ! -f "$NSQD_BIN" ] || [ ! -f "$NSQADMIN_BIN" ];then
         export GOPATH=$NSQ_DIR
         if type go >/dev/null 2>&1; then
-            go install github.com/bitly/nsq
+            go install github.com/bitly/nsq/nsqd
+            go install github.com/bitly/nsq/nsqadmin
+            go install github.com/bitly/nsq/nsqlookupd
         else
             echo "I can find the *go* command"
         fi
