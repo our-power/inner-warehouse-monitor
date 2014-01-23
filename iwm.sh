@@ -128,11 +128,11 @@ function stop_all()
     declare -a PROCESS_LIST=("$ROOT/nsq/bin/nsqlookupd" "$ROOT/nsq/bin/nsqd" "$ROOT/nsq/bin/nsqadmin" "$ROOT/client/bin/main" "$ROOT/webapp/local_server/bin/main")
     for p in ${PROCESS_LIST[@]};do
         pid=$(ps aux | grep -v grep | grep $p | awk '{print $2}')
-        if [ "$pid" -ne "" ];then
+        if [ "$pid" != "" ];then
             kill -1 $pid
         fi
         pid_again=$(ps aux | grep -v grep | grep $p | awk '{print $2}')
-        if [ "$pid_again" -ne "" ];then
+        if [ "$pid_again" != "" ];then
             kill -9 $pid_again
         fi
     done
