@@ -387,12 +387,12 @@ $(function () {
                     "dataType": "json"
                 });
 
+                $("#machine_list tr").remove();
                 // 加载等待提示
                 loadWaitTips("#machine_list tbody", "");
 
                 req.done(function (resp) {
                     $("#machine_list tbody").empty();
-                    $("#machine_list tr").remove();
                     var machineExistList = new Array();
                     var machineExistNum = resp.length;
                     if (resp.length > 0) {
