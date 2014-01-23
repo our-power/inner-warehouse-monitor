@@ -391,7 +391,7 @@ $(function () {
                 loadWaitTips("#machine_list tbody", "");
 
                 req.done(function (resp) {
-                    $("#machine_list tbody").remove();
+                    $("#machine_list tr").remove();
                     var machineExistList = new Array();
                     var machineExistNum = resp.length;
                     if (resp.length > 0) {
