@@ -137,6 +137,7 @@ function stop_all()
         if [ "$pid_again" != "" ];then
             kill -9 $pid_again
         fi
+        echo "Stopping $p"
     done
 }
 
