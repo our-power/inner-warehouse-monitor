@@ -132,12 +132,13 @@ function stop_all()
         pid=$(ps aux | grep -v grep | grep $p | awk '{print $2}')
         if [ "$pid" != "" ];then
             kill -1 $pid
+            echo "Stopping $p"
         fi
         pid_again=$(ps aux | grep -v grep | grep $p | awk '{print $2}')
         if [ "$pid_again" != "" ];then
             kill -9 $pid_again
+            echo "Stopping $p again"
         fi
-        echo "Stopping $p"
     done
 }
 
