@@ -127,7 +127,7 @@ function start_all()
 function stop_all()
 {
     ROOT=`pwd`
-    declare -a PROCESS_LIST=("$ROOT/nsq/bin/nsqlookupd" "$ROOT/nsq/bin/nsqd" "$ROOT/nsq/bin/nsqadmin" "$ROOT/client/bin/main" "$ROOT/webapp/local_server/bin/main")
+    declare -a PROCESS_LIST=("$ROOT/nsq/bin/nsqlookupd" "$ROOT/nsq/bin/nsqd" "$ROOT/nsq/bin/nsqadmin" "$ROOT/client/bin/nsq_client" "$ROOT/webapp/local_server/src/big_brother/big_brother")
     for p in ${PROCESS_LIST[@]};do
         pid=$(ps aux | grep -v grep | grep $p | awk '{print $2}')
         if [ "$pid" != "" ];then
