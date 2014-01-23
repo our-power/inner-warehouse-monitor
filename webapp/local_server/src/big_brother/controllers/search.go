@@ -83,7 +83,8 @@ func (this *SearchController) FilterMachineList() {
 	hardwareAddrList := this.GetString("hardwareaddrlist")
 	results := make([]ResultType, 0, 10)
 	results = append(results, queryMachine("ip", ipList)...)
-	results = append(results, queryMachine("host_name", hostNameList)...)
+	results = append(results, queryMachine("host_name__iexact", hostNameList)...)
+	results = append(results, queryMachine("host_name__contains", hostNameList)...)
 	results = append(results, queryMachine("hardware_addr", hardwareAddrList)...)
 
 	this.Data["json"] = results
