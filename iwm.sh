@@ -72,7 +72,7 @@ function start_all()
 
     LOCAL_SERVER_WEBAPP_DIR="$ROOT/webapp/local_server"
     LOCAL_SERVER_WEBAPP_BIN="$LOCAL_SERVER_WEBAPP_DIR/src/big_brother/big_brother"
-    CHECK_CLIENT=$( ps aux | grep -v grep | grep $CLIENT_BIN )
+    CHECK_CLIENT=$( ps aux | grep -v grep | grep $CLIENT_BIN | wc -l)
     if [ ! -d "$LOCAL_SERVER_WEBAPP_DIR" ]; then
         echo "Not Exist local server webapp source code!"
         exit 1
@@ -82,7 +82,7 @@ function start_all()
         go install big_brother
         mv $LOCAL_SERVER_WEBAPP_DIR/bin/big_brother $LOCAL_SERVER_WEBAPP_BIN
     fi
-    if [ -f "$LOCAL_SERVER_WEBAPP_BIN" ] && [ "$CHECK_NSQD" -gt "0" ] && [ "$CHECK_CLIENT" -gt "0" ]; then
+    if [ -f "$LOCAL_SERVER_WEBAPP_BIN" ] && [ $CHECK_NSQD -gt 0 ] && [ $CHECK_CLIENT -gt "0" ]; then
         LOCAL_SERVER_WEBAPP_LOG_DIR="/var/log/local_server"
         if [ ! -d "$LOCAL_SERVER_WEBAPP_LOG_DIR" ]; then
             mkdir -p $LOCAL_SERVER_WEBAPP_LOG_DIR
@@ -90,7 +90,7 @@ function start_all()
         cd $(LOCAL_SERVER_WEBAPP_DIR)/src/big_brother && ./big_brother > $LOCAL_SERVER_WEBAPP_LOG_DIR/webapp.log 2>&1 &
     else
         echo "I can't run up local server webapp!"
-        exit !
+        exit 1
     fi
     ####################################################################################################################
     # check running
