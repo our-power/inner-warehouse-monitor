@@ -43,3 +43,7 @@ body {
 .no_use {
     background-color: yellowgreen;
 }
+
+#form-date {
+    display: none;
+}

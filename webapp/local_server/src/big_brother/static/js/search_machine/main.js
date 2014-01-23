@@ -318,7 +318,7 @@ $(function () {
         }
     }
 
-    $("#form-date").hide();
+    //$("#form-date").hide();
 
     $("textarea#machine-list").on("focusin",function (e) {
         e.preventDefault();
