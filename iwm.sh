@@ -19,7 +19,7 @@ function start_all()
     if [ ! -f "$NSQLOOKUPD_BIN" ] || [ ! -f "$NSQD_BIN" ] || [ ! -f "$NSQADMIN_BIN" ];then
         export GOPATH=$NSQ_DIR
         if type go >/dev/null 2>&1; then
-            go install
+            go install github.com/bitly/nsq
         else
             echo "I can find the *go* command"
         fi
@@ -42,7 +42,7 @@ function start_all()
     # start nsq client
 
     CLIENT_DIR="$ROOT/client"
-    CLIENT_BIN="$ROOT/client/bin/main"
+    CLIENT_BIN="$ROOT/client/bin/nsq_client"
     CHECK_NSQD=$( ps aux | grep -v grep | grep $NSQD_BIN | wc -l)
     if [ ! -d "$CLIENT_DIR" ]; then
         echo "Not Exist NSQ client source code!"
@@ -50,7 +50,7 @@ function start_all()
     fi
     if [ ! -f "$CLIENT_BIN" ]; then
         export GOPATH=$CLIENT_DIR
-        go install
+        go install nsq_client
     fi
     if [ -f "$CLIENT_BIN" ] && [ "$CHECK_NSQD" -gt "0" ]; then
         CLIENT_LOG_DIR="/var/log/nsq_client"
@@ -68,7 +68,7 @@ function start_all()
     # start local server webapp
 
     LOCAL_SERVER_WEBAPP_DIR="$ROOT/webapp/local_server"
-    LOCAL_SERVER_WEBAPP_BIN="$LOCAL_SERVER_WEBAPP_DIR/bin/main"
+    LOCAL_SERVER_WEBAPP_BIN="$LOCAL_SERVER_WEBAPP_DIR/src/big_brother/big_brother"
     CHECK_CLIENT=$( ps aux | grep -v grep | grep $CLIENT_BIN )
     if [ ! -f "$LOCAL_SERVER_WEBAPP_DIR" ]; then
         echo "Not Exist local server webapp source code!"
@@ -76,14 +76,15 @@ function start_all()
     fi
     if [ ! -f "$LOCAL_SERVER_WEBAPP_BIN" ]; then
         export GOPATH=$LOCAL_SERVER_WEBAPP_DIR
-        go install
+        go install big_brother
+        mv $(LOCAL_SERVER_WEBAPP_DIR)/bin/big_brother $(LOCAL_SERVER_WEBAPP_BIN)
     fi
     if [ -f "$LOCAL_SERVER_WEBAPP_BIN" ] && [ "$CHECK_NSQD" -gt "0" ] && [ "$CHECK_CLIENT" -gt "0" ]; then
         LOCAL_SERVER_WEBAPP_LOG_DIR="/var/log/local_server"
         if [ ! -d "$LOCAL_SERVER_WEBAPP_LOG_DIR" ]; then
             mkdir -p $LOCAL_SERVER_WEBAPP_LOG_DIR
         fi
-        $LOCAL_SERVER_WEBAPP_BIN > $LOCAL_SERVER_WEBAPP_LOG_DIR/webapp.log 2>&1 &
+        cd $(LOCAL_SERVER_WEBAPP_DIR)/src/big_brother && ./big_brother > $LOCAL_SERVER_WEBAPP_LOG_DIR/webapp.log 2>&1 &
     else
         echo "I can't run up local server webapp!"
         exit !
