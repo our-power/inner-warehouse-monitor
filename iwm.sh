@@ -72,7 +72,7 @@ function start_all()
     LOCAL_SERVER_WEBAPP_DIR="$ROOT/webapp/local_server"
     LOCAL_SERVER_WEBAPP_BIN="$LOCAL_SERVER_WEBAPP_DIR/src/big_brother/big_brother"
     CHECK_CLIENT=$( ps aux | grep -v grep | grep $CLIENT_BIN )
-    if [ ! -f "$LOCAL_SERVER_WEBAPP_DIR" ]; then
+    if [ ! -d "$LOCAL_SERVER_WEBAPP_DIR" ]; then
         echo "Not Exist local server webapp source code!"
         exit 1
     fi
