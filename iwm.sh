@@ -39,21 +39,6 @@ function start_all()
         echo "I can't run up *nsq*!"
         exit 1
     fi
-    if [ $(ps aux | grep -v grep | grep $NSQLOOKUPD_BIN | wc -l) -gt 0 ]; then
-        echo "Successfully to run up nsqlookupd"
-    else
-        echo "Failed to run up nsqlookupd"
-    fi
-    if [ $(ps aux | grep -v grep | grep $NSQD_BIN | wc -l) -gt 0 ]; then
-        echo "Successfully to run up nsqd"
-    else
-        echo "Failed to run up nsqd"
-    fi
-    if [ $(ps aux | grep -v grep | grep $NSQADMIN_BIN | wc -l) -gt 0 ]; then
-        echo "Successfully to run up nsqadmin"
-    else
-        echo "Failed to run up nsqadmin"
-    fi
     ####################################################################################################################
 
     # start nsq client
@@ -70,7 +55,7 @@ function start_all()
         go install nsq_client
         echo "Finish to compile nsq client"
     fi
-    if [ -f "$CLIENT_BIN" ] && [ "$CHECK_NSQD" -gt "0" ]; then
+    if [ -f "$CLIENT_BIN" ] && [ $CHECK_NSQD -gt 0 ]; then
         CLIENT_LOG_DIR="/var/log/nsq_client"
         if [ ! -d "$CLIENT_LOG_DIR" ]; then
             mkdir -p $CLIENT_LOG_DIR
@@ -79,11 +64,6 @@ function start_all()
     else
         echo "I can't run up nsq client!"
         exit 1
-    fi
-    if [ $(ps aux | grep -v grep | grep $CLIENT_BIN | wc -l) -gt 0 ]; then
-        echo "Successfully to run up nsq client"
-    else
-        echo "Failed to run up nsq client"
     fi
 
     ####################################################################################################################
@@ -112,13 +92,35 @@ function start_all()
         echo "I can't run up local server webapp!"
         exit !
     fi
+    ####################################################################################################################
+    # check running
+    if [ $(ps aux | grep -v grep | grep $NSQLOOKUPD_BIN | wc -l) -gt 0 ]; then
+        echo "Successfully to run up nsqlookupd"
+    else
+        echo "Failed to run up nsqlookupd"
+    fi
+    if [ $(ps aux | grep -v grep | grep $NSQD_BIN | wc -l) -gt 0 ]; then
+        echo "Successfully to run up nsqd"
+    else
+        echo "Failed to run up nsqd"
+    fi
+    if [ $(ps aux | grep -v grep | grep $NSQADMIN_BIN | wc -l) -gt 0 ]; then
+        echo "Successfully to run up nsqadmin"
+    else
+        echo "Failed to run up nsqadmin"
+    fi
+    if [ $(ps aux | grep -v grep | grep $CLIENT_BIN | wc -l) -gt 0 ]; then
+        echo "Successfully to run up nsq client"
+    else
+        echo "Failed to run up nsq client"
+    fi
     if [ $(ps aux | grep -v grep | grep ./big_brother | wc -l) -gt 0 ]; then
         echo "Successfully to run up big_brother"
     else
         echo "Failed to run up big_brother"
     fi
-    ####################################################################################################################
 
+    ####################################################################################################################
     # over !
 }
 
