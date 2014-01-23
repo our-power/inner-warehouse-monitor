@@ -226,11 +226,9 @@ func (p *LookupProtocolV1) IDENTIFY(client *ClientV1, reader *bufio.Reader, para
 		client, peerInfo.BroadcastAddress, peerInfo.TcpPort, peerInfo.HttpPort, peerInfo.Version)
 
 	client.peerInfo = &peerInfo
-	if p.context.nsqlookupd.DB.AddProducer(Registration{"client", "", ""}
-
-, &Producer{peerInfo: client.peerInfo}) {
-log.Printf("DB: client(%s) REGISTER category:%s key:%s subkey:%s", client, "client", "", "")
-}
+	if p.context.nsqlookupd.DB.AddProducer(Registration{"client", "", ""} , &Producer{peerInfo: client.peerInfo}) {
+		log.Printf("DB: client(%s) REGISTER category:%s key:%s subkey:%s", client, "client", "", "")
+	}
 
 // build a response
 data := make(map[string]interface{})
