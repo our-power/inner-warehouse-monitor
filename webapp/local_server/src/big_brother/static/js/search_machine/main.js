@@ -391,7 +391,7 @@ $(function () {
                 loadWaitTips("#machine_list tbody", "");
 
                 req.done(function (resp) {
-                    $("#machine_list tbody").empty();
+                    $("#machine_list tbody").remove();
                     var machineExistList = new Array();
                     var machineExistNum = resp.length;
                     if (resp.length > 0) {
@@ -419,7 +419,7 @@ $(function () {
                             $("#machine_list tbody").append("<tr class='" + trStatusClass + "'><td>" + (index + 1) + "</td><td class='target-machine'>" + resp[index].SearchItem + "</td><td class='host-name'>" + resp[index].Host_name + "</td><td class='hardware-addr'>" + resp[index].Hardware_addr + "</td><td>" + resp[index].Ip + "</td><td>" + resp[index].Machine_role + "</td><td class='machine-status'>" + resp[index].Status + "</td></tr>");
                         }
                     }
-                    $("#machine-list").val(machineExistList.join("\n"))
+                    //$("#machine-list").val(machineExistList.join("\n"))
                 });
             }
         }
