@@ -116,10 +116,16 @@ func CreateTable(indicator string, link *sql.DB) {
 		CREATE TABLE IF NOT EXISTS telnet_accessibility (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, date TEXT, time_index INTEGER, ip TEXT, host_name TEXT, hardware_addr TEXT, target_url TEXT, status TEXT);
 		DELETE FROM telnet_accessibility;
 		`
+
 		_, err := link.Exec(sql0)
 		if err != nil {
 			fmt.Println(err)
 		}
+	case "register_timeline":
+		sql = `
+		CREATE table IF NOT EXISTS register_timeline (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, date_time TEXT, machine_id INTEGER, status INTEGER);
+		DELETE FROM register_timeline;
+		`
 	default:
 		return
 	}
