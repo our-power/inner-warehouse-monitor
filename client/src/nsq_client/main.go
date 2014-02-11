@@ -235,34 +235,32 @@ func runRegisterToDBClient(rh *register.RegisterToDBHandler) (registerTodb *nsq.
 
 // 定期检测register数据表，将作业机器的运行情况按时间序列存入另一个数据表中，用于前端的可用性展示
 func checkRegisterTablePeriodically(registerDB *sql.DB, registerTimelineDB *sql.DB) {
-	for {
-		c := time.Tick(1 * time.Minute)
-		for _ = range c {
-			sql := "SELECT id, status FROM register"
-			rows, err := registerDB.Query(sql)
+	c := time.Tick(1 * time.Minute)
+	for _ = range c {
+		sql := "SELECT id, status FROM register"
+		rows, err := registerDB.Query(sql)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+		type idStatus struct {
+			Machine_id int
+			Status int
+		}
+		dataForRegisterTimeline := make([]idStatus, 0, 100)
+		var machineId int
+		var status int
+		for rows.Next() {
+			rows.Scan(&machineId, &status)
+			dataForRegisterTimeline = append(dataForRegisterTimeline, idStatus{Machine_id: machineId, Status: status})
+		}
+		rows.Close()
+		dateTimeStr := time.Now().Format("2006-01-02 15:04:05")
+		for _, item := range dataForRegisterTimeline {
+			sql = "INSERT INTO register_timeline (date_time, machine_id, status) VALUES (?, ?, ?)"
+			_, err = registerTimelineDB.Exec(sql, dateTimeStr, item.Machine_id, item.Status)
 			if err != nil {
 				fmt.Println(err)
-				continue
-			}
-			type idStatus struct {
-				Machine_id int
-				Status int
-			}
-			dataForRegisterTimeline := make([]idStatus, 0, 100)
-			var machineId int
-			var status int
-			for rows.Next() {
-				rows.Scan(&machineId, &status)
-				dataForRegisterTimeline = append(dataForRegisterTimeline, idStatus{Machine_id: machineId, Status: status})
-			}
-			rows.Close()
-			dateTimeStr := time.Now().Format("2006-01-02 15:04:05")
-			for _, item := range dataForRegisterTimeline {
-				sql = "INSERT INTO register_timeline (date_time, machine_id, status) VALUES (?, ?, ?)"
-				_, err = registerTimelineDB.Exec(sql, dateTimeStr, item.Machine_id, item.Status)
-				if err != nil {
-					fmt.Println(err)
-				}
 			}
 		}
 	}
