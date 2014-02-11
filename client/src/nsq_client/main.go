@@ -233,6 +233,11 @@ func runRegisterToDBClient(rh *register.RegisterToDBHandler) (registerTodb *nsq.
 	return
 }
 
+// 定期检测register数据表，将作业机器的运行情况按时间序列存入另一个数据表中，用于前端的可用性展示
+func checkRegisterTablePeriodically() {
+
+}
+
 func main() {
 	flag.Parse()
 
@@ -347,6 +352,9 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
+
+	// 在新goroutine中定期读取register数据表并存储相关数据
+	go checkRegisterTablePeriodically()
 
 	finishClients := func() {
 		cuTodb.Stop()
