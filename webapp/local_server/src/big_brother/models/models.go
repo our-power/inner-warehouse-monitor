@@ -71,6 +71,13 @@ type Register struct {
 	Status        int
 }
 
+type Register_timeline struct {
+	Id int
+	Date_time string
+	Machine_id int
+	Status int
+}
+
 type User struct {
 	Id int
 	Name string
@@ -119,5 +126,5 @@ type Telnet_accessibility struct {
 */
 func InitModels() {
 	//orm.RegisterModel(new(Cpu_usage), new(Mem_usage), new(Net_flow), new(Heart_beat), new(Register), new(Ping_accessibility), new(Telnet_accessibility))
-	orm.RegisterModel(new(Register), new(User), new(Role), new(Trace))
+	orm.RegisterModel(new(Register), new(Register_timeline), new(User), new(Role), new(Trace))
 }

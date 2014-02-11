@@ -11,8 +11,10 @@ import (
 
 func init() {
 	registerDB := beego.AppConfig.String("multidb") + "register.db"
+	registerTimelineDB := beego.AppConfig.String("multidb") + "register_timeline.db"
 	adminDB := beego.AppConfig.String("admindb")
 	orm.RegisterDataBase("default", beego.AppConfig.String("dbdriver"), registerDB)
+	orm.RegisterDataBase("register_timeline", beego.AppConfig.String("dbdriver"), registerTimelineDB)
 	orm.RegisterDataBase("admin", beego.AppConfig.String("dbdriver"), adminDB)
 	models.InitModels()
 	controllers.InitControllers()
