@@ -4,9 +4,11 @@ import (
 	"database/sql"
 	"github.com/astaxie/beego/orm"
 	_ "github.com/mattn/go-sqlite3"
+	"big_brother/models"
 	"runtime"
 	"strings"
 	"time"
+	"fmt"
 )
 
 type ApiController struct {
@@ -266,5 +268,19 @@ func (this *ApiController) GetMachineAccessibilityData() {
 	}
 	telnetTimeIndex = latest
 	this.Data["json"] = ResultType{Hardware_addr: hardwareAddr, Date: now.Format("2006-01-02"), Ping_time_index: pingTimeIndex, Ping_results: pingResults, Telnet_time_index: telnetTimeIndex, Telnet_results: telnetResults}
+	this.ServeJson()
+}
+
+func (this *ApiController)GetMachineStatusTimeline() {
+	targetDay := this.GetString("date")
+	o.Using("register_timeline")
+	var registerTimelinePoints []*models.Register_timeline
+	_, err := o.QueryTable("register_timeline").Filter("the_day", targetDay).Limit(-1).OrderBy("the_time").All(&registerTimelinePoints)
+	if err != nil {
+		fmt.Println(err)
+		this.Data["json"] = nil
+	}else{
+		this.Data["json"] = registerTimelinePoints
+	}
 	this.ServeJson()
 }

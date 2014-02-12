@@ -245,7 +245,7 @@ func checkRegisterTablePeriodically(registerDB *sql.DB, registerTimelineDB *sql.
 		}
 		type idStatus struct {
 			Machine_id int
-			Status int
+			Status     int
 		}
 		dataForRegisterTimeline := make([]idStatus, 0, 100)
 		var machineId int
@@ -255,10 +255,13 @@ func checkRegisterTablePeriodically(registerDB *sql.DB, registerTimelineDB *sql.
 			dataForRegisterTimeline = append(dataForRegisterTimeline, idStatus{Machine_id: machineId, Status: status})
 		}
 		rows.Close()
-		dateTimeStr := time.Now().Format("2006-01-02 15:04:05")
+
+		now := time.Now()
+		today := now.Format("2006-01-02")
+		todayTime := util.GetTodayTime(now)
 		for _, item := range dataForRegisterTimeline {
-			sql = "INSERT INTO register_timeline (date_time, machine_id, status) VALUES (?, ?, ?)"
-			_, err = registerTimelineDB.Exec(sql, dateTimeStr, item.Machine_id, item.Status)
+			sql = "INSERT INTO register_timeline (the_day, the_time, machine_id, status) VALUES (?, ?, ?, ?)"
+			_, err = registerTimelineDB.Exec(sql, today, todayTime, item.Machine_id, item.Status)
 			if err != nil {
 				fmt.Println(err)
 			}

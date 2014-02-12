@@ -73,7 +73,8 @@ type Register struct {
 
 type Register_timeline struct {
 	Id int
-	Date_time string
+	The_day string
+	The_time int
 	Machine_id int
 	Status int
 }
