@@ -46,6 +46,7 @@ function start_all()
     CLIENT_DIR="$ROOT/client"
     CLIENT_BIN="$ROOT/client/bin/nsq_client"
     CHECK_NSQD=$( ps aux | grep -v grep | grep $NSQD_BIN | wc -l)
+
     if [ ! -d "$CLIENT_DIR" ]; then
         echo "Not Exist NSQ client source code!"
         exit 1
@@ -55,6 +56,13 @@ function start_all()
         go install nsq_client
         echo "Finish to compile nsq client"
     fi
+
+    # prepare to start nsq client
+    CLIENT_DB_DIR=$CLIENT_DIR/db
+    if [ ! -d "$CLIENT_DB_DIR" ]; then
+        mkdir -p $CLIENT_DB_DIR
+    fi
+
     if [ -f "$CLIENT_BIN" ] && [ $CHECK_NSQD -gt 0 ]; then
         CLIENT_LOG_DIR="/var/log/nsq_client"
         if [ ! -d "$CLIENT_LOG_DIR" ]; then
