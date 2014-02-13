@@ -66,13 +66,18 @@ function start_all()
         exit 1
     fi
 
+    # if nsq_client not started, then try another way!
+    CHECK_CLIENT=$( ps aux | grep -v grep | grep $CLIENT_BIN | wc -l)
+    if [ $CHECK_CLIENT -eq 0 ]; then
+        $CLIENT_BIN --db-path=$CLIENT_DIR/db --lookupd-http-address=127.0.0.1:4161 > $CLIENT_LOG_DIR/client.log 2>&1 &
+    fi
+
     ####################################################################################################################
 
     # start local server webapp
 
     LOCAL_SERVER_WEBAPP_DIR="$ROOT/webapp/local_server"
     LOCAL_SERVER_WEBAPP_BIN="$LOCAL_SERVER_WEBAPP_DIR/src/big_brother/big_brother"
-    CHECK_CLIENT=$( ps aux | grep -v grep | grep $CLIENT_BIN | wc -l)
     if [ ! -d "$LOCAL_SERVER_WEBAPP_DIR" ]; then
         echo "Not Exist local server webapp source code!"
         exit 1
@@ -82,7 +87,7 @@ function start_all()
         go install big_brother
         mv $LOCAL_SERVER_WEBAPP_DIR/bin/big_brother $LOCAL_SERVER_WEBAPP_BIN
     fi
-    if [ -f "$LOCAL_SERVER_WEBAPP_BIN" ] && [ $CHECK_NSQD -gt 0 ] && [ $CHECK_CLIENT -gt "0" ]; then
+    if [ -f "$LOCAL_SERVER_WEBAPP_BIN" ] && [ $CHECK_NSQD -gt 0 ] && [ $CHECK_CLIENT -gt 0 ]; then
         LOCAL_SERVER_WEBAPP_LOG_DIR="/var/log/local_server"
         if [ ! -d "$LOCAL_SERVER_WEBAPP_LOG_DIR" ]; then
             mkdir -p $LOCAL_SERVER_WEBAPP_LOG_DIR
