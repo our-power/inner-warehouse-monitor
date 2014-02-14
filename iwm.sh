@@ -76,6 +76,12 @@ function start_all()
 
     # if nsq_client not started, then try another way!
     CHECK_CLIENT=$( ps aux | grep -v grep | grep $CLIENT_BIN | wc -l)
+
+    if [ $CHECK_CLIENT -eq 0 ]; then
+        ip=$(ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1')
+        $CLIENT_BIN --db-path=$CLIENT_DIR/db --nsqd-tcp-address=$ip:4150 > $CLIENT_LOG_DIR/client.log 2>&1 &
+    fi
+
     if [ $CHECK_CLIENT -eq 0 ]; then
         $CLIENT_BIN --db-path=$CLIENT_DIR/db --lookupd-http-address=127.0.0.1:4161 > $CLIENT_LOG_DIR/client.log 2>&1 &
     fi
