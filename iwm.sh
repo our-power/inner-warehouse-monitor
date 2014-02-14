@@ -99,7 +99,7 @@ function start_all()
         go install big_brother
         mv $LOCAL_SERVER_WEBAPP_DIR/bin/big_brother $LOCAL_SERVER_WEBAPP_BIN
     fi
-    if [ -f "$LOCAL_SERVER_WEBAPP_BIN" ] && [ $CHECK_NSQD -gt 0 ] && [ $CHECK_CLIENT -gt 0 ]; then
+    if [ -f "$LOCAL_SERVER_WEBAPP_BIN" ] && [ $CHECK_NSQD -gt 0 ] && [ $( ps aux | grep -v grep | grep $CLIENT_BIN | wc -l) -gt 0 ]; then
         LOCAL_SERVER_WEBAPP_LOG_DIR="/var/log/local_server"
         if [ ! -d "$LOCAL_SERVER_WEBAPP_LOG_DIR" ]; then
             mkdir -p $LOCAL_SERVER_WEBAPP_LOG_DIR
