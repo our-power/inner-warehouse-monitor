@@ -284,7 +284,8 @@ $(function () {
                 // 加载等待提示
                 loadWaitTips(href, "wait-tips-" + index);
 
-                var machineInChartTitle = $(hardwareAddrList[index]).siblings(".target-machine").text();
+                //var machineInChartTitle = $(hardwareAddrList[index]).siblings(".target-machine").text();
+                var machineInChartTitle = $(hardwareAddrList[index]).text();
                 var machineStatus = $(hardwareAddrList[index]).siblings(".machine-status").text();
                 var req = $.ajax({
                     "type": "get",
