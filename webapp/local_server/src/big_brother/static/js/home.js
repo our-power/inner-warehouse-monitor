@@ -33,7 +33,7 @@ $(document).ready(function () {
         });
     }
 
-    var groups = ["kaipiao@财务开票", "ercifenjian@二次分拣", "dabao@打包", "fenbo@分拨"]
+    var groups = ["kaipiao@财务开票", "ercifenjian@二次分拣", "dabao@打包", "fenbo@分拨", "shouhuo@收货", "fenqu@分区", "guizhong@贵重"]
     for (var i in groups) {
         if (groups.hasOwnProperty(i)) {
             var sp = new Array();
