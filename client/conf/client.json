@@ -1,0 +1,4 @@
+{
+    "ip": "10.24.120.22",
+    "target_url": "http://192.168.2.201:10067/api/receive_availability_data"
+}

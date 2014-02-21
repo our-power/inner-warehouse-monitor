@@ -19,7 +19,16 @@ import (
 	"accessibility"
 	"register"
 	"path"
+	"net/http"
+	"net/url"
+	"io/ioutil"
+	"encoding/json"
 )
+
+type ConfType struct {
+	Ip         string
+	Target_url string
+}
 
 var (
 	showVersion        = flag.Bool("version", false, "print version string")
@@ -234,7 +243,7 @@ func runRegisterToDBClient(rh *register.RegisterToDBHandler) (registerTodb *nsq.
 }
 
 // 定期检测register数据表，将作业机器的运行情况按时间序列存入另一个数据表中，用于前端的可用性展示
-func checkRegisterTablePeriodically(registerDB *sql.DB, registerTimelineDB *sql.DB) {
+func checkRegisterTablePeriodically(registerDB *sql.DB, registerTimelineDB *sql.DB, client *http.Client) {
 	c := time.Tick(1 * time.Minute)
 	for _ = range c {
 		sql := "SELECT id, status FROM register"
@@ -259,12 +268,50 @@ func checkRegisterTablePeriodically(registerDB *sql.DB, registerTimelineDB *sql.
 		now := time.Now()
 		today := now.Format("2006-01-02")
 		todayTime := util.GetTodayTime(now)
+
+		countMapper := map[int]int{
+			// 0:  "已正常关机",
+			0: 0,
+			// 1:  "正常运行中",
+			1: 0,
+			// -1: "运行异常",
+			-1: 0,
+			// -2: "不再使用",
+			-2: 0,
+		}
+
 		for _, item := range dataForRegisterTimeline {
+
+			countMapper[item.Status] += 1
+
 			sql = "INSERT INTO register_timeline (the_day, the_time, machine_id, status) VALUES (?, ?, ?, ?)"
 			_, err = registerTimelineDB.Exec(sql, today, todayTime, item.Machine_id, item.Status)
 			if err != nil {
 				fmt.Println(err)
 			}
+		}
+		// 发送一份统计数据到统一平台
+		conf, err := ioutil.ReadFile("../conf/client.json")
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+		var confContent ConfType
+		err = json.Unmarshal(conf, &confContent)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+		formValue := url.Values{}
+		formValue.Set("ip", confContent.Ip)
+		formValue.Set("the_date", today)
+		formValue.Set("the_time", now.Format("15:04:05"))
+		formValue.Set("running_num", string(countMapper[1]))
+		formValue.Set("shutdown_num", string(countMapper[0]))
+		formValue.Set("abnormal_num", string(countMapper[-1]))
+		_, err = client.PostForm(confContent.Target_url, formValue)
+		if err != nil {
+			fmt.Println(err)
 		}
 	}
 }
@@ -385,13 +432,19 @@ func main() {
 	}
 
 	// 在新goroutine中定期读取register数据表并存储相关数据
+	tr := &http.Transport{
+		// Timeout is set to 10 seconds
+		ResponseHeaderTimeout: time.Second * 10,
+	}
+	client := &http.Client{Transport: tr}
+
 	register_timeline_db_link, err := sql.Open("sqlite3", path.Join(*dbPath, "register_timeline.db"))
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 	util.CreateTable("register_timeline", register_timeline_db_link)
-	go checkRegisterTablePeriodically(register_db_link, register_timeline_db_link)
+	go checkRegisterTablePeriodically(register_db_link, register_timeline_db_link, client)
 
 	finishClients := func() {
 		cuTodb.Stop()
