@@ -3,7 +3,7 @@ package util
 import (
 	"os"
 	"fmt"
-	"time"
+//	"time"
 	"strconv"
 	"strings"
 	"database/sql"
@@ -55,20 +55,20 @@ func (link *DbLink) GetLink(date string, hardware_addr string, indicator string)
 			return nil, err
 		}
 		CreateTable(indicator, newLink)
-		go func() {
-			c := time.Tick(5*time.Minute)
-			for _ = range c {
-				for k, v := range link.Links {
-					// 如果缓存中有非Today的日期，表示已经过期，可以执行延时关闭
-					if !strings.HasPrefix(k, link.Today) {
-						v.Close()
-						fmt.Println(k, "to be deleted")
-						delete(link.Links, k)
-						link.Changing = false
-					}
-				}
-			}
-		}()
+//		go func() {
+//			c := time.Tick(5*time.Minute)
+//			for _ = range c {
+//				for k, v := range link.Links {
+//					// 如果缓存中有非Today的日期，表示已经过期，可以执行延时关闭
+//					if !strings.HasPrefix(k, link.Today) {
+//						v.Close()
+//						fmt.Println(k, "to be deleted")
+//						delete(link.Links, k)
+//						link.Changing = false
+//					}
+//				}
+//			}
+//		}()
 		return newLink, nil
 	}
 	return nil, nil
