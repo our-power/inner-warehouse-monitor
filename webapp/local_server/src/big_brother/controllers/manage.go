@@ -24,6 +24,9 @@ func (this *ManageController) GetManagePage() {
 		"kaipiao":     "财务开票",
 		"dabao":       "打包",
 		"fenbo":       "分拨",
+		"shouhuo": "收货",
+		"fenqu": "分区",
+		"guizhong": "贵重",
 	}
 	this.Data["status_mapper"] = map[int]string{
 		0:  "已正常关机",
