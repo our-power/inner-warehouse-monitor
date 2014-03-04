@@ -45,7 +45,6 @@ function start_all()
 
     CLIENT_DIR="$ROOT/client"
     CLIENT_BIN="$ROOT/client/bin/nsq_client"
-    CHECK_NSQD=$( ps aux | grep -v grep | grep $NSQD_BIN | wc -l)
 
     if [ ! -d "$CLIENT_DIR" ]; then
         echo "Not Exist NSQ client source code!"
@@ -63,7 +62,7 @@ function start_all()
         mkdir -p $CLIENT_DB_DIR
     fi
 
-    if [ -f "$CLIENT_BIN" ] && [ $CHECK_NSQD -gt 0 ]; then
+    if [ -f "$CLIENT_BIN" ] && [ $( ps aux | grep -v grep | grep $NSQD_BIN | wc -l) -gt 0 ]; then
         CLIENT_LOG_DIR="/var/log/nsq_client"
         if [ ! -d "$CLIENT_LOG_DIR" ]; then
             mkdir -p $CLIENT_LOG_DIR
@@ -99,7 +98,7 @@ function start_all()
         go install big_brother
         mv $LOCAL_SERVER_WEBAPP_DIR/bin/big_brother $LOCAL_SERVER_WEBAPP_BIN
     fi
-    if [ -f "$LOCAL_SERVER_WEBAPP_BIN" ] && [ $CHECK_NSQD -gt 0 ] && [ $( ps aux | grep -v grep | grep $CLIENT_BIN | wc -l) -gt 0 ]; then
+    if [ -f "$LOCAL_SERVER_WEBAPP_BIN" ] && [ $( ps aux | grep -v grep | grep $NSQD_BIN | wc -l) -gt 0 ] && [ $( ps aux | grep -v grep | grep $CLIENT_BIN | wc -l) -gt 0 ]; then
         LOCAL_SERVER_WEBAPP_LOG_DIR="/var/log/local_server"
         if [ ! -d "$LOCAL_SERVER_WEBAPP_LOG_DIR" ]; then
             mkdir -p $LOCAL_SERVER_WEBAPP_LOG_DIR
