@@ -3,7 +3,7 @@ package util
 import (
 	"os"
 	"fmt"
-//	"time"
+	"time"
 	"strconv"
 	"strings"
 	"database/sql"
@@ -14,7 +14,7 @@ import (
 type DbLink struct {
 	Today    string
 	Changing bool
-	DbPath string
+	DbPath   string
 	Links map[string]*sql.DB
 }
 
@@ -40,36 +40,65 @@ func (link *DbLink) GetLink(date string, hardware_addr string, indicator string)
 		// 否则为新的日期打开新的数据库连接，并延时关闭原有日期对应的数据库连接，且删除其在本结构体中的注册条目
 		var dbPath, dbSourceName string
 		dbPath = path.Join(link.DbPath, date, strings.Replace(hardware_addr, ":", "_", -1))
-		dbSourceName = path.Join(dbPath, indicator + ".db")
-		os.MkdirAll(dbPath, 0666)
-		link.Changing = true
-		inComingDate, _ := strconv.Atoi(date)
-		currentDate, _ := strconv.Atoi(link.Today)
-		if inComingDate > currentDate {
-			// 仅当后来的日期比保存的日期更晚时，更新结构体中的Today值
-			link.Today = date
+		dbSourceName = path.Join(dbPath, indicator+".db")
+		// equivalent to Python's `if not os.path.exists(filename)`
+		if _, err := os.Stat(dbSourceName); os.IsNotExist(err) {
+			os.MkdirAll(dbPath, 0666)
+			link.Changing = true
+			inComingDate, _ := strconv.Atoi(date)
+			currentDate, _ := strconv.Atoi(link.Today)
+			if inComingDate > currentDate {
+				// 仅当后来的日期比保存的日期更晚时，更新结构体中的Today值
+				link.Today = date
+			}
+			newLink, err := sql.Open("sqlite3", dbSourceName)
+			link.Links[key] = newLink
+			if err != nil {
+				return nil, err
+			}
+			CreateTable(indicator, newLink)
+			go func() {
+				theDate, _ := time.Parse("20060102", date)
+				preDate := time.Unix(theDate.Unix()-86400, 0).Format("20060102")
+				preDateLinkKey := preDate + "_" + hardware_addr
+				preDateLink, ok := link.Links[preDateLinkKey]
+				if ok {
+					preDateLink.Close()
+					delete(link.Links, preDateLinkKey)
+					fmt.Println(preDateLinkKey, "to be deleted")
+				}
+			}()
+			link.Changing = false
+			//		for k, v := range link.Links {
+			//					// 如果缓存中有非Today的日期，表示已经过期，可以执行延时关闭
+			//					if !strings.HasPrefix(k, link.Today) {
+			//						v.Close()
+			//						fmt.Println(k, "to be deleted")
+			//						delete(link.Links, k)
+			//						link.Changing = false
+			//					}
+			//				}
+			//			}
+			//		}()
+			return newLink, nil
+		} else {
+			link.Changing = true
+			oldLink, err := sql.Open("sqlite3", dbSourceName)
+			link.Links[key] = oldLink
+			if err != nil {
+				return nil, err
+			}
+			go func() {
+				c := time.Tick(10*time.Minute)
+				for _ = range c {
+					oldLink.Close()
+					delete(link.Links, key)
+					fmt.Println(key, "to be deleted")
+				}
+			}()
+			link.Changing = false
+			return oldLink, nil
 		}
-		newLink, err := sql.Open("sqlite3", dbSourceName)
-		link.Links[key] = newLink
-		if err != nil {
-			return nil, err
-		}
-		CreateTable(indicator, newLink)
-//		go func() {
-//			c := time.Tick(5*time.Minute)
-//			for _ = range c {
-//				for k, v := range link.Links {
-//					// 如果缓存中有非Today的日期，表示已经过期，可以执行延时关闭
-//					if !strings.HasPrefix(k, link.Today) {
-//						v.Close()
-//						fmt.Println(k, "to be deleted")
-//						delete(link.Links, k)
-//						link.Changing = false
-//					}
-//				}
-//			}
-//		}()
-		return newLink, nil
 	}
 	return nil, nil
 }
